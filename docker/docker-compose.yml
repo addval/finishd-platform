@@ -1,0 +1,104 @@
+# Docker Compose Configuration
+# Development environment orchestration
+
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:16-alpine
+    container_name: rituality-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: rituality
+      POSTGRES_PASSWORD: rituality123
+      POSTGRES_DB: rituality_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U rituality"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - rituality-network
+
+  # Redis (Caching)
+  redis:
+    image: redis:7-alpine
+    container_name: rituality-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - rituality-network
+
+  # Backend API
+  backend:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.backend
+    container_name: rituality-backend
+    restart: unless-stopped
+    environment:
+      NODE_ENV: development
+      PORT: 3000
+      DATABASE_URL: postgresql://rituality:rituality123@postgres:5432/rituality_db
+      REDIS_URL: redis://redis:6379
+      JWT_SECRET: ${JWT_SECRET}
+      CORS_ORIGIN: http://localhost:5173
+    ports:
+      - "3000:3000"
+    volumes:
+      - ../apps/backend:/app
+      - /app/node_modules
+      - /app/dist
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - rituality-network
+    command: pnpm run dev
+
+  # Frontend
+  frontend:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.frontend
+    container_name: rituality-frontend
+    restart: unless-stopped
+    environment:
+      VITE_API_URL: http://localhost:3000
+    ports:
+      - "5173:5173"
+    volumes:
+      - ../apps/frontend:/app
+      - /app/node_modules
+      - /app/dist
+    depends_on:
+      - backend
+    networks:
+      - rituality-network
+    command: pnpm run dev
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+
+networks:
+  rituality-network:
+    driver: bridge

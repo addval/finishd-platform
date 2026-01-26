@@ -1,0 +1,54 @@
+{
+  "name": "rituality-platform",
+  "version": "1.0.0",
+  "description": "Full-stack Node.js, React, PostgreSQL application with monorepo architecture",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "concurrently \"pnpm --filter backend dev\" \"pnpm --filter frontend dev\"",
+    "dev:backend": "pnpm --filter backend dev",
+    "dev:frontend": "pnpm --filter frontend dev",
+    "build": "pnpm --filter './apps/**' build",
+    "build:backend": "pnpm --filter backend build",
+    "build:frontend": "pnpm --filter frontend build",
+    "test": "pnpm --filter './apps/**' test",
+    "test:coverage": "pnpm --filter './apps/**' test:coverage",
+    "lint": "biome check .",
+    "lint:fix": "biome check --write .",
+    "format": "biome format --write .",
+    "format:check": "biome format --check .",
+    "check": "biome check --write .",
+    "clean": "pnpm --filter './apps/**' clean && pnpm --filter './packages/**' clean",
+    "type-check": "pnpm --filter './apps/**' type-check",
+    "migrate": "pnpm --filter backend migrate",
+    "seed": "pnpm --filter backend seed",
+    "reset": "pnpm --filter backend reset",
+    "migrate:undo": "pnpm --filter backend npx sequelize-cli db:migrate:undo --options-path .sequelizerc",
+    "migrate:undo:all": "pnpm --filter backend npx sequelize-cli db:migrate:undo:all --options-path .sequelizerc",
+    "seed:undo": "pnpm --filter backend npx sequelize-cli db:seed:undo:all --options-path .sequelizerc"
+  },
+  "keywords": [
+    "monorepo",
+    "nodejs",
+    "react",
+    "typescript",
+    "express",
+    "sequelize",
+    "postgresql",
+    "vitest",
+    "biome"
+  ],
+  "author": "Rituality Platform Team",
+  "license": "MIT",
+  "devDependencies": {
+    "@biomejs/biome": "^2.3.11",
+    "@types/node": "^22.10.0",
+    "concurrently": "^9.1.2",
+    "typescript": "^5.9.3"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=8.0.0"
+  },
+  "packageManager": "pnpm@8.12.0"
+}

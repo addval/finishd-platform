@@ -1,0 +1,2 @@
+# Email templates (server-side templates with {{}} interpolation)
+apps/backend/src/email-templates/
