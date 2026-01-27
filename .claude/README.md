@@ -12,7 +12,7 @@ This directory contains world-class Claude Skills tailored for a Node.js, React,
     ├── backend-api-development/       # Express.js, TypeScript, Sequelize
     ├── database-schema-migrations/    # PostgreSQL, Sequelize migrations
     ├── react-component-development/   # React, TypeScript, Hooks
-    ├── code-quality-testing/          # Vitest, ESLint, Prettier
+    ├── code-quality-testing/          # Vitest, Biome
     └── git-workflow/                  # Conventional commits, PRs
 ```
 
@@ -85,12 +85,12 @@ Builds modern React components with TypeScript and hooks.
 ### 4. Code Quality & Testing
 **Location**: `.claude/skills/code-quality-testing/`
 
-Ensures code quality using Vitest, ESLint, and Prettier.
+Ensures code quality using Vitest and Biome.
 
 **What it does**:
 - Generates Vitest tests for React and backend
 - Creates unit and integration tests
-- Sets up ESLint and Prettier configurations
+- Sets up Biome configuration
 - Enforces TypeScript strict mode
 - Provides testing best practices
 
@@ -214,8 +214,7 @@ See `CLAUDE.md` for:
 
 ### Recommended VS Code Extensions
 
-- ESLint
-- Prettier
+- Biome
 - TypeScript Vue Plugin (if using Vue)
 - Vitest
 - GitLens

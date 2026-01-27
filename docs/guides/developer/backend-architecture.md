@@ -285,7 +285,7 @@ Reusable utility functions and helpers.
 | **Authentication** | JWT | - | Token-based auth |
 | **Validation** | Joi/Zod | - | Request validation |
 | **Testing** | Jest | - | Unit/integration tests |
-| **Code Quality** | ESLint, Prettier | - | Linting and formatting |
+| **Code Quality** | Biome | - | Linting and formatting |
 
 ---
 

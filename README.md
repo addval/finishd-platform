@@ -28,7 +28,7 @@
 - **Monorepo**: pnpm workspaces
 - **Containerization**: Docker + Docker Compose
 - **CI/CD**: GitHub Actions
-- **Code Quality**: ESLint + Prettier
+- **Code Quality**: Biome
 - **Version Control**: Git with conventional commits
 
 ## 📁 Project Structure
@@ -42,7 +42,7 @@ rituality-platform/
 ├── packages/                  # Shared packages
 │   ├── shared-types/          # TypeScript types
 │   ├── shared-utils/          # Utility functions
-│   └── eslint-config/         # ESLint config
+│   └── biome-config/          # Biome config
 ├── docker/                    # Docker configuration
 ├── docs/                      # Documentation
 ├── .github/workflows/         # CI/CD pipelines
@@ -231,8 +231,7 @@ We maintain high code quality standards:
 
 - **80%+ test coverage**
 - **TypeScript strict mode**
-- **ESLint** for linting
-- **Prettier** for formatting
+- **Biome** for linting and formatting
 - **Automated CI/CD** checks
 - **Code review** required
 

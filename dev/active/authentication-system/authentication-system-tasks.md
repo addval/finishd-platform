@@ -497,7 +497,7 @@
 - [ ] Remove TODO comments
 - [ ] Add JSDoc comments to public methods
 - [ ] Ensure no TypeScript errors
-- [ ] Ensure no ESLint warnings
+- [ ] Ensure no Biome warnings
 - [ ] Run Prettier on all files
 - [ ] Add gitignore patterns for .env, logs
 

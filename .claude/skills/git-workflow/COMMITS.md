@@ -196,7 +196,7 @@ Reduces database load by 60%.
 ci(github): add automated testing workflow
 
 Implement GitHub Actions workflow that runs on every push:
-- Linting with ESLint
+- Linting with Biome
 - Type checking with TypeScript
 - Unit tests with Vitest
 - Integration tests with test database

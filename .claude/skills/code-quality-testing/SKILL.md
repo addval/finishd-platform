@@ -1,6 +1,6 @@
 ---
 name: code-quality-testing
-description: Generate Vitest tests for React components and backend services, ESLint/Prettier configurations, and TypeScript strict mode enforcement. Use when writing tests, linting code, or ensuring code quality standards.
+description: Generate Vitest tests for React components and backend services, Biome configurations, and TypeScript strict mode enforcement. Use when writing tests, linting code, or ensuring code quality standards.
 allowed-tools:
   - Read
   - Write
@@ -21,8 +21,7 @@ This project uses:
 - **React Testing Library** - Test React components
 - **@testing-library/react** - For React component testing
 - **@testing-library/user-event** - Simulate user interactions
-- **ESLint** - Linting for JavaScript/TypeScript
-- **Prettier** - Code formatting
+- **Biome** - Linting and formatting for JavaScript/TypeScript
 
 ## Configuration Files
 
@@ -763,49 +762,46 @@ npm run test:backend
 
 ## Code Quality Tools
 
-### ESLint Configuration
+### Biome Configuration
 
 ```json
-// .eslintrc.json
+// biome.json
 {
-  "extends": [
-    "eslint:recommended",
-    "plugin:@typescript-eslint/recommended",
-    "plugin:react/recommended",
-    "plugin:react-hooks/recommended",
-    "prettier"
-  ],
-  "parser": "@typescript-eslint/parser",
-  "plugins": ["@typescript-eslint", "react", "react-hooks"],
-  "rules": {
-    "react/react-in-jsx-scope": "off",
-    "@typescript-eslint/no-unused-vars": ["error", { "argsIgnorePattern": "^_" }],
-    "@typescript-eslint/explicit-function-return-type": "warn",
-    "@typescript-eslint/no-explicit-any": "warn",
-    "react-hooks/rules-of-hooks": "error",
-    "react-hooks/exhaustive-deps": "warn"
+  "$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
+  "organizeImports": {
+    "enabled": true
   },
-  "settings": {
-    "react": {
-      "version": "detect"
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "recommended": true,
+      "correctness": {
+        "noUnusedVariables": "error",
+        "noUnusedImports": "error"
+      },
+      "suspicious": {
+        "noExplicitAny": "warn"
+      },
+      "style": {
+        "useConst": "error",
+        "noNonNullAssertion": "warn"
+      }
+    }
+  },
+  "formatter": {
+    "enabled": true,
+    "indentStyle": "space",
+    "indentWidth": 2,
+    "lineWidth": 100
+  },
+  "javascript": {
+    "formatter": {
+      "semicolons": "always",
+      "quoteStyle": "single",
+      "trailingCommas": "es5",
+      "arrowParentheses": "always"
     }
   }
-}
-```
-
-### Prettier Configuration
-
-```json
-// .prettierrc
-{
-  "semi": true,
-  "trailingComma": "es5",
-  "singleQuote": true,
-  "printWidth": 100,
-  "tabWidth": 2,
-  "useTabs": false,
-  "arrowParens": "always",
-  "endOfLine": "lf"
 }
 ```
 
