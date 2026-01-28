@@ -1,12 +1,8 @@
-# pnpm Workspace Configuration
-# Defines workspace packages for monorepo management
-
 packages:
-  # Backend application
-  - 'apps/backend'
+  - apps/backend
+  - apps/frontend
+  - packages/*
 
-  # Frontend application
-  - 'apps/frontend'
-
-  # Shared packages
-  - 'packages/*'
+ignoredBuiltDependencies:
+  - bcrypt
+  - esbuild
