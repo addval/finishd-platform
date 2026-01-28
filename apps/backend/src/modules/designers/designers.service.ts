@@ -10,6 +10,7 @@ import {
   type DesignerProfile,
   type NewDesignerProfile,
 } from "../../db/index.js"
+import { indexDesigner } from "../search/search.service.js"
 
 // ============================================================================
 // PROFILE OPERATIONS
@@ -60,6 +61,9 @@ export async function createDesignerProfile(
       .values({ ...data, userId })
       .returning()
 
+    // Index in Typesense (async, don't await)
+    indexDesigner(profiles[0]).catch((err) => console.error("[Designers] Index failed:", err))
+
     return { success: true, profile: profiles[0] }
   } catch (error) {
     console.error("[Designers] Failed to create profile:", error)
@@ -84,6 +88,9 @@ export async function updateDesignerProfile(
     if (profiles.length === 0) {
       return { success: false, error: "Profile not found" }
     }
+
+    // Re-index in Typesense (async, don't await)
+    indexDesigner(profiles[0]).catch((err) => console.error("[Designers] Index failed:", err))
 
     return { success: true, profile: profiles[0] }
   } catch (error) {
@@ -233,6 +240,9 @@ export async function verifyDesigner(
     if (profiles.length === 0) {
       return { success: false, error: "Designer not found" }
     }
+
+    // Re-index in Typesense (now verified, will appear in search)
+    indexDesigner(profiles[0]).catch((err) => console.error("[Designers] Index failed:", err))
 
     return { success: true, profile: profiles[0] }
   } catch (error) {

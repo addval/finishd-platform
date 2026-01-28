@@ -2,11 +2,11 @@
 
 ## SESSION PROGRESS (2026-01-28)
 
-### Current Status: PHASE 1 COMPLETE, STARTING PHASE 2
+### Current Status: PHASE 2 COMPLETE, READY FOR PHASE 3
 
 **Session Goal:** Build Finishd marketplace backend foundation
 
-### Completed This Session (Phase 1)
+### Completed This Session (Phase 1 + Phase 2)
 - [x] Read and analyzed PRD documents
 - [x] Reviewed existing codebase structure
 - [x] Created dev docs (plan, tasks, context)
@@ -15,10 +15,11 @@
 - [x] Implemented phone OTP authentication module
 - [x] Created user/profile CRUD for all user types
 - [x] Implemented file upload endpoint
-
-### In Progress (Phase 2)
-- [ ] Typesense integration for search
-- [ ] Projects module with state machine
+- [x] Typesense integration for search (designers/contractors)
+- [x] Projects module with state machine
+- [x] Requests & proposals workflow
+- [x] Tasks, milestones, costs management
+- [x] Activity logging
 
 ### Blockers
 - None currently
@@ -53,6 +54,27 @@
 - `apps/backend/src/modules/upload/upload.service.ts` - File handling
 - `apps/backend/src/modules/upload/upload.controller.ts` - HTTP handlers
 - `apps/backend/src/modules/upload/upload.routes.ts` - API routes
+
+### Search Module (NEW)
+- `apps/backend/src/modules/search/typesense.config.ts` - Typesense client & collections
+- `apps/backend/src/modules/search/search.service.ts` - Index & search operations
+- `apps/backend/src/modules/search/search.controller.ts` - HTTP handlers
+- `apps/backend/src/modules/search/search.routes.ts` - API routes
+
+### Projects Module (NEW)
+- `apps/backend/src/modules/projects/projects.service.ts` - Project CRUD & state machine
+- `apps/backend/src/modules/projects/projects.controller.ts` - HTTP handlers
+- `apps/backend/src/modules/projects/projects.routes.ts` - API routes
+
+### Requests Module (NEW)
+- `apps/backend/src/modules/requests/requests.service.ts` - Requests & proposals workflow
+- `apps/backend/src/modules/requests/requests.controller.ts` - HTTP handlers
+- `apps/backend/src/modules/requests/requests.routes.ts` - API routes
+
+### Tasks Module (NEW)
+- `apps/backend/src/modules/tasks/tasks.service.ts` - Tasks, milestones, costs
+- `apps/backend/src/modules/tasks/tasks.controller.ts` - HTTP handlers
+- `apps/backend/src/modules/tasks/tasks.routes.ts` - API routes
 
 ### Configuration
 - `docker/docker-compose.yml` - Added Typesense, updated naming
@@ -102,6 +124,56 @@
 - `POST /multiple` - Upload multiple files
 - `DELETE /` - Delete file
 
+### Search (/api/v1/search) - NEW
+- `GET /designers` - Typesense search for designers
+- `GET /contractors` - Typesense search for contractors
+
+### Projects (/api/v1/projects) - NEW
+- `GET /` - List homeowner's projects
+- `POST /` - Create new project
+- `GET /designer` - List designer's assigned projects
+- `GET /:id` - Get project details
+- `PATCH /:id` - Update project (draft only)
+- `POST /:id/complete` - Mark project completed
+- `POST /:id/cancel` - Cancel project
+- `GET /:id/activity` - Get activity log
+
+### Requests (/api/v1/requests) - NEW
+- `POST /` - Send request to designer (homeowner)
+- `GET /project/:projectId` - Get requests for project
+- `GET /project/:projectId/proposals` - Get proposals for project
+- `POST /proposals/:proposalId/accept` - Accept proposal
+- `POST /proposals/:proposalId/reject` - Reject proposal
+- `GET /designer` - Get requests for designer
+- `GET /:requestId` - Get request details (designer)
+- `POST /:requestId/decline` - Decline request
+- `POST /:requestId/proposal` - Submit proposal
+
+### Tasks & Milestones (/api/v1) - NEW
+- `POST /projects/:projectId/tasks` - Create task
+- `GET /projects/:projectId/tasks` - Get tasks
+- `PATCH /tasks/:taskId` - Update task
+- `PATCH /tasks/:taskId/status` - Update task status
+- `DELETE /tasks/:taskId` - Delete task
+- `POST /projects/:projectId/milestones` - Create milestone
+- `GET /projects/:projectId/milestones` - Get milestones
+- `PATCH /milestones/:milestoneId` - Update milestone
+- `PATCH /milestones/:milestoneId/status` - Update status
+- `PATCH /milestones/:milestoneId/payment` - Update payment
+- `DELETE /milestones/:milestoneId` - Delete milestone
+- `POST /projects/:projectId/costs` - Create cost estimate
+- `GET /projects/:projectId/costs` - Get cost estimates with summary
+- `PATCH /costs/:costEstimateId` - Update cost estimate
+- `DELETE /costs/:costEstimateId` - Delete cost estimate
+
+## Project State Machine
+
+Valid transitions:
+- `draft` → `seeking_designer` (when first request sent)
+- `seeking_designer` → `in_progress` (when proposal accepted)
+- `in_progress` → `completed` (when project finished)
+- Any state → `cancelled` (homeowner can cancel)
+
 ## Database Tables (Drizzle Schema)
 
 1. `users` - Base user accounts (phone, user_type, language)
@@ -138,16 +210,20 @@
 - `uploads/` directory for dev
 - Abstract behind interface for S3 later
 
+### 5. Typesense Integration
+- Auto-indexes designers/contractors on create/update/verify
+- Collections: finishd_designers, finishd_contractors
+- Search supports filters: city, styles, budget, trades
+
 ## Quick Resume
 
 ### To Continue Implementation:
 
-**Next Steps (Phase 2):**
-1. Set up Typesense client configuration
-2. Create designer/contractor search collections
-3. Implement sync hooks for data updates
-4. Build projects module with state machine
-5. Implement requests & proposals workflow
+**Next Steps (Phase 3):**
+1. Set up frontend with Vite + React + shadcn/ui
+2. Configure TanStack Query for API calls
+3. Set up Zustand for state management
+4. Create base layout components
 
 **Commands:**
 ```bash
@@ -170,19 +246,19 @@ cd apps/backend && pnpm dev
 ### Current Priority
 
 **HIGH PRIORITY (Continue):**
-1. Typesense search integration
-2. Projects module with state machine
-3. Requests & proposals workflow
+1. Frontend foundation (React + shadcn/ui)
+2. Auth screens (OTP flow)
+3. Onboarding screens
 
 **MEDIUM PRIORITY:**
-1. Tasks, milestones, costs
-2. Activity logging
-3. Contractor invitations/quotes
+1. Designer/contractor browse screens
+2. Project creation flow
+3. Dashboard screens
 
 **LOW PRIORITY:**
-1. Frontend components
-2. Testing
-3. Seed data
+1. Testing
+2. Seed data
+3. Production deployment
 
 ## Environment Setup
 
@@ -204,6 +280,15 @@ curl -X POST http://localhost:3000/api/v1/auth/verify-otp \
   -d '{"phone":"9876543210","otp":"123456"}'
 ```
 
+### Test Project Flow
+```bash
+# Create project (with auth token)
+curl -X POST http://localhost:3000/api/v1/projects \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <token>" \
+  -d '{"title":"Living Room Renovation","scope":"partial"}'
+```
+
 ## Notes
 
 - Phone numbers stored in E.164 format (+91XXXXXXXXXX)
@@ -216,4 +301,4 @@ curl -X POST http://localhost:3000/api/v1/auth/verify-otp \
 
 **Document Status:** Active
 **Last Updated:** 2026-01-28
-**Next Update:** After completing Typesense integration
+**Next Update:** After setting up frontend foundation

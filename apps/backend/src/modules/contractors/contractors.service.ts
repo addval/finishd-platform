@@ -10,6 +10,7 @@ import {
   type ContractorProfile,
   type NewContractorProfile,
 } from "../../db/index.js"
+import { indexContractor } from "../search/search.service.js"
 
 // ============================================================================
 // PROFILE OPERATIONS
@@ -59,6 +60,9 @@ export async function createContractorProfile(
       .values({ ...data, userId })
       .returning()
 
+    // Index in Typesense (async, don't await)
+    indexContractor(profiles[0]).catch((err) => console.error("[Contractors] Index failed:", err))
+
     return { success: true, profile: profiles[0] }
   } catch (error) {
     console.error("[Contractors] Failed to create profile:", error)
@@ -83,6 +87,9 @@ export async function updateContractorProfile(
     if (profiles.length === 0) {
       return { success: false, error: "Profile not found" }
     }
+
+    // Re-index in Typesense (async, don't await)
+    indexContractor(profiles[0]).catch((err) => console.error("[Contractors] Re-index failed:", err))
 
     return { success: true, profile: profiles[0] }
   } catch (error) {
@@ -205,6 +212,9 @@ export async function verifyContractor(
     if (profiles.length === 0) {
       return { success: false, error: "Contractor not found" }
     }
+
+    // Index verified contractor in Typesense (async, don't await)
+    indexContractor(profiles[0]).catch((err) => console.error("[Contractors] Index verified failed:", err))
 
     return { success: true, profile: profiles[0] }
   } catch (error) {

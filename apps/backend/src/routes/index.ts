@@ -25,6 +25,10 @@ import { homeownersRoutes } from "../modules/homeowners/index.js"
 import { designersRoutes } from "../modules/designers/index.js"
 import { contractorsRoutes } from "../modules/contractors/index.js"
 import { uploadRoutes } from "../modules/upload/index.js"
+import { searchRoutes } from "../modules/search/index.js"
+import { projectsRoutes } from "../modules/projects/index.js"
+import { requestsRoutes } from "../modules/requests/index.js"
+import { tasksRoutes } from "../modules/tasks/index.js"
 
 const router = Router()
 
@@ -46,9 +50,17 @@ router.use("/api/v1/contractors", contractorsRoutes)
 // File upload routes
 router.use("/api/v1/upload", uploadRoutes)
 
-// TODO: Add these routes as they are implemented
-// router.use("/api/v1/projects", projectsRoutes)
-// router.use("/api/v1/search", searchRoutes)
+// Search routes (Typesense)
+router.use("/api/v1/search", searchRoutes)
+
+// Project routes
+router.use("/api/v1/projects", projectsRoutes)
+
+// Requests & proposals routes
+router.use("/api/v1/requests", requestsRoutes)
+
+// Tasks, milestones, costs routes
+router.use("/api/v1", tasksRoutes)
 
 // ============================================================================
 // LEGACY ROUTES (to be deprecated)
