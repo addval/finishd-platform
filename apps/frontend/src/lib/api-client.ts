@@ -13,7 +13,7 @@ import {
 } from "./token-manager"
 
 // Get API URL from environment
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3001"
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000"
 
 // Create axios instance
 export const apiClient = axios.create({
@@ -117,17 +117,17 @@ apiClient.interceptors.response.use(
       const refreshToken = getRefreshToken()
       const deviceId = getDeviceId()
 
-      const response = await axios.post(`${API_URL}/auth/refresh-token`, {
+      // Try Finishd API first, fall back to legacy
+      const response = await axios.post(`${API_URL}/api/v1/auth/refresh-token`, {
         refreshToken,
-        deviceId,
       })
 
-      const { accessToken, refreshToken: newRefreshToken } = response.data.data.tokens
+      const { accessToken } = response.data.data
 
-      // Update stored tokens
+      // Update stored tokens (Finishd API returns only accessToken)
       setTokens({
         accessToken,
-        refreshToken: newRefreshToken,
+        refreshToken: refreshToken || "",
         deviceId: deviceId || "",
       })
 
@@ -144,7 +144,12 @@ apiClient.interceptors.response.use(
       // Refresh failed, clear tokens and redirect to login
       processQueue(refreshError as Error, null)
       clearTokens()
-      window.location.href = "/login"
+      // Check if we're in Finishd context
+      if (window.location.pathname.startsWith("/finishd")) {
+        window.location.href = "/finishd/login"
+      } else {
+        window.location.href = "/login"
+      }
       return Promise.reject(refreshError)
     } finally {
       isRefreshing = false

@@ -13,8 +13,12 @@ import { ProfileCreationScreen } from "@/features/profile/pages/createProfile"
 import { AppLayout } from "@/layout/AppLayout"
 import { AuthLayout } from "@/layout/AuthLayout"
 import { ProtectedRoute } from "@/routes/ProtectedRoute"
+import { finishdRoutes } from "@/features/finishd"
 
 export const router = createBrowserRouter([
+  // Finishd routes (phone OTP auth)
+  ...finishdRoutes,
+
   {
     path: "/",
     element: (
