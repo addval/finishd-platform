@@ -9,11 +9,17 @@ import dotenv from "dotenv"
 dotenv.config()
 
 import { createServer } from "node:http"
+import path from "node:path"
+import { fileURLToPath } from "node:url"
 import compression from "compression"
 import cors from "cors"
 import express, { type Application } from "express"
 import helmet from "helmet"
 import type { HttpServerType } from "./types/index.js"
+
+// Get __dirname equivalent for ES modules
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
 
 class Server {
   private app: Application
@@ -46,6 +52,10 @@ class Server {
 
     // Compression middleware
     this.app.use(compression())
+
+    // Static file serving for uploads
+    const uploadsDir = process.env.UPLOAD_DIR || path.join(__dirname, "..", "uploads")
+    this.app.use("/uploads", express.static(uploadsDir))
 
     // Request logging
     this.app.use(requestLogger)
