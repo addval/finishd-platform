@@ -6,8 +6,7 @@
   "type": "module",
   "main": "dist/server.js",
   "scripts": {
-    "dev": "tsx watch src/server.ts",
-    "start:dev": "nodemon",
+    "dev": "nodemon",
     "build": "tsc",
     "start": "node dist/server.js",
     "test": "vitest",
@@ -50,6 +49,7 @@
     "@types/jsonwebtoken": "^9.0.5",
     "@types/multer": "^1.4.12",
     "@types/node": "^22.10.0",
+    "@types/pg": "^8.16.0",
     "@vitest/coverage-v8": "^4.0.16",
     "drizzle-kit": "^0.30.0",
     "nodemon": "^3.1.7",

@@ -95,17 +95,17 @@ class Server {
 
   public async start(): Promise<void> {
     try {
-      // Import database and logger
-      const { testConnection } = await import("./db/index.js")
+      // Import database and logger using dynamic import for CommonJS modules
+      const { initDatabase } = await import("./config/database.js")
       const { default: logger } = await import("./utils/logger.js")
 
       // Initialize all middlewares
       await this.initializeMiddlewares()
-      await this.initializeRoutes()
+      await this.initializeRoutes() // Add await here
       await this.initializeErrorHandling()
 
-      // Test database connection
-      await testConnection()
+      // Initialize database
+      await initDatabase()
 
       // Initialize Redis (optional)
       if (process.env.REDIS_URL) {
@@ -137,9 +137,8 @@ class Server {
       this.httpServer.close(async () => {
         try {
           // Close database connection
-          const { closeConnection } = await import("./db/index.js")
-          await closeConnection()
-          logger.info("Database connection closed")
+          const { closeDatabase } = await import("./config/database.js")
+          await closeDatabase()
 
           // Close Redis connection
           if (process.env.REDIS_URL) {

@@ -17,16 +17,16 @@ export function FinishdProtectedRoute({
   children,
   requireUserType = false,
 }: FinishdProtectedRouteProps) {
-  const { isAuthenticated, needsOnboarding, getUserType } = useFinishdAuthStore()
+  const { user, isAuthenticated, needsOnboarding, getUserType } = useFinishdAuthStore()
 
   // Not authenticated - redirect to login
   if (!isAuthenticated()) {
-    return <Navigate to="/login" replace />
+    return <Navigate to="/finishd/login" replace />
   }
 
   // Authenticated but needs onboarding (no user type)
   if (needsOnboarding() && requireUserType) {
-    return <Navigate to="/onboarding" replace />
+    return <Navigate to="/finishd/onboarding" replace />
   }
 
   // Check specific user type requirement
@@ -34,7 +34,7 @@ export function FinishdProtectedRoute({
     const currentUserType = getUserType()
     if (currentUserType !== requireUserType) {
       // Redirect to dashboard if wrong user type
-      return <Navigate to="/dashboard" replace />
+      return <Navigate to="/finishd/dashboard" replace />
     }
   }
 

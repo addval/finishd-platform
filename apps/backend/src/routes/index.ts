@@ -5,11 +5,20 @@
  * Route Structure:
  * - Public routes (no auth): /api/v1/auth/*
  * - Protected routes (auth required): /api/v1/users/*, /api/v1/homeowners/*, etc.
+ *
+ * Legacy routes (to be deprecated):
+ * - /auth/* - Old auth routes
+ * - /api/* - Old API routes
  */
 
 import { Router } from "express"
 
-// Finishd routes (v1)
+// Legacy routes removed - migrated to Drizzle ORM
+// import authProtectedRoutes from "./auth.protected.routes.js"
+// import authPublicRoutes from "./auth.public.routes.js"
+// import userRoutes from "./user.routes.js"
+
+// New Finishd routes (v1)
 import { authRoutes } from "../modules/auth/index.js"
 import { usersRoutes } from "../modules/users/index.js"
 import { homeownersRoutes } from "../modules/homeowners/index.js"
@@ -52,6 +61,12 @@ router.use("/api/v1/requests", requestsRoutes)
 
 // Tasks, milestones, costs routes
 router.use("/api/v1", tasksRoutes)
+
+// ============================================================================
+// LEGACY ROUTES (removed - migrated to Drizzle ORM)
+// ============================================================================
+// Legacy Sequelize-based routes have been removed.
+// Use /api/v1/* routes instead.
 
 // ============================================================================
 // HEALTH CHECK

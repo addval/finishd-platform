@@ -32,7 +32,8 @@ export async function getHomeownerProfile(userId: string): Promise<HomeownerProf
 }
 
 /**
- * Create homeowner profile
+ * Create or update homeowner profile
+ * Uses upsert pattern - if profile exists (e.g., placeholder from user type selection), update it
  */
 export async function createHomeownerProfile(
   userId: string,
@@ -42,9 +43,16 @@ export async function createHomeownerProfile(
     // Check if profile already exists
     const existing = await getHomeownerProfile(userId)
     if (existing) {
-      return { success: false, error: "Profile already exists" }
+      // Profile exists (could be placeholder from setUserType), update it
+      const profiles = await db
+        .update(homeownerProfiles)
+        .set({ ...data, updatedAt: new Date() })
+        .where(eq(homeownerProfiles.userId, userId))
+        .returning()
+      return { success: true, profile: profiles[0] }
     }
 
+    // Create new profile
     const profiles = await db
       .insert(homeownerProfiles)
       .values({ ...data, userId })

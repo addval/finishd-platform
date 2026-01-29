@@ -13,9 +13,7 @@ import {
 } from "./token-manager"
 
 // Get API URL from environment
-// In development, use empty string to leverage Vite proxy
-// In production, use the configured VITE_API_URL
-const API_URL = import.meta.env.VITE_API_URL || ""
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000"
 
 // Create axios instance
 export const apiClient = axios.create({
@@ -119,8 +117,8 @@ apiClient.interceptors.response.use(
       const refreshToken = getRefreshToken()
       const deviceId = getDeviceId()
 
-      // Use relative URL to go through Vite proxy in development
-      const response = await axios.post("/api/v1/auth/refresh-token", {
+      // Try Finishd API first, fall back to legacy
+      const response = await axios.post(`${API_URL}/api/v1/auth/refresh-token`, {
         refreshToken,
       })
 
@@ -146,7 +144,12 @@ apiClient.interceptors.response.use(
       // Refresh failed, clear tokens and redirect to login
       processQueue(refreshError as Error, null)
       clearTokens()
-      window.location.href = "/login"
+      // Check if we're in Finishd context
+      if (window.location.pathname.startsWith("/finishd")) {
+        window.location.href = "/finishd/login"
+      } else {
+        window.location.href = "/login"
+      }
       return Promise.reject(refreshError)
     } finally {
       isRefreshing = false
