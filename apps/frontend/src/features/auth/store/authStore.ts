@@ -152,7 +152,7 @@ export const useAuthStore = create<AuthState>()(
       isOnboardingCompleted: () => !!get().user?.onboardingCompleted,
     }),
     {
-      name: "rituality-auth-store",
+      name: "finishd-auth-store",
       storage: createJSONStorage(() => localStorage),
       // Only persist non-sensitive data
       // Tokens are managed by token-manager.ts

@@ -619,12 +619,12 @@
 - [ ] Optimize queries with limits
 - [ ] Test query limits
 
-### 9.5 Use Sequelize Paranoid for Soft Deletes
-- [ ] Enable paranoid in User model
-- [ ] Remove manual deleted flag logic
-- [ ] Update defaultScope
+### 9.5 Implement Drizzle Soft Delete Pattern
+- [ ] Add deletedAt column to schema
+- [ ] Create soft delete helper function
+- [ ] Update queries to filter out deleted records
 - [ ] Migrate existing soft delete logic
-- [ ] Test paranoid queries
+- [ ] Test soft delete queries
 
 ### 9.6 Implement Database Connection Pooling
 - [ ] Review current pool configuration

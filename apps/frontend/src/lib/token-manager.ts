@@ -7,7 +7,7 @@ const TOKEN_KEYS = {
   ACCESS_TOKEN: "access_token",
   REFRESH_TOKEN: "refresh_token",
   DEVICE_ID: "device_id",
-  AUTH_STORE_KEY: "rituality-auth-store",
+  AUTH_STORE_KEY: "finishd-auth-store",
 } as const
 
 /**

@@ -1,8 +1,8 @@
-# Frontend Component Library - Rituality Platform
+# Frontend Component Library - Finishd Platform
 
 ## 📋 Overview
 
-This document provides a guide to using and customizing the Shadcn/ui component library in the Rituality Platform.
+This document provides a guide to using and customizing the Shadcn/ui component library in the Finishd Platform.
 
 **Last Updated**: January 12, 2026
 **Version**: 1.0.0

@@ -39,7 +39,7 @@ export function LoginScreen() {
             <div className="space-y-6">
               <div className="text-center mb-6">
                 <h2 className="text-2xl font-semibold" style={{ color: "#333333" }}>
-                  Welcome to Rituality
+                  Welcome to Finishd
                 </h2>
               </div>
 

@@ -1,5 +1,5 @@
 {
-  "name": "rituality-platform",
+  "name": "finishd-platform",
   "version": "1.0.0",
   "description": "Full-stack Node.js, React, PostgreSQL application with monorepo architecture",
   "private": true,
@@ -20,12 +20,12 @@
     "check": "biome check --write .",
     "clean": "pnpm --filter './apps/**' clean && pnpm --filter './packages/**' clean",
     "type-check": "pnpm --filter './apps/**' type-check",
-    "migrate": "pnpm --filter backend migrate",
-    "seed": "pnpm --filter backend seed",
-    "reset": "pnpm --filter backend reset",
-    "migrate:undo": "pnpm --filter backend npx sequelize-cli db:migrate:undo --options-path .sequelizerc",
-    "migrate:undo:all": "pnpm --filter backend npx sequelize-cli db:migrate:undo:all --options-path .sequelizerc",
-    "seed:undo": "pnpm --filter backend npx sequelize-cli db:seed:undo:all --options-path .sequelizerc"
+    "db:generate": "pnpm --filter backend db:generate",
+    "db:migrate": "pnpm --filter backend db:migrate",
+    "db:push": "pnpm --filter backend db:push",
+    "db:studio": "pnpm --filter backend db:studio",
+    "db:seed": "pnpm --filter backend db:seed",
+    "db:seed:finishd": "pnpm --filter backend db:seed:finishd"
   },
   "keywords": [
     "monorepo",
@@ -33,12 +33,12 @@
     "react",
     "typescript",
     "express",
-    "sequelize",
+    "drizzle",
     "postgresql",
     "vitest",
     "biome"
   ],
-  "author": "Rituality Platform Team",
+  "author": "Finishd Platform Team",
   "license": "MIT",
   "devDependencies": {
     "@biomejs/biome": "^2.3.11",

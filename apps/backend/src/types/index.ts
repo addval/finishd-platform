@@ -1,139 +1,96 @@
 /**
  * Global TypeScript Type Definitions
- * Centralized type definitions for the application
+ * Centralized type definitions for the Finishd application
  */
 
-import type { Model } from "sequelize"
+import type { Server as HttpServer } from "node:http"
 
-// ============================================================================
-// MODEL TYPES
-// ============================================================================
-
-export interface Role extends Model {
-  id: string
-  name: string
-  description: string | null
-  createdAt: Date
-  updatedAt: Date
-}
-
-export interface User extends Model {
-  id: string
-  roleId: string
-  email: string
-  passwordHash: string
-  name: string | null
-  username: string | null
-  city: string | null
-  phoneNumber: string | null
-  countryCode: string | null
-  timezone: string | null
-  emailVerified: boolean
-  emailVerifiedAt: Date | null
-  emailVerificationCode: string | null
-  emailVerificationCodeExpiresAt: Date | null
-  phoneNumberVerified: boolean
-  phoneNumberVerifiedAt: Date | null
-  phoneVerificationCode: string | null
-  phoneVerificationCodeExpiresAt: Date | null
-  confirmationCode: string | null
-  confirmationCodeExpiresAt: Date | null
-  passwordResetCode: string | null
-  passwordResetCodeExpiresAt: Date | null
-  onboardingCompleted: boolean
-  profileCreated: boolean
-  profilePictureUrl: string | null
-  bio: string | null
-  status: "active" | "inactive"
-  deleted: boolean
-  deletedAt: Date | null
-  lastLoginAt: Date | null
-  createdAt: Date
-  updatedAt: Date
-  role?: Role
-  userPermission?: UserPermission
-  userDevices?: UserDevice[]
-}
-
-export type SafeUser = Omit<
+// Re-export all types from schema
+export type {
   User,
-  | "passwordHash"
-  | "emailVerificationCode"
-  | "phoneVerificationCode"
-  | "confirmationCode"
-  | "passwordResetCode"
->
+  NewUser,
+  HomeownerProfile,
+  NewHomeownerProfile,
+  DesignerProfile,
+  NewDesignerProfile,
+  ContractorProfile,
+  NewContractorProfile,
+  Property,
+  NewProperty,
+  Project,
+  NewProject,
+  ProjectRequest,
+  NewProjectRequest,
+  Proposal,
+  NewProposal,
+  ProjectContractor,
+  NewProjectContractor,
+  Task,
+  NewTask,
+  Milestone,
+  NewMilestone,
+  CostEstimate,
+  NewCostEstimate,
+  ActivityLog,
+  NewActivityLog,
+} from "../db/schema.js"
 
-export interface UserPermission extends Model {
-  id: string
-  userId: string
-  calendarEnabled: boolean
-  notificationsEnabled: boolean
-  contactsEnabled: boolean
-  locationEnabled: boolean
-  marketingEmailsEnabled: boolean
-  ritualRemindersEnabled: boolean
-  communityUpdatesEnabled: boolean
-  createdAt: Date
-  updatedAt: Date
+// Note: Express Request type augmentation is defined in modules/auth/auth.middleware.ts
+// The req.user object contains: { userId: string; phone: string; userType: ... }
+
+// ============================================================================
+// DATABASE ERROR TYPES (PostgreSQL)
+// ============================================================================
+
+export interface PostgresErrorDetail {
+  column?: string
+  constraint?: string
+  dataType?: string
+  detail?: string
+  hint?: string
+  schema?: string
+  table?: string
 }
 
-export interface UserDevice extends Model {
-  id: string
-  userId: string
-  token: string
-  refreshToken: string
-  tokenExpiresAt: Date
-  refreshTokenExpiresAt: Date
-  deviceType: "mobile" | "desktop" | "tablet" | "unknown" | null
-  deviceName: string | null
-  userAgent: string | null
-  ipAddress: string | null
-  isActive: boolean
-  lastUsedAt: Date
-  createdAt: Date
-  updatedAt: Date
+export interface PostgresError extends Error {
+  code?: string
+  detail?: string
+  constraint?: string
+  column?: string
+  table?: string
+  schema?: string
+}
+
+// Common PostgreSQL error codes
+export const PG_ERROR_CODES = {
+  UNIQUE_VIOLATION: "23505",
+  FOREIGN_KEY_VIOLATION: "23503",
+  NOT_NULL_VIOLATION: "23502",
+  CHECK_VIOLATION: "23514",
+} as const
+
+// Type guard for PostgreSQL errors
+export const isPostgresError = (error: unknown): error is PostgresError => {
+  return error instanceof Error && "code" in error
 }
 
 // ============================================================================
-// EXPRESS REQUEST TYPES
+// ZOD VALIDATION TYPES
 // ============================================================================
 
-declare global {
-  namespace Express {
-    interface Request {
-      user?: SafeUser
-      deviceId?: string
-    }
-  }
-}
-
-// ============================================================================
-// SEQUELIZE ERROR TYPES
-// ============================================================================
-
-export interface SequelizeValidationErrorItem {
-  path?: string
-  field?: string
+export interface ZodValidationErrorDetail {
   message: string
-  type?: string
-  validatorKey?: string
-  validatorName?: string
-  instance?: Model
+  path: (string | number)[]
+  code: string
 }
 
-export interface SequelizeValidationError extends Error {
-  name: "SequelizeValidationError" | "SequelizeUniqueConstraintError"
-  message: string
-  errors?: SequelizeValidationErrorItem[]
-  stack?: string
+export interface ZodValidationError extends Error {
+  issues: ZodValidationErrorDetail[]
+  name: "ZodError"
 }
-
-// Type guard for Sequelize validation errors
-export type SequelizeError = Error & Partial<SequelizeValidationError>
 
 // ============================================================================
-// JOI VALIDATION TYPES
+// JOI VALIDATION TYPES (for backwards compatibility)
 // ============================================================================
 
 export interface JoiValidationErrorDetail {
@@ -182,7 +139,5 @@ export interface RateLimitError {
 // ============================================================================
 // HTTP SERVER TYPES
 // ============================================================================
-
-import type { Server as HttpServer } from "node:http"
 
 export type HttpServerType = HttpServer

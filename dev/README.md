@@ -414,7 +414,7 @@ mkdir -p dev/active/your-task-name
 
 ---
 
-## Rituality Platform Examples
+## Finishd Platform Examples
 
 Current active dev docs in this project:
 

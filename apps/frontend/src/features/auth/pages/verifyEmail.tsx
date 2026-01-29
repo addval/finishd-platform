@@ -12,7 +12,7 @@ import { useAuthStore } from "../store/authStore"
  * - WHITE HEADER BAR at top (60px height, 100% width, border-bottom)
  * - Background: #F8F5F2 for main page
  * - Center white card/modal (~420px wide) with all content inside
- * - "RITUALITY" in header: Medium weight (500), 24px, letter-spacing: 0.05em
+ * - "Finishd" in header: Medium weight (500), 24px, letter-spacing: 0.05em
  * - Title: "Verify your email"
  * - 6 OTP boxes: 45px × 45px (not 48px)
  */

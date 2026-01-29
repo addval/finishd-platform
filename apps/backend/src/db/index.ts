@@ -11,7 +11,7 @@ const { Pool } = pg
 
 // Create connection pool
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL || "postgresql://finishd:finishd123@localhost:5432/finishd_db",
+  connectionString: process.env.DATABASE_URL || "postgresql://shantanu:@localhost:5432/finishd_dev",
   max: 20,
   idleTimeoutMillis: 30000,
   connectionTimeoutMillis: 2000,

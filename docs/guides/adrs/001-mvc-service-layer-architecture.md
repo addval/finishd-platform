@@ -4,13 +4,13 @@
 Accepted
 
 ## Context
-The Rituality Platform backend requires a scalable, maintainable architecture to handle business logic complexity as the application grows.
+The Finishd Platform backend requires a scalable, maintainable architecture to handle business logic complexity as the application grows.
 
 ## Decision
 Adopt **MVC (Model-View-Controller) + Service Layer** pattern:
 - **Controllers**: Thin HTTP request/response handlers
 - **Services**: Fat business logic layer
-- **Models**: Data access with Sequelize ORM
+- **Schema/Models**: Data access with Drizzle ORM
 
 ## Benefits
 - Clear separation of concerns

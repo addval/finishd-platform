@@ -22,7 +22,7 @@ export const EMAIL_TEMPLATES = {
 export const EMAIL_SUBJECTS = {
   EMAIL_VERIFICATION: "Verify Your Email Address",
   PASSWORD_RESET: "Reset Your Password",
-  WELCOME: "Welcome to Rituality!",
+  WELCOME: "Welcome to Finishd!",
   PHONE_VERIFICATION: "Verify Your Phone Number",
 } as const
 

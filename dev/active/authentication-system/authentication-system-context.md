@@ -320,8 +320,8 @@
 
 ### Configuration
 
-**`apps/backend/src/config/database.ts`** ✅
-- PostgreSQL database configuration with Sequelize
+**`apps/backend/src/db/index.ts`** ✅
+- PostgreSQL database configuration with Drizzle ORM
 
 **`apps/backend/src/config/redis.ts`** ✅
 - Redis client configuration
@@ -456,16 +456,16 @@
 **Status:** ✅ IMPLEMENTED in `password.util.ts`
 
 ### 7. Database Strategy ✅
-**Decision:** PostgreSQL with Sequelize ORM, soft deletes
+**Decision:** PostgreSQL with Drizzle ORM, soft deletes
 
 **Why:**
 - PostgreSQL is reliable and feature-rich
-- Sequelize provides good TypeScript support
+- Drizzle provides excellent TypeScript support with type inference
 - Soft deletes allow data recovery
-- Scopes for common queries (active, verified)
+- Drizzle queries for common filters (active, verified)
 
 **Trade-offs:**
-- Sequelize overhead vs raw SQL
+- Schema-first approach requires migration generation
 - Soft deletes complicate unique constraints
 
 **Status:** ✅ IMPLEMENTED
@@ -494,9 +494,9 @@
 
 ### Database Constraints
 1. **Database:** PostgreSQL (required, no alternative)
-2. **ORM:** Sequelize (established, no changes)
-3. **Migrations:** Required for all schema changes
-4. **Naming:** snake_case in database, camelCase in code
+2. **ORM:** Drizzle ORM (schema-first approach with type inference)
+3. **Migrations:** Required for all schema changes (use drizzle-kit)
+4. **Naming:** snake_case in database, camelCase in TypeScript
 
 ### Cache Constraints
 1. **Cache Layer:** Redis (required for OTP and token storage)

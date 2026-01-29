@@ -1,8 +1,8 @@
-# Frontend Architecture - Rituality Platform
+# Frontend Architecture - Finishd Platform
 
 ## 📋 Overview
 
-This document provides a comprehensive overview of the Rituality Platform frontend architecture, including design patterns, folder structure, technology stack, and implementation status.
+This document provides a comprehensive overview of the Finishd Platform frontend architecture, including design patterns, folder structure, technology stack, and implementation status.
 
 **Last Updated**: January 12, 2026
 **Version**: 1.0.0
