@@ -77,6 +77,9 @@ export function VerifyOtpPage() {
   }
 
   const handleVerify = async (otpValue: string) => {
+    // Guard against concurrent verify calls
+    if (isLoading) return
+
     try {
       await verifyOtp(phone, otpValue)
       toast.success("Logged in successfully!")
