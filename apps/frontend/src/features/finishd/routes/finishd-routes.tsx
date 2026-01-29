@@ -13,6 +13,12 @@ import { ContractorOnboardingPage } from "../pages/onboarding/contractor-onboard
 import { BrowseDesignersPage } from "../pages/browse-designers"
 import { CreateProjectPage } from "../pages/create-project"
 import { DashboardPage } from "../pages/dashboard"
+import { DesignerDetailPage } from "../pages/designer-detail"
+import { ProjectDetailPage } from "../pages/project-detail"
+import { ProposalsPage } from "../pages/proposals"
+import { EditProfilePage } from "../pages/edit-profile"
+import { AdminPanelPage } from "../pages/admin-panel"
+import { NotificationsPage } from "../pages/notifications"
 import { FinishdProtectedRoute } from "./finishd-protected-route"
 
 /**
@@ -50,7 +56,7 @@ export const finishdRoutes: RouteObject[] = [
     ),
   },
 
-  // Homeowner routes
+  // Homeowner onboarding
   {
     path: "/finishd/onboarding/homeowner",
     element: (
@@ -60,7 +66,7 @@ export const finishdRoutes: RouteObject[] = [
     ),
   },
 
-  // Designer routes
+  // Designer onboarding
   {
     path: "/finishd/onboarding/designer",
     element: (
@@ -70,7 +76,7 @@ export const finishdRoutes: RouteObject[] = [
     ),
   },
 
-  // Contractor routes
+  // Contractor onboarding
   {
     path: "/finishd/onboarding/contractor",
     element: (
@@ -80,7 +86,7 @@ export const finishdRoutes: RouteObject[] = [
     ),
   },
 
-  // Browse designers (for homeowners)
+  // Browse designers
   {
     path: "/finishd/designers",
     element: (
@@ -90,12 +96,72 @@ export const finishdRoutes: RouteObject[] = [
     ),
   },
 
-  // Create project (for homeowners)
+  // Designer detail
+  {
+    path: "/finishd/designers/:id",
+    element: (
+      <FinishdProtectedRoute requireUserType>
+        <DesignerDetailPage />
+      </FinishdProtectedRoute>
+    ),
+  },
+
+  // Create project
   {
     path: "/finishd/projects/new",
     element: (
       <FinishdProtectedRoute requireUserType="homeowner">
         <CreateProjectPage />
+      </FinishdProtectedRoute>
+    ),
+  },
+
+  // Project detail
+  {
+    path: "/finishd/projects/:id",
+    element: (
+      <FinishdProtectedRoute requireUserType>
+        <ProjectDetailPage />
+      </FinishdProtectedRoute>
+    ),
+  },
+
+  // Proposals management
+  {
+    path: "/finishd/proposals",
+    element: (
+      <FinishdProtectedRoute requireUserType>
+        <ProposalsPage />
+      </FinishdProtectedRoute>
+    ),
+  },
+
+  // Edit profile
+  {
+    path: "/finishd/profile/edit",
+    element: (
+      <FinishdProtectedRoute requireUserType>
+        <EditProfilePage />
+      </FinishdProtectedRoute>
+    ),
+  },
+
+  // Notifications
+  {
+    path: "/finishd/notifications",
+    element: (
+      <FinishdProtectedRoute requireUserType>
+        <NotificationsPage />
+      </FinishdProtectedRoute>
+    ),
+  },
+
+  // Admin panel
+  {
+    path: "/finishd/admin",
+    element: (
+      <FinishdProtectedRoute requireUserType>
+        <AdminPanelPage />
       </FinishdProtectedRoute>
     ),
   },
