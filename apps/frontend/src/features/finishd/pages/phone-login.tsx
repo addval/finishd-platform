@@ -7,6 +7,9 @@ import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { toast } from "sonner"
 import { useFinishdAuthStore } from "../store/finishd-auth.store"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 
 export function PhoneLoginPage() {
   const navigate = useNavigate()
@@ -33,36 +36,36 @@ export function PhoneLoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-gray-50 px-4">
+    <div className="flex min-h-screen flex-col items-center justify-center bg-muted px-4">
       <div className="w-full max-w-md">
         {/* Logo/Header */}
         <div className="mb-8 text-center">
-          <h1 className="text-3xl font-bold text-gray-900">Finishd</h1>
-          <p className="mt-2 text-gray-600">
+          <h1 className="text-3xl font-bold text-foreground">Finishd</h1>
+          <p className="mt-2 text-muted-foreground">
             Connect with interior designers and contractors
           </p>
         </div>
 
         {/* Login Card */}
-        <div className="rounded-lg bg-white p-8 shadow-md">
-          <h2 className="mb-6 text-xl font-semibold text-gray-900">
+        <div className="rounded-lg bg-card p-8 shadow-md">
+          <h2 className="mb-6 text-xl font-semibold text-foreground">
             Login with Phone
           </h2>
 
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Phone Input */}
             <div>
-              <label
+              <Label
                 htmlFor="phone"
-                className="mb-2 block text-sm font-medium text-gray-700"
+                className="mb-2 block"
               >
                 Phone Number
-              </label>
+              </Label>
               <div className="flex">
-                <span className="inline-flex items-center rounded-l-md border border-r-0 border-gray-300 bg-gray-50 px-3 text-gray-500">
+                <span className="inline-flex items-center rounded-l-md border border-r-0 border-input bg-muted px-3 text-muted-foreground">
                   +91
                 </span>
-                <input
+                <Input
                   type="tel"
                   id="phone"
                   value={phone}
@@ -73,43 +76,45 @@ export function PhoneLoginPage() {
                     setPhone(value)
                   }}
                   placeholder="9876543210"
-                  className="block w-full rounded-r-md border border-gray-300 px-4 py-3 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  className="rounded-l-none rounded-r-md px-4 py-3"
                   maxLength={10}
                   required
                 />
               </div>
-              <p className="mt-1 text-xs text-gray-500">
+              <p className="mt-1 text-xs text-muted-foreground">
                 We'll send you a one-time password
               </p>
             </div>
 
             {/* Error Display */}
             {error && (
-              <div className="rounded-md bg-red-50 p-3 text-sm text-red-600">
+              <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
                 {error}
               </div>
             )}
 
             {/* Submit Button */}
-            <button
+            <Button
               type="submit"
+              variant="primary"
+              fullWidth
+              isLoading={isLoading}
               disabled={isLoading || phone.length !== 10}
-              className="w-full rounded-md bg-blue-600 px-4 py-3 font-medium text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-blue-300"
             >
               {isLoading ? "Sending OTP..." : "Continue"}
-            </button>
+            </Button>
           </form>
 
           {/* Dev hint */}
           {import.meta.env.DEV && (
-            <p className="mt-4 text-center text-xs text-gray-400">
+            <p className="mt-4 text-center text-xs text-muted-foreground">
               Dev mode: Use OTP "123456" for any phone number
             </p>
           )}
         </div>
 
         {/* Footer */}
-        <p className="mt-6 text-center text-sm text-gray-500">
+        <p className="mt-6 text-center text-sm text-muted-foreground">
           By continuing, you agree to our Terms of Service and Privacy Policy
         </p>
       </div>

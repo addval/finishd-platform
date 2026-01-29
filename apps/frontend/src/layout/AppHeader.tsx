@@ -26,31 +26,20 @@ export function AppHeader() {
   return (
     <>
       <header
-        className="fixed top-0 left-0 right-0 z-50"
-        style={{
-          height: "60px",
-          backgroundColor: "#FFFFFF",
-          borderBottom: "1px solid #E5E5E5",
-        }}
+        className="fixed top-0 left-0 right-0 z-50 h-15 bg-card border-b border-border-light"
       >
         <div className="relative h-full flex items-center justify-between px-6">
           {/* Logo - Left */}
           <img
             src={logo}
             alt="Finishd"
-            style={{ height: "auto", width: "130px" }}
-            className="ms-10"
+            className="h-auto w-32.5 ms-10"
           />
 
           {/* Logout Button - Right */}
           <button
             onClick={() => setShowLogoutModal(true)}
-            className="flex items-center gap-2 px-4 py-2 rounded-lg border transition-colors hover:opacity-80"
-            style={{
-              borderColor: "#CCCCCC",
-              backgroundColor: "#FFFFFF",
-              color: "#666666",
-            }}
+            className="flex items-center gap-2 px-4 py-2 rounded-lg border border-border-default bg-card text-text-secondary transition-colors hover:opacity-80"
           >
             <LogOut className="w-4 h-4" />
             <span className="text-sm font-medium">Logout</span>

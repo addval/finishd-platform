@@ -96,7 +96,7 @@ export function PhoneVerificationScreen({
   }
 
   return (
-    <div className="min-h-screen flex flex-col px-4 py-6" style={{ backgroundColor: "#F8F5F2" }}>
+    <div className="min-h-screen flex flex-col px-4 py-6 bg-background">
       {/* Close Icon - Top Left */}
       <button
         onClick={onClose}
@@ -107,7 +107,7 @@ export function PhoneVerificationScreen({
 
       {/* Brand Header - Centered Top */}
       <div className="text-center mb-8">
-        <h1 className="text-xl font-bold uppercase tracking-wider" style={{ color: "#333333" }}>
+        <h1 className="text-xl font-bold uppercase tracking-wider text-text-primary">
           Finishd
         </h1>
       </div>
@@ -117,17 +117,17 @@ export function PhoneVerificationScreen({
         <div className="w-full max-w-md">
           {/* Title */}
           <div className="text-center mb-3">
-            <h2 className="text-xl font-semibold" style={{ color: "#333333" }}>
+            <h2 className="text-xl font-semibold text-text-primary">
               Verify your phone number
             </h2>
           </div>
 
           {/* Subtitle */}
           <div className="text-center mb-8 space-y-1">
-            <p className="text-sm" style={{ color: "#666666" }}>
+            <p className="text-sm text-text-secondary">
               We've sent a code to {phoneNumber}
             </p>
-            <p className="text-sm" style={{ color: "#666666" }}>
+            <p className="text-sm text-text-secondary">
               Please enter the code below.
             </p>
           </div>
@@ -156,10 +156,6 @@ export function PhoneVerificationScreen({
                     ? "border-error focus:border-error focus:ring-error"
                     : "border-border-light focus:border-border-primary focus:ring-2 focus:ring-border-primary/20",
                 )}
-                style={{
-                  fontSize: "18px",
-                  fontFamily: "inherit",
-                }}
               />
             ))}
           </div>
@@ -173,16 +169,15 @@ export function PhoneVerificationScreen({
 
           {/* Resend Link */}
           <div className="text-center mb-8">
-            <p className="text-sm" style={{ color: "#666666" }}>
+            <p className="text-sm text-text-secondary">
               Didn't get a code?{" "}
               {resendCountdown > 0 ? (
-                <span style={{ color: "#999999" }}>Resend in {resendCountdown}s</span>
+                <span className="text-text-tertiary">Resend in {resendCountdown}s</span>
               ) : (
                 <button
                   type="button"
                   onClick={handleResendCode}
-                  className="font-semibold underline hover:no-underline focus:outline-none"
-                  style={{ color: "#333333" }}
+                  className="font-semibold underline hover:no-underline focus:outline-none text-text-primary"
                   disabled={isLoading}
                 >
                   Resend
@@ -195,8 +190,7 @@ export function PhoneVerificationScreen({
           <div className="flex justify-center">
             <button
               type="button"
-              className="min-w-[200px] h-12 px-8 text-base font-semibold rounded-lg text-white transition-colors hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
-              style={{ backgroundColor: "#000000" }}
+              className="min-w-50 h-12 px-8 text-base font-semibold rounded-lg text-white bg-primary transition-colors hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
               disabled={!isOtpComplete || isLoading}
               onClick={handleVerify}
             >

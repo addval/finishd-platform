@@ -6,10 +6,9 @@
 import { forwardRef } from "react"
 import PhoneInput from "react-phone-input-2"
 import "react-phone-input-2/lib/style.css"
+import { cn } from "@/lib/utils"
 
 interface PhoneInputProps {
-  label?: string
-  required?: boolean
   error?: string
   countryCode?: string
   onCountryCodeChange?: (code: string) => void
@@ -20,8 +19,6 @@ interface PhoneInputProps {
 
 export const PhoneNumberInput = forwardRef<typeof PhoneInput, PhoneInputProps>(
   ({
-    label: _label,
-    required: _required,
     error,
     countryCode = "+1",
     onCountryCodeChange,
@@ -48,27 +45,27 @@ export const PhoneNumberInput = forwardRef<typeof PhoneInput, PhoneInputProps>(
             onChange={handleChange}
             disabled={disabled}
             placeholder={placeholder}
-            inputClass={`
-              !flex-1 !px-4 !py-3 !border !rounded-md
-              !focus:outline-none !focus:ring-2 !focus:ring-black
-              !transition-all !duration-200
-              ${error ? "!border-red-500" : "!border-gray-300"}
-              ${disabled ? "!opacity-50 !cursor-not-allowed" : ""}
-            `}
+            inputClass={cn(
+              "!flex-1 !px-4 !py-3 !border !rounded-md",
+              "!focus:outline-none !focus:ring-2 !focus:ring-ring",
+              "!transition-all !duration-200",
+              error ? "!border-destructive" : "!border-input",
+              disabled && "!opacity-50 !cursor-not-allowed",
+            )}
             inputStyle={{
               paddingLeft: "80px",
             }}
-            buttonClass={`
-              !rounded-l-md !border !border-r-0
-              ${error ? "!border-red-500" : "!border-gray-300"}
-              !hover:bg-gray-50 !transition-all
-              !px-3 !py-3 !flex-shrink-0
-            `}
-            dropdownClass={`
-              !bg-white !border !border-gray-300 !rounded-md
-              !shadow-lg !max-h-100 !overflow-y-auto
-              !mt-1 !z-50
-            `}
+            buttonClass={cn(
+              "!rounded-l-md !border !border-r-0",
+              error ? "!border-destructive" : "!border-input",
+              "!hover:bg-muted !transition-all",
+              "!px-3 !py-3 !flex-shrink-0",
+            )}
+            dropdownClass={cn(
+              "!bg-card !border !border-input !rounded-md",
+              "!shadow-lg !max-h-100 !overflow-y-auto",
+              "!mt-1 !z-50",
+            )}
             containerClass="!w-full !flex !items-stretch"
             enableSearch={true}
             disableSearchIcon={false}
@@ -78,12 +75,12 @@ export const PhoneNumberInput = forwardRef<typeof PhoneInput, PhoneInputProps>(
               autoFocus: false,
             }}
             specialLabel={""}
-            searchClass="!px-3 !py-2 !border-b !border-gray-200"
+            searchClass="!px-3 !py-2 !border-b !border-border"
             searchPlaceholder="Search country..."
             countryCodeEditable={false}
           />
         </div>
-        {error && <p className="text-xs text-red-500 mt-1">{error}</p>}
+        {error && <p className="text-xs text-destructive mt-1">{error}</p>}
       </div>
     )
   },

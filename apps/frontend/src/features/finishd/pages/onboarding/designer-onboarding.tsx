@@ -6,6 +6,10 @@
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { toast } from "sonner"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { createDesignerProfile } from "../../services/finishd-api.service"
 
 const CITIES = [
@@ -140,102 +144,105 @@ export function DesignerOnboardingPage() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-gray-50 px-4 py-8">
+    <div className="flex min-h-screen flex-col items-center justify-center bg-muted px-4 py-8">
       <div className="w-full max-w-2xl">
         {/* Progress indicator */}
         <div className="mb-8">
           <div className="flex items-center justify-center gap-2">
-            <div className={`h-2 w-24 rounded-full ${step === "basic" ? "bg-blue-600" : "bg-blue-200"}`} />
-            <div className={`h-2 w-24 rounded-full ${step === "expertise" ? "bg-blue-600" : step === "complete" ? "bg-blue-200" : "bg-gray-200"}`} />
-            <div className={`h-2 w-24 rounded-full ${step === "complete" ? "bg-blue-600" : "bg-gray-200"}`} />
+            <div className={`h-2 w-24 rounded-full ${step === "basic" ? "bg-primary" : "bg-primary/20"}`} />
+            <div className={`h-2 w-24 rounded-full ${step === "expertise" ? "bg-primary" : step === "complete" ? "bg-primary/20" : "bg-muted-foreground/20"}`} />
+            <div className={`h-2 w-24 rounded-full ${step === "complete" ? "bg-primary" : "bg-muted-foreground/20"}`} />
           </div>
         </div>
 
         {/* Basic Info Step */}
         {step === "basic" && (
-          <div className="rounded-lg bg-white p-8 shadow-md">
-            <h2 className="mb-2 text-2xl font-bold text-gray-900">Create your designer profile</h2>
-            <p className="mb-6 text-gray-600">Let homeowners know about you and your work</p>
+          <div className="rounded-lg bg-card p-8 shadow-md">
+            <h2 className="mb-2 text-2xl font-bold text-foreground">Create your designer profile</h2>
+            <p className="mb-6 text-muted-foreground">Let homeowners know about you and your work</p>
 
             <form onSubmit={handleBasicSubmit} className="space-y-4">
               <div>
-                <label className="mb-1 block text-sm font-medium text-gray-700">Your Name *</label>
-                <input
+                <Label className="mb-1 block">Your Name *</Label>
+                <Input
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="Enter your full name"
-                  className="w-full rounded-md border border-gray-300 px-4 py-3 focus:border-blue-500 focus:outline-none"
+                  className="px-4 py-3 h-auto"
                   required
                 />
               </div>
 
               <div>
-                <label className="mb-1 block text-sm font-medium text-gray-700">
+                <Label className="mb-1 block">
                   Firm / Studio Name (optional)
-                </label>
-                <input
+                </Label>
+                <Input
                   type="text"
                   value={firmName}
                   onChange={(e) => setFirmName(e.target.value)}
                   placeholder="e.g., Design Studio Co."
-                  className="w-full rounded-md border border-gray-300 px-4 py-3 focus:border-blue-500 focus:outline-none"
+                  className="px-4 py-3 h-auto"
                 />
               </div>
 
               <div>
-                <label className="mb-1 block text-sm font-medium text-gray-700">
+                <Label className="mb-1 block">
                   Years of Experience
-                </label>
-                <select
-                  value={experienceYears}
-                  onChange={(e) => setExperienceYears(e.target.value)}
-                  className="w-full rounded-md border border-gray-300 px-4 py-3 focus:border-blue-500 focus:outline-none"
-                >
-                  <option value="">Select experience</option>
-                  <option value="1">1-2 years</option>
-                  <option value="3">3-5 years</option>
-                  <option value="6">6-10 years</option>
-                  <option value="11">10-15 years</option>
-                  <option value="16">15+ years</option>
-                </select>
+                </Label>
+                <Select value={experienceYears || "__none__"} onValueChange={(value) => setExperienceYears(value === "__none__" ? "" : value)}>
+                  <SelectTrigger className="w-full h-auto px-4 py-3">
+                    <SelectValue placeholder="Select experience" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="__none__">Select experience</SelectItem>
+                    <SelectItem value="1">1-2 years</SelectItem>
+                    <SelectItem value="3">3-5 years</SelectItem>
+                    <SelectItem value="6">6-10 years</SelectItem>
+                    <SelectItem value="11">10-15 years</SelectItem>
+                    <SelectItem value="16">15+ years</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
 
               <div>
-                <label className="mb-1 block text-sm font-medium text-gray-700">
+                <Label className="mb-1 block">
                   About You / Your Work
-                </label>
+                </Label>
                 <textarea
                   value={bio}
                   onChange={(e) => setBio(e.target.value)}
                   placeholder="Tell homeowners about your design philosophy, specializations, and what makes you unique..."
                   rows={4}
-                  className="w-full rounded-md border border-gray-300 px-4 py-3 focus:border-blue-500 focus:outline-none"
+                  className="w-full rounded-md border border-input px-4 py-3 focus:border-primary focus:outline-none"
                 />
               </div>
 
-              <button
+              <Button
                 type="submit"
-                className="mt-6 w-full rounded-md bg-blue-600 px-4 py-3 font-medium text-white transition-colors hover:bg-blue-700"
+                variant="primary"
+                fullWidth
+                className="mt-6 py-3"
               >
                 Continue
-              </button>
+              </Button>
             </form>
           </div>
         )}
 
         {/* Expertise Step */}
         {step === "expertise" && (
-          <div className="rounded-lg bg-white p-8 shadow-md">
-            <h2 className="mb-2 text-2xl font-bold text-gray-900">Your expertise</h2>
-            <p className="mb-6 text-gray-600">Help homeowners find you based on their needs</p>
+          <div className="rounded-lg bg-card p-8 shadow-md">
+            <h2 className="mb-2 text-2xl font-bold text-foreground">Your expertise</h2>
+            <p className="mb-6 text-muted-foreground">Help homeowners find you based on their needs</p>
 
             <form onSubmit={handleExpertiseSubmit} className="space-y-6">
               {/* Cities */}
               <div>
-                <label className="mb-2 block text-sm font-medium text-gray-700">
+                <Label className="mb-2 block">
                   Cities you serve *
-                </label>
+                </Label>
                 <div className="flex flex-wrap gap-2">
                   {CITIES.map((city) => (
                     <button
@@ -244,8 +251,8 @@ export function DesignerOnboardingPage() {
                       onClick={() => toggleCity(city.value)}
                       className={`rounded-full border px-4 py-2 text-sm font-medium transition-colors ${
                         selectedCities.includes(city.value)
-                          ? "border-blue-500 bg-blue-50 text-blue-700"
-                          : "border-gray-200 hover:border-gray-300"
+                          ? "border-primary bg-primary/10 text-primary"
+                          : "border-input hover:border-input/80"
                       }`}
                     >
                       {city.label}
@@ -256,9 +263,9 @@ export function DesignerOnboardingPage() {
 
               {/* Design Styles */}
               <div>
-                <label className="mb-2 block text-sm font-medium text-gray-700">
+                <Label className="mb-2 block">
                   Design styles you specialize in *
-                </label>
+                </Label>
                 <div className="flex flex-wrap gap-2">
                   {DESIGN_STYLES.map((style) => (
                     <button
@@ -267,8 +274,8 @@ export function DesignerOnboardingPage() {
                       onClick={() => toggleStyle(style)}
                       className={`rounded-full border px-4 py-2 text-sm font-medium transition-colors ${
                         selectedStyles.includes(style)
-                          ? "border-blue-500 bg-blue-50 text-blue-700"
-                          : "border-gray-200 hover:border-gray-300"
+                          ? "border-primary bg-primary/10 text-primary"
+                          : "border-input hover:border-input/80"
                       }`}
                     >
                       {style}
@@ -279,9 +286,9 @@ export function DesignerOnboardingPage() {
 
               {/* Services */}
               <div>
-                <label className="mb-2 block text-sm font-medium text-gray-700">
+                <Label className="mb-2 block">
                   Services you offer
-                </label>
+                </Label>
                 <div className="flex flex-wrap gap-2">
                   {SERVICES.map((service) => (
                     <button
@@ -290,8 +297,8 @@ export function DesignerOnboardingPage() {
                       onClick={() => toggleService(service)}
                       className={`rounded-full border px-4 py-2 text-sm font-medium transition-colors ${
                         selectedServices.includes(service)
-                          ? "border-blue-500 bg-blue-50 text-blue-700"
-                          : "border-gray-200 hover:border-gray-300"
+                          ? "border-primary bg-primary/10 text-primary"
+                          : "border-input hover:border-input/80"
                       }`}
                     >
                       {service}
@@ -302,9 +309,9 @@ export function DesignerOnboardingPage() {
 
               {/* Budget Range */}
               <div>
-                <label className="mb-2 block text-sm font-medium text-gray-700">
+                <Label className="mb-2 block">
                   Typical project budget range
-                </label>
+                </Label>
                 <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
                   {BUDGET_RANGES.map((range) => (
                     <button
@@ -313,8 +320,8 @@ export function DesignerOnboardingPage() {
                       onClick={() => setBudgetRange(range)}
                       className={`rounded-md border px-4 py-3 text-sm font-medium transition-colors ${
                         budgetRange?.min === range.min
-                          ? "border-blue-500 bg-blue-50 text-blue-700"
-                          : "border-gray-200 hover:border-gray-300"
+                          ? "border-primary bg-primary/10 text-primary"
+                          : "border-input hover:border-input/80"
                       }`}
                     >
                       {range.label}
@@ -324,20 +331,22 @@ export function DesignerOnboardingPage() {
               </div>
 
               <div className="flex gap-3 pt-4">
-                <button
+                <Button
                   type="button"
                   onClick={() => setStep("basic")}
-                  className="flex-1 rounded-md border border-gray-300 px-4 py-3 font-medium text-gray-700 transition-colors hover:bg-gray-50"
+                  variant="outline"
+                  className="flex-1 py-3"
                 >
                   Back
-                </button>
-                <button
+                </Button>
+                <Button
                   type="submit"
-                  disabled={isLoading}
-                  className="flex-1 rounded-md bg-blue-600 px-4 py-3 font-medium text-white transition-colors hover:bg-blue-700 disabled:bg-blue-300"
+                  variant="primary"
+                  isLoading={isLoading}
+                  className="flex-1 py-3"
                 >
                   {isLoading ? "Creating..." : "Create Profile"}
-                </button>
+                </Button>
               </div>
             </form>
           </div>
@@ -345,15 +354,15 @@ export function DesignerOnboardingPage() {
 
         {/* Complete Step */}
         {step === "complete" && (
-          <div className="rounded-lg bg-white p-8 text-center shadow-md">
+          <div className="rounded-lg bg-card p-8 text-center shadow-md">
             <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
               <svg className="h-8 w-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
               </svg>
             </div>
 
-            <h2 className="mb-2 text-2xl font-bold text-gray-900">Profile submitted!</h2>
-            <p className="mb-6 text-gray-600">
+            <h2 className="mb-2 text-2xl font-bold text-foreground">Profile submitted!</h2>
+            <p className="mb-6 text-muted-foreground">
               Your profile is under review. Once verified, you'll start receiving project requests
               from homeowners.
             </p>
@@ -365,12 +374,14 @@ export function DesignerOnboardingPage() {
               </p>
             </div>
 
-            <button
+            <Button
               onClick={handleComplete}
-              className="w-full rounded-md bg-blue-600 px-4 py-3 font-medium text-white transition-colors hover:bg-blue-700"
+              variant="primary"
+              fullWidth
+              className="py-3"
             >
               Go to Dashboard
-            </button>
+            </Button>
           </div>
         )}
       </div>

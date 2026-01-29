@@ -6,6 +6,10 @@
 import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import { toast } from "sonner"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import {
   getProperties,
   createProject,
@@ -142,37 +146,37 @@ export function CreateProjectPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-muted py-8">
       <div className="mx-auto max-w-2xl px-4">
         {/* Progress */}
         <div className="mb-8">
           <div className="flex items-center justify-between text-sm">
-            <span className={step === "scope" ? "font-medium text-blue-600" : "text-gray-500"}>
+            <span className={step === "scope" ? "font-medium text-primary" : "text-muted-foreground"}>
               Scope
             </span>
-            <span className={step === "details" ? "font-medium text-blue-600" : "text-gray-500"}>
+            <span className={step === "details" ? "font-medium text-primary" : "text-muted-foreground"}>
               Details
             </span>
-            <span className={step === "budget" ? "font-medium text-blue-600" : "text-gray-500"}>
+            <span className={step === "budget" ? "font-medium text-primary" : "text-muted-foreground"}>
               Budget
             </span>
-            <span className={step === "review" ? "font-medium text-blue-600" : "text-gray-500"}>
+            <span className={step === "review" ? "font-medium text-primary" : "text-muted-foreground"}>
               Review
             </span>
           </div>
           <div className="mt-2 flex gap-1">
-            <div className={`h-1 flex-1 rounded ${step === "scope" ? "bg-blue-600" : "bg-blue-200"}`} />
-            <div className={`h-1 flex-1 rounded ${step === "details" ? "bg-blue-600" : step === "budget" || step === "review" ? "bg-blue-200" : "bg-gray-200"}`} />
-            <div className={`h-1 flex-1 rounded ${step === "budget" ? "bg-blue-600" : step === "review" ? "bg-blue-200" : "bg-gray-200"}`} />
-            <div className={`h-1 flex-1 rounded ${step === "review" ? "bg-blue-600" : "bg-gray-200"}`} />
+            <div className={`h-1 flex-1 rounded ${step === "scope" ? "bg-primary" : "bg-primary/20"}`} />
+            <div className={`h-1 flex-1 rounded ${step === "details" ? "bg-primary" : step === "budget" || step === "review" ? "bg-primary/20" : "bg-muted-foreground/20"}`} />
+            <div className={`h-1 flex-1 rounded ${step === "budget" ? "bg-primary" : step === "review" ? "bg-primary/20" : "bg-muted-foreground/20"}`} />
+            <div className={`h-1 flex-1 rounded ${step === "review" ? "bg-primary" : "bg-muted-foreground/20"}`} />
           </div>
         </div>
 
         {/* Scope Step */}
         {step === "scope" && (
-          <div className="rounded-lg bg-white p-8 shadow-sm">
-            <h2 className="mb-2 text-2xl font-bold text-gray-900">What do you want to design?</h2>
-            <p className="mb-6 text-gray-600">Tell us the scope of your project</p>
+          <div className="rounded-lg bg-card p-8 shadow-sm">
+            <h2 className="mb-2 text-2xl font-bold text-foreground">What do you want to design?</h2>
+            <p className="mb-6 text-muted-foreground">Tell us the scope of your project</p>
 
             <div className="space-y-4">
               <button
@@ -180,12 +184,12 @@ export function CreateProjectPage() {
                 onClick={() => setScope("full_home")}
                 className={`w-full rounded-lg border-2 p-6 text-left transition-colors ${
                   scope === "full_home"
-                    ? "border-blue-500 bg-blue-50"
-                    : "border-gray-200 hover:border-gray-300"
+                    ? "border-primary bg-primary/10"
+                    : "border-input hover:border-input/80"
                 }`}
               >
                 <h3 className="text-lg font-semibold">Full Home Interior</h3>
-                <p className="mt-1 text-sm text-gray-600">
+                <p className="mt-1 text-sm text-muted-foreground">
                   Complete interior design for your entire home
                 </p>
               </button>
@@ -195,12 +199,12 @@ export function CreateProjectPage() {
                 onClick={() => setScope("partial")}
                 className={`w-full rounded-lg border-2 p-6 text-left transition-colors ${
                   scope === "partial"
-                    ? "border-blue-500 bg-blue-50"
-                    : "border-gray-200 hover:border-gray-300"
+                    ? "border-primary bg-primary/10"
+                    : "border-input hover:border-input/80"
                 }`}
               >
                 <h3 className="text-lg font-semibold">Specific Rooms</h3>
-                <p className="mt-1 text-sm text-gray-600">
+                <p className="mt-1 text-sm text-muted-foreground">
                   Design only selected rooms or areas
                 </p>
               </button>
@@ -208,9 +212,9 @@ export function CreateProjectPage() {
 
             {scope === "partial" && (
               <div className="mt-6">
-                <label className="mb-2 block text-sm font-medium text-gray-700">
+                <Label className="mb-2 block">
                   Select rooms to design
-                </label>
+                </Label>
                 <div className="flex flex-wrap gap-2">
                   {ROOMS.map((room) => (
                     <button
@@ -219,8 +223,8 @@ export function CreateProjectPage() {
                       onClick={() => toggleRoom(room)}
                       className={`rounded-full border px-4 py-2 text-sm font-medium transition-colors ${
                         selectedRooms.includes(room)
-                          ? "border-blue-500 bg-blue-50 text-blue-700"
-                          : "border-gray-200 hover:border-gray-300"
+                          ? "border-primary bg-primary/10 text-primary"
+                          : "border-input hover:border-input/80"
                       }`}
                     >
                       {room}
@@ -230,142 +234,139 @@ export function CreateProjectPage() {
               </div>
             )}
 
-            <button
+            <Button
               onClick={handleScopeNext}
-              className="mt-8 w-full rounded-md bg-blue-600 px-4 py-3 font-medium text-white transition-colors hover:bg-blue-700"
+              variant="primary"
+              fullWidth
+              className="mt-8 py-3"
             >
               Continue
-            </button>
+            </Button>
           </div>
         )}
 
         {/* Details Step */}
         {step === "details" && (
-          <div className="rounded-lg bg-white p-8 shadow-sm">
-            <h2 className="mb-2 text-2xl font-bold text-gray-900">Project details</h2>
-            <p className="mb-6 text-gray-600">Give your project a name and add any notes</p>
+          <div className="rounded-lg bg-card p-8 shadow-sm">
+            <h2 className="mb-2 text-2xl font-bold text-foreground">Project details</h2>
+            <p className="mb-6 text-muted-foreground">Give your project a name and add any notes</p>
 
             <div className="space-y-4">
               <div>
-                <label className="mb-1 block text-sm font-medium text-gray-700">
+                <Label className="mb-1 block">
                   Project Title *
-                </label>
-                <input
+                </Label>
+                <Input
                   type="text"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   placeholder="e.g., 3BHK Modern Apartment Interior"
-                  className="w-full rounded-md border border-gray-300 px-4 py-3 focus:border-blue-500 focus:outline-none"
+                  className="px-4 py-3 h-auto"
                 />
               </div>
 
               {properties.length > 0 && (
                 <div>
-                  <label className="mb-1 block text-sm font-medium text-gray-700">
+                  <Label className="mb-1 block">
                     Property
-                  </label>
-                  <select
-                    value={propertyId}
-                    onChange={(e) => setPropertyId(e.target.value)}
-                    className="w-full rounded-md border border-gray-300 px-4 py-3 focus:border-blue-500 focus:outline-none"
-                  >
-                    {properties.map((prop) => {
-                      const propertyType =
-                        prop.type.charAt(0).toUpperCase() + prop.type.slice(1)
-                      const cityText = prop.city || "No city"
-                      const sizeText = prop.sizeSqft
-                        ? `${prop.sizeSqft} square feet`
-                        : "Size not available"
-                      const ariaLabel = `${propertyType} property in ${cityText}, ${sizeText}`
+                  </Label>
+                  <Select value={propertyId} onValueChange={setPropertyId}>
+                    <SelectTrigger className="w-full h-auto px-4 py-3">
+                      <SelectValue placeholder="Select property" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {properties.map((prop) => {
+                        const propertyType =
+                          prop.type.charAt(0).toUpperCase() + prop.type.slice(1)
+                        const cityText = prop.city || "No city"
 
-                      return (
-                        <option
-                          key={prop.id}
-                          value={prop.id}
-                          aria-label={ariaLabel}
-                        >
-                          {propertyType} - {cityText} ({prop.sizeSqft || "N/A"} sq.ft)
-                        </option>
-                      )
-                    })}
-                  </select>
+                        return (
+                          <SelectItem key={prop.id} value={prop.id}>
+                            {propertyType} - {cityText} ({prop.sizeSqft || "N/A"} sq.ft)
+                          </SelectItem>
+                        )
+                      })}
+                    </SelectContent>
+                  </Select>
                 </div>
               )}
 
               <div>
-                <label className="mb-1 block text-sm font-medium text-gray-700">
+                <Label className="mb-1 block">
                   Additional Notes
-                </label>
+                </Label>
                 <textarea
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
                   placeholder="Any specific requirements, preferences, or things you want the designer to know..."
                   rows={4}
-                  className="w-full rounded-md border border-gray-300 px-4 py-3 focus:border-blue-500 focus:outline-none"
+                  className="w-full rounded-md border border-input px-4 py-3 focus:border-primary focus:outline-none"
                 />
               </div>
             </div>
 
             <div className="mt-8 flex gap-3">
-              <button
+              <Button
                 onClick={() => setStep("scope")}
-                className="flex-1 rounded-md border border-gray-300 px-4 py-3 font-medium text-gray-700 hover:bg-gray-50"
+                variant="outline"
+                className="flex-1 py-3"
               >
                 Back
-              </button>
-              <button
+              </Button>
+              <Button
                 onClick={handleDetailsNext}
-                className="flex-1 rounded-md bg-blue-600 px-4 py-3 font-medium text-white hover:bg-blue-700"
+                variant="primary"
+                className="flex-1 py-3"
               >
                 Continue
-              </button>
+              </Button>
             </div>
           </div>
         )}
 
         {/* Budget Step */}
         {step === "budget" && (
-          <div className="rounded-lg bg-white p-8 shadow-sm">
-            <h2 className="mb-2 text-2xl font-bold text-gray-900">Budget & Timeline</h2>
-            <p className="mb-6 text-gray-600">Help designers understand your expectations</p>
+          <div className="rounded-lg bg-card p-8 shadow-sm">
+            <h2 className="mb-2 text-2xl font-bold text-foreground">Budget & Timeline</h2>
+            <p className="mb-6 text-muted-foreground">Help designers understand your expectations</p>
 
             <div className="space-y-6">
               <div>
-                <label className="mb-2 block text-sm font-medium text-gray-700">
+                <Label className="mb-2 block">
                   Budget Range (in ₹) *
-                </label>
+                </Label>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <input
+                    <Input
                       type="number"
                       value={budgetMin}
                       onChange={(e) => setBudgetMin(e.target.value)}
                       placeholder="Minimum"
-                      className="w-full rounded-md border border-gray-300 px-4 py-3 focus:border-blue-500 focus:outline-none"
+                      className="px-4 py-3 h-auto"
                     />
                     {budgetMin && (
-                      <p className="mt-1 text-xs text-gray-500">{formatBudget(budgetMin)}</p>
+                      <p className="mt-1 text-xs text-muted-foreground">{formatBudget(budgetMin)}</p>
                     )}
                   </div>
                   <div>
-                    <input
+                    <Input
                       type="number"
                       value={budgetMax}
                       onChange={(e) => setBudgetMax(e.target.value)}
                       placeholder="Maximum"
-                      className="w-full rounded-md border border-gray-300 px-4 py-3 focus:border-blue-500 focus:outline-none"
+                      className="px-4 py-3 h-auto"
                     />
                     {budgetMax && (
-                      <p className="mt-1 text-xs text-gray-500">{formatBudget(budgetMax)}</p>
+                      <p className="mt-1 text-xs text-muted-foreground">{formatBudget(budgetMax)}</p>
                     )}
                   </div>
                 </div>
               </div>
 
               <div>
-                <label className="mb-2 block text-sm font-medium text-gray-700">
+                <Label className="mb-2 block">
                   When do you want to start?
-                </label>
+                </Label>
                 <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
                   {TIMELINE_OPTIONS.map((option) => (
                     <button
@@ -374,8 +375,8 @@ export function CreateProjectPage() {
                       onClick={() => setStartTimeline(option.value)}
                       className={`rounded-md border px-4 py-3 text-sm font-medium transition-colors ${
                         startTimeline === option.value
-                          ? "border-blue-500 bg-blue-50 text-blue-700"
-                          : "border-gray-200 hover:border-gray-300"
+                          ? "border-primary bg-primary/10 text-primary"
+                          : "border-input hover:border-input/80"
                       }`}
                     >
                       {option.label}
@@ -385,64 +386,66 @@ export function CreateProjectPage() {
               </div>
 
               <div>
-                <label className="mb-1 block text-sm font-medium text-gray-700">
+                <Label className="mb-1 block">
                   Expected duration (weeks)
-                </label>
-                <input
+                </Label>
+                <Input
                   type="number"
                   value={timelineWeeks}
                   onChange={(e) => setTimelineWeeks(e.target.value)}
                   placeholder="e.g., 12"
-                  className="w-full rounded-md border border-gray-300 px-4 py-3 focus:border-blue-500 focus:outline-none"
+                  className="px-4 py-3 h-auto"
                 />
               </div>
             </div>
 
             <div className="mt-8 flex gap-3">
-              <button
+              <Button
                 onClick={() => setStep("details")}
-                className="flex-1 rounded-md border border-gray-300 px-4 py-3 font-medium text-gray-700 hover:bg-gray-50"
+                variant="outline"
+                className="flex-1 py-3"
               >
                 Back
-              </button>
-              <button
+              </Button>
+              <Button
                 onClick={handleBudgetNext}
-                className="flex-1 rounded-md bg-blue-600 px-4 py-3 font-medium text-white hover:bg-blue-700"
+                variant="primary"
+                className="flex-1 py-3"
               >
                 Review
-              </button>
+              </Button>
             </div>
           </div>
         )}
 
         {/* Review Step */}
         {step === "review" && (
-          <div className="rounded-lg bg-white p-8 shadow-sm">
-            <h2 className="mb-2 text-2xl font-bold text-gray-900">Review your project</h2>
-            <p className="mb-6 text-gray-600">Make sure everything looks good before creating</p>
+          <div className="rounded-lg bg-card p-8 shadow-sm">
+            <h2 className="mb-2 text-2xl font-bold text-foreground">Review your project</h2>
+            <p className="mb-6 text-muted-foreground">Make sure everything looks good before creating</p>
 
             <div className="space-y-4 divide-y">
               <div className="pb-4">
-                <h3 className="text-sm font-medium text-gray-500">Project Title</h3>
+                <h3 className="text-sm font-medium text-muted-foreground">Project Title</h3>
                 <p className="mt-1 text-lg font-semibold">{title}</p>
               </div>
 
               <div className="py-4">
-                <h3 className="text-sm font-medium text-gray-500">Scope</h3>
+                <h3 className="text-sm font-medium text-muted-foreground">Scope</h3>
                 <p className="mt-1">
                   {scope === "full_home" ? "Full Home Interior" : `Specific Rooms: ${selectedRooms.join(", ")}`}
                 </p>
               </div>
 
               <div className="py-4">
-                <h3 className="text-sm font-medium text-gray-500">Budget</h3>
+                <h3 className="text-sm font-medium text-muted-foreground">Budget</h3>
                 <p className="mt-1">
                   {formatBudget(budgetMin)} - {formatBudget(budgetMax)}
                 </p>
               </div>
 
               <div className="py-4">
-                <h3 className="text-sm font-medium text-gray-500">Timeline</h3>
+                <h3 className="text-sm font-medium text-muted-foreground">Timeline</h3>
                 <p className="mt-1">
                   Start: {TIMELINE_OPTIONS.find((t) => t.value === startTimeline)?.label}
                   {timelineWeeks && ` • Duration: ${timelineWeeks} weeks`}
@@ -451,26 +454,28 @@ export function CreateProjectPage() {
 
               {notes && (
                 <div className="pt-4">
-                  <h3 className="text-sm font-medium text-gray-500">Notes</h3>
-                  <p className="mt-1 text-gray-600">{notes}</p>
+                  <h3 className="text-sm font-medium text-muted-foreground">Notes</h3>
+                  <p className="mt-1 text-muted-foreground">{notes}</p>
                 </div>
               )}
             </div>
 
             <div className="mt-8 flex gap-3">
-              <button
+              <Button
                 onClick={() => setStep("budget")}
-                className="flex-1 rounded-md border border-gray-300 px-4 py-3 font-medium text-gray-700 hover:bg-gray-50"
+                variant="outline"
+                className="flex-1 py-3"
               >
                 Back
-              </button>
-              <button
+              </Button>
+              <Button
                 onClick={handleSubmit}
-                disabled={isLoading}
-                className="flex-1 rounded-md bg-blue-600 px-4 py-3 font-medium text-white hover:bg-blue-700 disabled:bg-blue-300"
+                variant="primary"
+                isLoading={isLoading}
+                className="flex-1 py-3"
               >
                 {isLoading ? "Creating..." : "Create Project"}
-              </button>
+              </Button>
             </div>
           </div>
         )}

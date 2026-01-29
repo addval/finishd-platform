@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
-import { Button } from "@/components/buttons/button"
+import { Button } from "@/components/ui/button"
 import { OtpInput } from "@/components/forms/otp-input"
 import { useResendVerification, useVerifyEmail } from "../hooks/useAuth"
 import { useAuthStore } from "../store/authStore"
@@ -65,23 +65,22 @@ export function EmailVerificationScreen() {
   }
 
   return (
-    <div className="relative min-h-screen" style={{ backgroundColor: "#F8F5F2" }}>
+    <div className="relative min-h-screen bg-background">
       {/* Main Content - Centered White Card/Modal */}
       <div className="flex items-center justify-center min-h-screen px-4">
         <div
-          className="w-full max-w-[550px] rounded-md p-10 shadow-lg"
-          style={{ backgroundColor: "#FFFFFF" }}
+          className="w-full max-w-[550px] rounded-md p-10 shadow-lg bg-card"
         >
           {/* Title */}
           <div className="text-center mb-3">
-            <h2 className="text-2xl font-semibold" style={{ color: "#333333" }}>
+            <h2 className="text-2xl font-semibold text-text-primary">
               Verify your email
             </h2>
           </div>
 
           {/* Subtitle */}
           <div className="text-center mb-8 space-y-1">
-            <p className="text-sm" style={{ color: "#666666" }}>
+            <p className="text-sm text-text-secondary">
               We've sent a code to {email || "your email"}. Please enter the code below.
             </p>
           </div>
@@ -99,16 +98,15 @@ export function EmailVerificationScreen() {
 
           {/* Resend Link */}
           <div className="text-center mb-8">
-            <p className="text-sm" style={{ color: "#666666" }}>
+            <p className="text-sm text-text-secondary">
               Didn't get a code?{" "}
               {resendCountdown > 0 ? (
-                <span style={{ color: "#999999" }}>Resend in {resendCountdown}s</span>
+                <span className="text-text-tertiary">Resend in {resendCountdown}s</span>
               ) : (
                 <button
                   type="button"
                   onClick={handleResendCode}
-                  className="font-semibold underline hover:no-underline focus:outline-none transition-opacity"
-                  style={{ color: "#333333" }}
+                  className="font-semibold underline hover:no-underline focus:outline-none transition-opacity text-text-primary"
                   disabled={isLoading}
                 >
                   Resend

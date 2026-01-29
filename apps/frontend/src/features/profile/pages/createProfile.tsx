@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom"
-import { Button } from "@/components/buttons/button"
+import { Button } from "@/components/ui/button"
 import { FloatingLabelInput } from "@/components/forms/floating-label-input"
 import { PhoneNumberInput } from "@/components/ui/phone-input"
 import { useCreateProfile } from "@/features/auth/hooks/useAuth"
@@ -36,16 +36,15 @@ export function ProfileCreationScreen() {
   const { form, isSubmitting } = useAuthForm(profileCreationSchema, handleProfileSubmit)
 
   return (
-    <div className="relative min-h-screen" style={{ backgroundColor: "#F8F5F2" }}>
+    <div className="relative min-h-screen bg-background">
       {/* Main Content - Centered White Card */}
       <div className="flex items-center justify-center min-h-screen px-4">
         <div
-          className="w-full max-w-[550px] rounded-md p-10 shadow-lg"
-          style={{ backgroundColor: "#FFFFFF" }}
+          className="w-full max-w-[550px] rounded-md p-10 shadow-lg bg-card"
         >
           {/* Title */}
           <div className="text-center mb-8">
-            <h2 className="text-2xl font-semibold" style={{ color: "#333333" }}>
+            <h2 className="text-2xl font-semibold text-text-primary">
               Tell us a bit about yourself
             </h2>
           </div>
@@ -84,7 +83,6 @@ export function ProfileCreationScreen() {
 
             {/* Phone Number Field */}
             <PhoneNumberInput
-              required={true}
               countryCode={form.watch("countryCode")}
               onCountryCodeChange={code => form.setValue("countryCode", code)}
               onPhoneNumberChange={phone => form.setValue("phoneNumber", phone)}
@@ -94,7 +92,7 @@ export function ProfileCreationScreen() {
             />
 
             <div>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-text-secondary">
                 Enter your phone number to make sure you never lose access to your account.
               </p>
             </div>

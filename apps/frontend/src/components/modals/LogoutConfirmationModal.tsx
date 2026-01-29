@@ -1,11 +1,14 @@
-/**
- * Logout Confirmation Modal
- * Modern, minimal modal design for confirming logout action
- */
-
 import { LogOut } from "lucide-react"
-import { useEffect } from "react"
-import { Button } from "@/components/buttons/button"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 
 interface LogoutConfirmationModalProps {
   isOpen: boolean
@@ -18,120 +21,40 @@ export function LogoutConfirmationModal({
   onClose,
   onConfirm,
 }: LogoutConfirmationModalProps) {
-  // Prevent body scroll when modal is open
-  useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = "hidden"
-    } else {
-      document.body.style.overflow = "unset"
-    }
-    return () => {
-      document.body.style.overflow = "unset"
-    }
-  }, [isOpen])
-
-  if (!isOpen) return null
-
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4"
-      style={{ backgroundColor: "rgba(0, 0, 0, 0.4)" }}
-      onClick={onClose}
-    >
-      <div
-        className="bg-white rounded-md p-10 max-w-[440px] w-full shadow-2xl"
-        style={{
-          backgroundColor: "#FFFFFF",
-          animation: "modalEnter 0.2s ease-out",
-        }}
-        onClick={e => e.stopPropagation()}
-      >
+    <AlertDialog open={isOpen} onOpenChange={open => { if (!open) onClose() }}>
+      <AlertDialogContent className="max-w-[440px] p-10">
         {/* Icon Section */}
-        <div className="flex justify-center mb-6" style={{ marginBottom: "24px" }}>
-          <div
-            className="w-12 h-12 rounded-full flex items-center justify-center"
-            style={{
-              backgroundColor: "#FEF2F2",
-              width: "48px",
-              height: "48px",
-            }}
-          >
-            <LogOut size={24} style={{ color: "#DC2626" }} />
+        <div className="flex justify-center mb-6">
+          <div className="h-12 w-12 rounded-full bg-destructive/10 flex items-center justify-center">
+            <LogOut size={24} className="text-destructive" />
           </div>
         </div>
 
-        {/* Title */}
-        <h2
-          className="text-2xl font-semibold text-center mb-3"
-          style={{
-            color: "#1A1A1A",
-            fontSize: "24px",
-            fontWeight: 600,
-            textAlign: "center",
-            marginBottom: "12px",
-          }}
-        >
-          Logging Out?
-        </h2>
+        <AlertDialogHeader className="text-center sm:text-center">
+          <AlertDialogTitle className="text-2xl font-semibold text-foreground">
+            Logging Out?
+          </AlertDialogTitle>
+          <AlertDialogDescription className="text-[15px] leading-relaxed text-muted-foreground">
+            You're about to log out of your account.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
 
-        {/* Description */}
-        <p
-          className="text-center leading-relaxed mb-8"
-          style={{
-            color: "#666666",
-            fontSize: "15px",
-            lineHeight: "1.6",
-            textAlign: "center",
-            marginBottom: "32px",
-          }}
-        >
-          You're about to log out of your account.
-        </p>
-
-        {/* Action Buttons */}
-        <div className="flex gap-3" style={{ gap: "12px" }}>
-          {/* Cancel Button - Stay */}
-          <Button
-            variant="secondary"
-            size="md"
+        <AlertDialogFooter className="flex-row gap-3 sm:flex-row sm:space-x-0">
+          <AlertDialogCancel
+            className="flex-1 mt-0 h-12 text-base font-semibold border-2 border-primary bg-transparent text-foreground hover:opacity-90"
             onClick={onClose}
-            style={{
-              borderColor: "#D1D5DB",
-              color: "#374151",
-              flex: 1,
-            }}
           >
             Stay
-          </Button>
-
-          {/* Confirm Button - Log Out */}
-          <Button
-            variant="primary"
-            size="md"
+          </AlertDialogCancel>
+          <AlertDialogAction
+            className="flex-1 h-12 text-base font-semibold bg-destructive text-destructive-foreground hover:opacity-90"
             onClick={onConfirm}
-            style={{
-              backgroundColor: "#DC2626",
-              flex: 1,
-            }}
           >
             Log Out
-          </Button>
-        </div>
-      </div>
-
-      {/* Inline animation keyframes */}
-      <style>{`
-        @keyframes modalEnter {
-          from {
-            opacity: 0;
-            transform: scale(0.95);
-          }
-          to {
-            opacity: 1;
-            transform: scale(1);
-          }
-        }
-      `}</style>
-    </div>
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   )
 }

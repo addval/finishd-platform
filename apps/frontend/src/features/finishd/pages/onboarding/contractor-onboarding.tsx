@@ -6,6 +6,10 @@
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { toast } from "sonner"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { createContractorProfile } from "../../services/finishd-api.service"
 
 const CITIES = [
@@ -99,9 +103,9 @@ export function ContractorOnboardingPage() {
 
   if (isComplete) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center bg-gray-50 px-4 py-8">
+      <div className="flex min-h-screen flex-col items-center justify-center bg-muted px-4 py-8">
         <div className="w-full max-w-lg">
-          <div className="rounded-lg bg-white p-8 text-center shadow-md">
+          <div className="rounded-lg bg-card p-8 text-center shadow-md">
             <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
               <svg
                 className="h-8 w-8 text-green-600"
@@ -118,8 +122,8 @@ export function ContractorOnboardingPage() {
               </svg>
             </div>
 
-            <h2 className="mb-2 text-2xl font-bold text-gray-900">Profile submitted!</h2>
-            <p className="mb-6 text-gray-600">
+            <h2 className="mb-2 text-2xl font-bold text-foreground">Profile submitted!</h2>
+            <p className="mb-6 text-muted-foreground">
               Your profile is under review. Once verified, designers will be able to invite you to
               projects.
             </p>
@@ -131,12 +135,14 @@ export function ContractorOnboardingPage() {
               </p>
             </div>
 
-            <button
+            <Button
               onClick={handleComplete}
-              className="w-full rounded-md bg-blue-600 px-4 py-3 font-medium text-white transition-colors hover:bg-blue-700"
+              variant="primary"
+              fullWidth
+              className="py-3"
             >
               Go to Dashboard
-            </button>
+            </Button>
           </div>
         </div>
       </div>
@@ -144,71 +150,72 @@ export function ContractorOnboardingPage() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-gray-50 px-4 py-8">
+    <div className="flex min-h-screen flex-col items-center justify-center bg-muted px-4 py-8">
       <div className="w-full max-w-2xl">
         {/* Header */}
         <div className="mb-8 text-center">
-          <h1 className="text-2xl font-bold text-gray-900">Create your contractor profile</h1>
-          <p className="mt-2 text-gray-600">
+          <h1 className="text-2xl font-bold text-foreground">Create your contractor profile</h1>
+          <p className="mt-2 text-muted-foreground">
             Let designers and homeowners know about your skills
           </p>
         </div>
 
-        <div className="rounded-lg bg-white p-8 shadow-md">
+        <div className="rounded-lg bg-card p-8 shadow-md">
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Basic Info */}
             <div className="space-y-4">
               <div>
-                <label className="mb-1 block text-sm font-medium text-gray-700">
+                <Label className="mb-1 block">
                   Your Name / Business Name *
-                </label>
-                <input
+                </Label>
+                <Input
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="e.g., Sharma Electricals"
-                  className="w-full rounded-md border border-gray-300 px-4 py-3 focus:border-blue-500 focus:outline-none"
+                  className="px-4 py-3 h-auto"
                   required
                 />
               </div>
 
               <div>
-                <label className="mb-1 block text-sm font-medium text-gray-700">
+                <Label className="mb-1 block">
                   Years of Experience
-                </label>
-                <select
-                  value={experienceYears}
-                  onChange={(e) => setExperienceYears(e.target.value)}
-                  className="w-full rounded-md border border-gray-300 px-4 py-3 focus:border-blue-500 focus:outline-none"
-                >
-                  <option value="">Select experience</option>
-                  <option value="1">1-2 years</option>
-                  <option value="3">3-5 years</option>
-                  <option value="6">6-10 years</option>
-                  <option value="11">10-15 years</option>
-                  <option value="16">15+ years</option>
-                </select>
+                </Label>
+                <Select value={experienceYears || "__none__"} onValueChange={(value) => setExperienceYears(value === "__none__" ? "" : value)}>
+                  <SelectTrigger className="w-full h-auto px-4 py-3">
+                    <SelectValue placeholder="Select experience" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="__none__">Select experience</SelectItem>
+                    <SelectItem value="1">1-2 years</SelectItem>
+                    <SelectItem value="3">3-5 years</SelectItem>
+                    <SelectItem value="6">6-10 years</SelectItem>
+                    <SelectItem value="11">10-15 years</SelectItem>
+                    <SelectItem value="16">15+ years</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
 
               <div>
-                <label className="mb-1 block text-sm font-medium text-gray-700">
+                <Label className="mb-1 block">
                   About Your Work
-                </label>
+                </Label>
                 <textarea
                   value={bio}
                   onChange={(e) => setBio(e.target.value)}
                   placeholder="Describe your experience, specializations, and what makes you reliable..."
                   rows={3}
-                  className="w-full rounded-md border border-gray-300 px-4 py-3 focus:border-blue-500 focus:outline-none"
+                  className="w-full rounded-md border border-input px-4 py-3 focus:border-primary focus:outline-none"
                 />
               </div>
             </div>
 
             {/* Trades */}
             <div>
-              <label className="mb-2 block text-sm font-medium text-gray-700">
+              <Label className="mb-2 block">
                 Your trades / skills *
-              </label>
+              </Label>
               <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
                 {TRADES.map((trade) => (
                   <button
@@ -217,8 +224,8 @@ export function ContractorOnboardingPage() {
                     onClick={() => toggleTrade(trade.value)}
                     className={`flex items-center gap-2 rounded-md border px-4 py-3 text-left text-sm font-medium transition-colors ${
                       selectedTrades.includes(trade.value)
-                        ? "border-blue-500 bg-blue-50 text-blue-700"
-                        : "border-gray-200 hover:border-gray-300"
+                        ? "border-primary bg-primary/10 text-primary"
+                        : "border-input hover:border-input/80"
                     }`}
                   >
                     <span>{trade.icon}</span>
@@ -230,9 +237,9 @@ export function ContractorOnboardingPage() {
 
             {/* Service Areas */}
             <div>
-              <label className="mb-2 block text-sm font-medium text-gray-700">
+              <Label className="mb-2 block">
                 Areas you serve *
-              </label>
+              </Label>
               <div className="flex flex-wrap gap-2">
                 {CITIES.map((city) => (
                   <button
@@ -241,8 +248,8 @@ export function ContractorOnboardingPage() {
                     onClick={() => toggleCity(city.value)}
                     className={`rounded-full border px-4 py-2 text-sm font-medium transition-colors ${
                       selectedCities.includes(city.value)
-                        ? "border-blue-500 bg-blue-50 text-blue-700"
-                        : "border-gray-200 hover:border-gray-300"
+                        ? "border-primary bg-primary/10 text-primary"
+                        : "border-input hover:border-input/80"
                     }`}
                   >
                     {city.label}
@@ -251,13 +258,15 @@ export function ContractorOnboardingPage() {
               </div>
             </div>
 
-            <button
+            <Button
               type="submit"
-              disabled={isLoading}
-              className="mt-6 w-full rounded-md bg-blue-600 px-4 py-3 font-medium text-white transition-colors hover:bg-blue-700 disabled:bg-blue-300"
+              variant="primary"
+              fullWidth
+              isLoading={isLoading}
+              className="mt-6 py-3"
             >
               {isLoading ? "Creating..." : "Create Profile"}
-            </button>
+            </Button>
           </form>
         </div>
       </div>

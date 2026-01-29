@@ -48,15 +48,13 @@ export function AuthHeader({
     return (
       <>
         <div
-          className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-4"
-          style={{ height: "60px", backgroundColor: "#FFFFFF", borderBottom: "1px solid #E5E5E5" }}
+          className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-4 h-15 bg-card border-b border-border-light"
         >
           {/* Back Button */}
           {showBackButton && (
             <button
               onClick={handleButtonClick}
-              className="flex items-center gap-2 px-4 py-2 rounded-lg border transition-colors"
-              style={{ borderColor: "#CCCCCC", backgroundColor: "#FFFFFF", color: "#666666" }}
+              className="flex items-center gap-2 px-4 py-2 rounded-lg border border-border-default bg-card text-text-secondary transition-colors"
             >
               <ArrowLeft className="w-4 h-4" />
               <span className="text-sm font-medium">Back</span>
@@ -64,7 +62,7 @@ export function AuthHeader({
           )}
 
           {/* Logo - Centered */}
-          <img src={logo} alt="Finishd" style={{ height: "auto", width: "130px" }} />
+          <img src={logo} alt="Finishd" className="h-auto w-32.5" />
 
           {/* Extra Content */}
           {extraContent}
@@ -82,24 +80,14 @@ export function AuthHeader({
   return (
     <>
       <header
-        className="fixed top-0 left-0 right-0 z-50"
-        style={{
-          height: "60px",
-          backgroundColor: "#FFFFFF",
-          borderBottom: "1px solid #E5E5E5",
-        }}
+        className="fixed top-0 left-0 right-0 z-50 h-15 bg-card border-b border-border-light"
       >
         <div className="relative h-full flex items-center justify-center px-4">
           {/* Back Button - Left */}
           {showBackButton && (
             <button
               onClick={handleButtonClick}
-              className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center gap-2 px-4 py-2 rounded-lg border transition-colors"
-              style={{
-                borderColor: "#CCCCCC",
-                backgroundColor: "#FFFFFF",
-                color: "#666666",
-              }}
+              className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center gap-2 px-4 py-2 rounded-lg border border-border-default bg-card text-text-secondary transition-colors"
             >
               <ArrowLeft className="w-4 h-4" />
               <span className="text-sm font-medium">Back</span>
@@ -107,7 +95,7 @@ export function AuthHeader({
           )}
 
           {/* Logo Branding - Centered */}
-          <img src={logo} alt="Finishd" style={{ height: "auto", width: "130px" }} />
+          <img src={logo} alt="Finishd" className="h-auto w-32.5" />
         </div>
       </header>
       <LogoutConfirmationModal

@@ -1,6 +1,6 @@
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
-import { Button } from "@/components/buttons/button"
+import { Button } from "@/components/ui/button"
 import { Switch } from "@/components/switches/switch"
 import { useUpdatePermissions } from "@/features/auth/hooks/useAuth"
 
@@ -66,30 +66,29 @@ export function PermissionSetupScreen() {
   ]
 
   return (
-    <div className="relative min-h-screen" style={{ backgroundColor: "#F8F5F2" }}>
+    <div className="relative min-h-screen bg-background">
       {/* Main Content - Centered White Card */}
       <div className="flex items-center justify-center min-h-screen px-4">
         <div
-          className="w-full max-w-[700px] rounded-md p-10 shadow-lg"
-          style={{ backgroundColor: "#FFFFFF" }}
+          className="w-full max-w-[700px] rounded-md p-10 shadow-lg bg-card"
         >
           {/* Title */}
           <div className="text-center mb-3">
-            <h2 className="text-2xl font-bold" style={{ color: "#000000" }}>
+            <h2 className="text-2xl font-bold text-foreground">
               Enable your journey
             </h2>
           </div>
 
           {/* Subtitle */}
           <div className="text-center mb-2">
-            <p className="text-sm" style={{ color: "#666666" }}>
+            <p className="text-sm text-text-secondary">
               Turn these on to get reminders, stay connected, and discover rituals near you.
             </p>
           </div>
 
           {/* Note */}
           <div className="text-center mb-8">
-            <p className="text-xs" style={{ color: "#999999" }}>
+            <p className="text-xs text-text-tertiary">
               You can change these settings anytime later.
             </p>
           </div>
@@ -99,15 +98,14 @@ export function PermissionSetupScreen() {
             {toggleItems.map(item => (
               <div
                 key={item.key}
-                className="rounded-lg p-4 border transition-colors hover:bg-gray-50 flex justify-between"
-                style={{ borderColor: "#E0E0E0" }}
+                className="rounded-lg p-4 border transition-colors hover:bg-muted flex justify-between border-border-light"
               >
                 {/* Text Content - Top */}
                 <div className="mb-3">
-                  <h3 className="text-base font-semibold" style={{ color: "#333333" }}>
+                  <h3 className="text-base font-semibold text-text-primary">
                     {item.label}
                   </h3>
-                  <p className="text-sm mt-1" style={{ color: "#666666" }}>
+                  <p className="text-sm mt-1 text-text-secondary">
                     {item.description}
                   </p>
                 </div>

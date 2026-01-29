@@ -7,6 +7,8 @@ import { useState, useEffect, useRef } from "react"
 import { useNavigate, useLocation } from "react-router-dom"
 import { toast } from "sonner"
 import { useFinishdAuthStore } from "../store/finishd-auth.store"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 
 export function VerifyOtpPage() {
   const navigate = useNavigate()
@@ -109,12 +111,12 @@ export function VerifyOtpPage() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-gray-50 px-4">
+    <div className="flex min-h-screen flex-col items-center justify-center bg-muted px-4">
       <div className="w-full max-w-md">
         {/* Header */}
         <div className="mb-8 text-center">
-          <h1 className="text-2xl font-bold text-gray-900">Verify OTP</h1>
-          <p className="mt-2 text-gray-600">
+          <h1 className="text-2xl font-bold text-foreground">Verify OTP</h1>
+          <p className="mt-2 text-muted-foreground">
             Enter the 6-digit code sent to
             <br />
             <span className="font-medium">+91 {phone}</span>
@@ -122,11 +124,11 @@ export function VerifyOtpPage() {
         </div>
 
         {/* OTP Card */}
-        <div className="rounded-lg bg-white p-8 shadow-md">
+        <div className="rounded-lg bg-card p-8 shadow-md">
           {/* OTP Inputs */}
           <div className="flex justify-center gap-2" onPaste={handlePaste}>
             {otp.map((digit, index) => (
-              <input
+              <Input
                 key={index}
                 ref={(el) => {
                   inputRefs.current[index] = el
@@ -136,7 +138,7 @@ export function VerifyOtpPage() {
                 value={digit}
                 onChange={(e) => handleOtpChange(index, e.target.value.replace(/\D/g, ""))}
                 onKeyDown={(e) => handleKeyDown(index, e)}
-                className="h-14 w-12 rounded-md border border-gray-300 text-center text-xl font-semibold focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="h-14 w-12 text-center text-xl font-semibold"
                 maxLength={1}
               />
             ))}
@@ -144,14 +146,14 @@ export function VerifyOtpPage() {
 
           {/* Error Display */}
           {error && (
-            <div className="mt-4 rounded-md bg-red-50 p-3 text-center text-sm text-red-600">
+            <div className="mt-4 rounded-md bg-destructive/10 p-3 text-center text-sm text-destructive">
               {error}
             </div>
           )}
 
           {/* Loading */}
           {isLoading && (
-            <div className="mt-4 text-center text-sm text-gray-500">
+            <div className="mt-4 text-center text-sm text-muted-foreground">
               Verifying...
             </div>
           )}
@@ -159,33 +161,35 @@ export function VerifyOtpPage() {
           {/* Resend */}
           <div className="mt-6 text-center">
             {resendTimer > 0 ? (
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-muted-foreground">
                 Resend OTP in {resendTimer}s
               </p>
             ) : (
-              <button
+              <Button
                 type="button"
+                variant="link"
                 onClick={handleResend}
                 disabled={isLoading}
-                className="text-sm font-medium text-blue-600 hover:text-blue-700"
               >
                 Resend OTP
-              </button>
+              </Button>
             )}
           </div>
 
           {/* Back button */}
-          <button
+          <Button
             type="button"
+            variant="ghost"
             onClick={handleBack}
-            className="mt-4 w-full text-sm text-gray-500 hover:text-gray-700"
+            fullWidth
+            className="mt-4 text-sm text-muted-foreground hover:text-foreground"
           >
-            ← Change phone number
-          </button>
+            &larr; Change phone number
+          </Button>
 
           {/* Dev hint */}
           {import.meta.env.DEV && (
-            <p className="mt-4 text-center text-xs text-gray-400">
+            <p className="mt-4 text-center text-xs text-muted-foreground">
               Dev mode: Use OTP "123456"
             </p>
           )}

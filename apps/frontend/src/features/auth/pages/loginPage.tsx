@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom"
-import { Button } from "@/components/buttons/button"
+import { Button } from "@/components/ui/button"
 import { FloatingLabelInput } from "@/components/forms/floating-label-input"
 import { useAuthStore } from "@/features/auth/store/authStore"
 import { useAuthForm } from "../hooks/useAuthForm"
@@ -29,16 +29,15 @@ export function LoginScreen() {
   )
 
   return (
-    <div className="relative min-h-screen" style={{ backgroundColor: "#F8F5F2" }}>
+    <div className="relative min-h-screen bg-background">
       <div className="flex items-center justify-center min-h-screen px-4">
         <div
-          className="w-full max-w-[550px] rounded-md p-10 shadow-lg"
-          style={{ backgroundColor: "#FFFFFF" }}
+          className="w-full max-w-[550px] rounded-md p-10 shadow-lg bg-card"
         >
           <form onSubmit={handleSubmit}>
             <div className="space-y-6">
               <div className="text-center mb-6">
-                <h2 className="text-2xl font-semibold" style={{ color: "#333333" }}>
+                <h2 className="text-2xl font-semibold text-text-primary">
                   Welcome to Finishd
                 </h2>
               </div>
@@ -76,8 +75,7 @@ export function LoginScreen() {
                 <button
                   type="button"
                   onClick={() => alert("Forgot password flow - coming soon!")}
-                  className="text-sm underline hover:no-underline focus:outline-none"
-                  style={{ color: "#666666" }}
+                  className="text-sm underline hover:no-underline focus:outline-none text-text-secondary"
                 >
                   Forgot password?
                 </button>
@@ -96,13 +94,12 @@ export function LoginScreen() {
               </div>
 
               <div className="text-center pt-4">
-                <p className="text-sm" style={{ color: "#666666" }}>
+                <p className="text-sm text-text-secondary">
                   Don't have an account?{" "}
                   <button
                     type="button"
                     onClick={() => navigate("/signup")}
-                    className="font-semibold underline hover:no-underline focus:outline-none transition-opacity"
-                    style={{ color: "#333333" }}
+                    className="font-semibold underline hover:no-underline focus:outline-none transition-opacity text-text-primary"
                   >
                     Sign up
                   </button>

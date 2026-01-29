@@ -7,6 +7,10 @@ import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { toast } from "sonner"
 import { createHomeownerProfile, createProperty } from "../../services/finishd-api.service"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 const CITIES = [
   { value: "Delhi", label: "Delhi" },
@@ -113,24 +117,24 @@ export function HomeownerOnboardingPage() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-gray-50 px-4 py-8">
+    <div className="flex min-h-screen flex-col items-center justify-center bg-muted px-4 py-8">
       <div className="w-full max-w-lg">
         {/* Progress indicator */}
         <div className="mb-8">
           <div className="flex items-center justify-center gap-2">
             <div
               className={`h-2 w-16 rounded-full ${
-                step === "profile" ? "bg-blue-600" : "bg-blue-200"
+                step === "profile" ? "bg-primary" : "bg-primary/30"
               }`}
             />
             <div
               className={`h-2 w-16 rounded-full ${
-                step === "property" ? "bg-blue-600" : step === "complete" ? "bg-blue-200" : "bg-gray-200"
+                step === "property" ? "bg-primary" : step === "complete" ? "bg-primary/30" : "bg-muted-foreground/20"
               }`}
             />
             <div
               className={`h-2 w-16 rounded-full ${
-                step === "complete" ? "bg-blue-600" : "bg-gray-200"
+                step === "complete" ? "bg-primary" : "bg-muted-foreground/20"
               }`}
             />
           </div>
@@ -138,95 +142,99 @@ export function HomeownerOnboardingPage() {
 
         {/* Profile Step */}
         {step === "profile" && (
-          <div className="rounded-lg bg-white p-8 shadow-md">
-            <h2 className="mb-2 text-2xl font-bold text-gray-900">Tell us about yourself</h2>
-            <p className="mb-6 text-gray-600">
+          <div className="rounded-lg bg-card p-8 shadow-md">
+            <h2 className="mb-2 text-2xl font-bold text-foreground">Tell us about yourself</h2>
+            <p className="mb-6 text-muted-foreground">
               Create your profile to start finding interior designers
             </p>
 
             <form onSubmit={handleProfileSubmit} className="space-y-4">
               <div>
-                <label className="mb-1 block text-sm font-medium text-gray-700">
+                <Label className="mb-1 block">
                   Full Name *
-                </label>
-                <input
+                </Label>
+                <Input
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="Enter your full name"
-                  className="w-full rounded-md border border-gray-300 px-4 py-3 focus:border-blue-500 focus:outline-none"
+                  className="px-4 py-3"
                   required
                 />
               </div>
 
               <div>
-                <label className="mb-1 block text-sm font-medium text-gray-700">
+                <Label className="mb-1 block">
                   Email (optional)
-                </label>
-                <input
+                </Label>
+                <Input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="your@email.com"
-                  className="w-full rounded-md border border-gray-300 px-4 py-3 focus:border-blue-500 focus:outline-none"
+                  className="px-4 py-3"
                 />
               </div>
 
               <div>
-                <label className="mb-1 block text-sm font-medium text-gray-700">
+                <Label className="mb-1 block">
                   City
-                </label>
-                <select
-                  value={city}
-                  onChange={(e) => setCity(e.target.value)}
-                  className="w-full rounded-md border border-gray-300 px-4 py-3 focus:border-blue-500 focus:outline-none"
-                >
-                  <option value="">Select city</option>
-                  {CITIES.map((c) => (
-                    <option key={c.value} value={c.value}>
-                      {c.label}
-                    </option>
-                  ))}
-                </select>
+                </Label>
+                <Select value={city || "__none__"} onValueChange={(value) => setCity(value === "__none__" ? "" : value)}>
+                  <SelectTrigger className="w-full h-auto px-4 py-3">
+                    <SelectValue placeholder="Select city" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="__none__">Select city</SelectItem>
+                    {CITIES.map((c) => (
+                      <SelectItem key={c.value} value={c.value}>
+                        {c.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
 
               <div>
-                <label className="mb-1 block text-sm font-medium text-gray-700">
+                <Label className="mb-1 block">
                   Locality / Area
-                </label>
-                <input
+                </Label>
+                <Input
                   type="text"
                   value={locality}
                   onChange={(e) => setLocality(e.target.value)}
                   placeholder="e.g., Sector 56, DLF Phase 1"
-                  className="w-full rounded-md border border-gray-300 px-4 py-3 focus:border-blue-500 focus:outline-none"
+                  className="px-4 py-3"
                 />
               </div>
 
-              <button
+              <Button
                 type="submit"
+                variant="primary"
+                fullWidth
+                isLoading={isLoading}
                 disabled={isLoading}
-                className="mt-6 w-full rounded-md bg-blue-600 px-4 py-3 font-medium text-white transition-colors hover:bg-blue-700 disabled:bg-blue-300"
+                className="mt-6"
               >
                 {isLoading ? "Creating..." : "Continue"}
-              </button>
+              </Button>
             </form>
           </div>
         )}
 
         {/* Property Step */}
         {step === "property" && (
-          <div className="rounded-lg bg-white p-8 shadow-md">
-            <h2 className="mb-2 text-2xl font-bold text-gray-900">Add your property</h2>
-            <p className="mb-6 text-gray-600">
+          <div className="rounded-lg bg-card p-8 shadow-md">
+            <h2 className="mb-2 text-2xl font-bold text-foreground">Add your property</h2>
+            <p className="mb-6 text-muted-foreground">
               Tell us about the property you want to design
             </p>
 
             <form onSubmit={handlePropertySubmit} className="space-y-4">
               <div>
-                <label className="mb-1 block text-sm font-medium text-gray-700">
+                <Label className="mb-1 block">
                   Property Type
-                </label>
+                </Label>
                 <div className="grid grid-cols-3 gap-2">
                   {PROPERTY_TYPES.map((type) => (
                     <button
@@ -235,8 +243,8 @@ export function HomeownerOnboardingPage() {
                       onClick={() => setPropertyType(type.value as typeof propertyType)}
                       className={`rounded-md border-2 px-4 py-3 text-sm font-medium transition-colors ${
                         propertyType === type.value
-                          ? "border-blue-500 bg-blue-50 text-blue-700"
-                          : "border-gray-200 hover:border-gray-300"
+                          ? "border-primary bg-primary/10 text-primary"
+                          : "border-input hover:border-muted-foreground"
                       }`}
                     >
                       {type.label}
@@ -247,101 +255,107 @@ export function HomeownerOnboardingPage() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="mb-1 block text-sm font-medium text-gray-700">
+                  <Label className="mb-1 block">
                     City
-                  </label>
-                  <select
-                    value={propertyCity || city}
-                    onChange={(e) => setPropertyCity(e.target.value)}
-                    className="w-full rounded-md border border-gray-300 px-4 py-3 focus:border-blue-500 focus:outline-none"
-                  >
-                    <option value="">Select city</option>
-                    {CITIES.map((c) => (
-                      <option key={c.value} value={c.value}>
-                        {c.label}
-                      </option>
-                    ))}
-                  </select>
+                  </Label>
+                  <Select value={propertyCity || city || "__none__"} onValueChange={(value) => setPropertyCity(value === "__none__" ? "" : value)}>
+                    <SelectTrigger className="w-full h-auto px-4 py-3">
+                      <SelectValue placeholder="Select city" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="__none__">Select city</SelectItem>
+                      {CITIES.map((c) => (
+                        <SelectItem key={c.value} value={c.value}>
+                          {c.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
 
                 <div>
-                  <label className="mb-1 block text-sm font-medium text-gray-700">
+                  <Label className="mb-1 block">
                     Size (sq.ft)
-                  </label>
-                  <input
+                  </Label>
+                  <Input
                     type="number"
                     value={sizeSqft}
                     onChange={(e) => setSizeSqft(e.target.value)}
                     placeholder="e.g., 1500"
-                    className="w-full rounded-md border border-gray-300 px-4 py-3 focus:border-blue-500 focus:outline-none"
+                    className="px-4 py-3"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="mb-1 block text-sm font-medium text-gray-700">
+                <Label className="mb-1 block">
                   Locality / Area
-                </label>
-                <input
+                </Label>
+                <Input
                   type="text"
                   value={propertyLocality || locality}
                   onChange={(e) => setPropertyLocality(e.target.value)}
                   placeholder="e.g., Sector 56"
-                  className="w-full rounded-md border border-gray-300 px-4 py-3 focus:border-blue-500 focus:outline-none"
+                  className="px-4 py-3"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="mb-1 block text-sm font-medium text-gray-700">
+                  <Label className="mb-1 block">
                     Bedrooms
-                  </label>
-                  <select
-                    value={bedrooms}
-                    onChange={(e) => setBedrooms(e.target.value)}
-                    className="w-full rounded-md border border-gray-300 px-4 py-3 focus:border-blue-500 focus:outline-none"
-                  >
-                    {[1, 2, 3, 4, 5].map((n) => (
-                      <option key={n} value={n}>
-                        {n} {n === 1 ? "Bedroom" : "Bedrooms"}
-                      </option>
-                    ))}
-                  </select>
+                  </Label>
+                  <Select value={bedrooms} onValueChange={setBedrooms}>
+                    <SelectTrigger className="w-full h-auto px-4 py-3">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {[1, 2, 3, 4, 5].map((n) => (
+                        <SelectItem key={n} value={String(n)}>
+                          {n} {n === 1 ? "Bedroom" : "Bedrooms"}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
 
                 <div>
-                  <label className="mb-1 block text-sm font-medium text-gray-700">
+                  <Label className="mb-1 block">
                     Bathrooms
-                  </label>
-                  <select
-                    value={bathrooms}
-                    onChange={(e) => setBathrooms(e.target.value)}
-                    className="w-full rounded-md border border-gray-300 px-4 py-3 focus:border-blue-500 focus:outline-none"
-                  >
-                    {[1, 2, 3, 4, 5].map((n) => (
-                      <option key={n} value={n}>
-                        {n} {n === 1 ? "Bathroom" : "Bathrooms"}
-                      </option>
-                    ))}
-                  </select>
+                  </Label>
+                  <Select value={bathrooms} onValueChange={setBathrooms}>
+                    <SelectTrigger className="w-full h-auto px-4 py-3">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {[1, 2, 3, 4, 5].map((n) => (
+                        <SelectItem key={n} value={String(n)}>
+                          {n} {n === 1 ? "Bathroom" : "Bathrooms"}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
 
               <div className="flex gap-3 pt-4">
-                <button
+                <Button
                   type="button"
+                  variant="outline"
                   onClick={handleSkipProperty}
-                  className="flex-1 rounded-md border border-gray-300 px-4 py-3 font-medium text-gray-700 transition-colors hover:bg-gray-50"
+                  className="flex-1"
                 >
                   Skip for now
-                </button>
-                <button
+                </Button>
+                <Button
                   type="submit"
+                  variant="primary"
+                  isLoading={isLoading}
                   disabled={isLoading}
-                  className="flex-1 rounded-md bg-blue-600 px-4 py-3 font-medium text-white transition-colors hover:bg-blue-700 disabled:bg-blue-300"
+                  className="flex-1"
                 >
                   {isLoading ? "Adding..." : "Add Property"}
-                </button>
+                </Button>
               </div>
             </form>
           </div>
@@ -349,7 +363,7 @@ export function HomeownerOnboardingPage() {
 
         {/* Complete Step */}
         {step === "complete" && (
-          <div className="rounded-lg bg-white p-8 text-center shadow-md">
+          <div className="rounded-lg bg-card p-8 text-center shadow-md">
             <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
               <svg
                 className="h-8 w-8 text-green-600"
@@ -366,18 +380,19 @@ export function HomeownerOnboardingPage() {
               </svg>
             </div>
 
-            <h2 className="mb-2 text-2xl font-bold text-gray-900">You're all set!</h2>
-            <p className="mb-6 text-gray-600">
+            <h2 className="mb-2 text-2xl font-bold text-foreground">You're all set!</h2>
+            <p className="mb-6 text-muted-foreground">
               Your profile is ready. Start exploring interior designers and bring your dream home to
               life.
             </p>
 
-            <button
+            <Button
+              variant="primary"
+              fullWidth
               onClick={handleComplete}
-              className="w-full rounded-md bg-blue-600 px-4 py-3 font-medium text-white transition-colors hover:bg-blue-700"
             >
               Go to Dashboard
-            </button>
+            </Button>
           </div>
         )}
       </div>

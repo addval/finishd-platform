@@ -35,7 +35,7 @@ export function AuthLayout({
         onNavigateBack={handleBack}
         enableSmartNavigation={enableSmartNavigation}
       />
-      <div style={{ paddingTop: "60px" }}>{children || <Outlet />}</div>
+      <div className="pt-15">{children || <Outlet />}</div>
     </>
   )
 }

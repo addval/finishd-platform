@@ -5,6 +5,9 @@
 
 import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { browseDesigners, type DesignerProfile } from "../services/finishd-api.service"
 
 const CITIES = [
@@ -49,12 +52,12 @@ function DesignerCard({ designer }: { designer: DesignerProfile }) {
 
   return (
     <div
-      className="cursor-pointer rounded-lg border border-gray-200 bg-white p-6 transition-shadow hover:shadow-md"
+      className="cursor-pointer rounded-lg border border-input bg-card p-6 transition-shadow hover:shadow-md"
       onClick={() => navigate(`/finishd/designers/${designer.id}`)}
     >
       <div className="flex items-start gap-4">
         {/* Avatar */}
-        <div className="flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-full bg-gray-100 text-2xl">
+        <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-muted text-2xl">
           {designer.profilePictureUrl ? (
             <img
               src={designer.profilePictureUrl}
@@ -69,9 +72,9 @@ function DesignerCard({ designer }: { designer: DesignerProfile }) {
         {/* Info */}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
-            <h3 className="text-lg font-semibold text-gray-900 truncate">{designer.name}</h3>
+            <h3 className="text-lg font-semibold text-foreground truncate">{designer.name}</h3>
             {designer.isVerified && (
-              <svg className="h-5 w-5 text-blue-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+              <svg className="h-5 w-5 text-primary shrink-0" fill="currentColor" viewBox="0 0 20 20">
                 <path
                   fillRule="evenodd"
                   d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
@@ -82,17 +85,17 @@ function DesignerCard({ designer }: { designer: DesignerProfile }) {
           </div>
 
           {designer.firmName && (
-            <p className="text-sm text-gray-600 truncate">{designer.firmName}</p>
+            <p className="text-sm text-muted-foreground truncate">{designer.firmName}</p>
           )}
 
           {designer.bio && (
-            <p className="mt-2 text-sm text-gray-500 line-clamp-2">{designer.bio}</p>
+            <p className="mt-2 text-sm text-muted-foreground line-clamp-2">{designer.bio}</p>
           )}
         </div>
       </div>
 
       {/* Stats */}
-      <div className="mt-4 flex flex-wrap items-center gap-4 text-sm text-gray-600">
+      <div className="mt-4 flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
         {designer.experienceYears && (
           <span className="flex items-center gap-1">
             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -127,13 +130,13 @@ function DesignerCard({ designer }: { designer: DesignerProfile }) {
           {designer.styles.slice(0, 3).map((style) => (
             <span
               key={style}
-              className="rounded-full bg-gray-100 px-2 py-1 text-xs text-gray-600"
+              className="rounded-full bg-muted px-2 py-1 text-xs text-muted-foreground"
             >
               {style}
             </span>
           ))}
           {designer.styles.length > 3 && (
-            <span className="rounded-full bg-gray-100 px-2 py-1 text-xs text-gray-600">
+            <span className="rounded-full bg-muted px-2 py-1 text-xs text-muted-foreground">
               +{designer.styles.length - 3} more
             </span>
           )}
@@ -142,7 +145,7 @@ function DesignerCard({ designer }: { designer: DesignerProfile }) {
 
       {/* Cities */}
       {designer.serviceCities && designer.serviceCities.length > 0 && (
-        <div className="mt-2 text-xs text-gray-500">
+        <div className="mt-2 text-xs text-muted-foreground">
           Serves: {designer.serviceCities.join(", ")}
         </div>
       )}
@@ -211,12 +214,12 @@ export function BrowseDesignersPage() {
   const hasFilters = searchQuery || selectedCity || selectedStyles.length > 0 || budgetMax
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-muted">
       {/* Header */}
-      <div className="bg-white border-b">
+      <div className="bg-card border-b">
         <div className="mx-auto max-w-7xl px-4 py-6">
-          <h1 className="text-2xl font-bold text-gray-900">Find Interior Designers</h1>
-          <p className="mt-1 text-gray-600">
+          <h1 className="text-2xl font-bold text-foreground">Find Interior Designers</h1>
+          <p className="mt-1 text-muted-foreground">
             Discover talented designers for your home project
           </p>
         </div>
@@ -225,14 +228,14 @@ export function BrowseDesignersPage() {
       <div className="mx-auto max-w-7xl px-4 py-6">
         <div className="flex flex-col gap-6 lg:flex-row">
           {/* Filters Sidebar */}
-          <div className="w-full lg:w-64 flex-shrink-0">
-            <div className="rounded-lg bg-white p-4 shadow-sm">
+          <div className="w-full lg:w-64 shrink-0">
+            <div className="rounded-lg bg-card p-4 shadow-sm">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="font-semibold text-gray-900">Filters</h2>
+                <h2 className="font-semibold text-foreground">Filters</h2>
                 {hasFilters && (
                   <button
                     onClick={clearFilters}
-                    className="text-sm text-blue-600 hover:text-blue-700"
+                    className="text-sm text-primary hover:text-primary/80"
                   >
                     Clear all
                   </button>
@@ -241,58 +244,54 @@ export function BrowseDesignersPage() {
 
               {/* Search */}
               <form onSubmit={handleSearch} className="mb-4">
-                <input
+                <Input
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search designers..."
-                  className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+                  className="text-sm"
                 />
               </form>
 
               {/* City */}
               <div className="mb-4">
-                <label className="mb-1 block text-sm font-medium text-gray-700">City</label>
-                <select
-                  value={selectedCity}
-                  onChange={(e) => {
-                    setSelectedCity(e.target.value)
-                    setPage(1)
-                  }}
-                  className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
-                >
-                  {CITIES.map((city) => (
-                    <option key={city.value} value={city.value}>
-                      {city.label}
-                    </option>
-                  ))}
-                </select>
+                <Label className="mb-1 block">City</Label>
+                <Select value={selectedCity || "__all__"} onValueChange={(value) => { setSelectedCity(value === "__all__" ? "" : value); setPage(1) }}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="All Cities" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {CITIES.map((city) => (
+                      <SelectItem key={city.value || "__all__"} value={city.value || "__all__"}>
+                        {city.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
 
               {/* Budget */}
               <div className="mb-4">
-                <label className="mb-1 block text-sm font-medium text-gray-700">Budget</label>
-                <select
-                  value={budgetMax}
-                  onChange={(e) => {
-                    setBudgetMax(e.target.value)
-                    setPage(1)
-                  }}
-                  className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
-                >
-                  {BUDGET_RANGES.map((range) => (
-                    <option key={range.value} value={range.value}>
-                      {range.label}
-                    </option>
-                  ))}
-                </select>
+                <Label className="mb-1 block">Budget</Label>
+                <Select value={budgetMax || "__any__"} onValueChange={(value) => { setBudgetMax(value === "__any__" ? "" : value); setPage(1) }}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Any Budget" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {BUDGET_RANGES.map((range) => (
+                      <SelectItem key={range.value || "__any__"} value={range.value || "__any__"}>
+                        {range.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
 
               {/* Design Styles */}
               <div>
-                <label className="mb-2 block text-sm font-medium text-gray-700">
+                <Label className="mb-2 block">
                   Design Style
-                </label>
+                </Label>
                 <div className="flex flex-wrap gap-1">
                   {DESIGN_STYLES.map((style) => (
                     <button
@@ -304,8 +303,8 @@ export function BrowseDesignersPage() {
                       }}
                       className={`rounded-full px-2 py-1 text-xs font-medium transition-colors ${
                         selectedStyles.includes(style)
-                          ? "bg-blue-100 text-blue-700"
-                          : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                          ? "bg-primary/10 text-primary"
+                          : "bg-muted text-muted-foreground hover:bg-muted/80"
                       }`}
                     >
                       {style}
@@ -320,7 +319,7 @@ export function BrowseDesignersPage() {
           <div className="flex-1">
             {/* Results count */}
             <div className="mb-4 flex items-center justify-between">
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-muted-foreground">
                 {isLoading ? "Loading..." : `${total} designers found`}
               </p>
             </div>
@@ -329,16 +328,16 @@ export function BrowseDesignersPage() {
             {isLoading ? (
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 {[1, 2, 3, 4].map((i) => (
-                  <div key={i} className="h-48 animate-pulse rounded-lg bg-gray-200" />
+                  <div key={i} className="h-48 animate-pulse rounded-lg bg-muted" />
                 ))}
               </div>
             ) : designers.length === 0 ? (
-              <div className="rounded-lg bg-white p-12 text-center">
-                <p className="text-gray-500">No designers found matching your criteria</p>
+              <div className="rounded-lg bg-card p-12 text-center">
+                <p className="text-muted-foreground">No designers found matching your criteria</p>
                 {hasFilters && (
                   <button
                     onClick={clearFilters}
-                    className="mt-4 text-sm text-blue-600 hover:text-blue-700"
+                    className="mt-4 text-sm text-primary hover:text-primary/80"
                   >
                     Clear filters
                   </button>
@@ -358,17 +357,17 @@ export function BrowseDesignersPage() {
                     <button
                       onClick={() => setPage((p) => Math.max(1, p - 1))}
                       disabled={page === 1}
-                      className="rounded-md border px-3 py-1 text-sm disabled:opacity-50"
+                      className="rounded-md border border-input px-3 py-1 text-sm disabled:opacity-50"
                     >
                       Previous
                     </button>
-                    <span className="text-sm text-gray-600">
+                    <span className="text-sm text-muted-foreground">
                       Page {page} of {totalPages}
                     </span>
                     <button
                       onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                       disabled={page === totalPages}
-                      className="rounded-md border px-3 py-1 text-sm disabled:opacity-50"
+                      className="rounded-md border border-input px-3 py-1 text-sm disabled:opacity-50"
                     >
                       Next
                     </button>

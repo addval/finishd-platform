@@ -14,7 +14,7 @@ export function AppLayout({ children }: AppLayoutProps) {
   return (
     <>
       <AppHeader />
-      <div style={{ paddingTop: "60px" }}>{children || <Outlet />}</div>
+      <div className="pt-15">{children || <Outlet />}</div>
     </>
   )
 }

@@ -7,6 +7,7 @@ import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import { toast } from "sonner"
 import { useFinishdAuthStore } from "../store/finishd-auth.store"
+import { Button } from "@/components/ui/button"
 
 type UserType = "homeowner" | "designer" | "contractor"
 
@@ -74,14 +75,14 @@ export function SelectUserTypePage() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-gray-50 px-4">
+    <div className="flex min-h-screen flex-col items-center justify-center bg-muted px-4">
       <div className="w-full max-w-lg">
         {/* Header */}
         <div className="mb-8 text-center">
-          <h1 className="text-2xl font-bold text-gray-900">
+          <h1 className="text-2xl font-bold text-foreground">
             How will you use Finishd?
           </h1>
-          <p className="mt-2 text-gray-600">
+          <p className="mt-2 text-muted-foreground">
             Choose your role to personalize your experience
           </p>
         </div>
@@ -95,17 +96,17 @@ export function SelectUserTypePage() {
               onClick={() => setSelected(option.type)}
               className={`w-full rounded-lg border-2 p-6 text-left transition-all ${
                 selected === option.type
-                  ? "border-blue-500 bg-blue-50"
-                  : "border-gray-200 bg-white hover:border-gray-300"
+                  ? "border-primary bg-primary/10"
+                  : "border-input bg-card hover:border-muted-foreground"
               }`}
             >
               <div className="flex items-start gap-4">
                 <span className="text-3xl">{option.icon}</span>
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-900">
+                  <h3 className="text-lg font-semibold text-foreground">
                     {option.title}
                   </h3>
-                  <p className="mt-1 text-sm text-gray-600">
+                  <p className="mt-1 text-sm text-muted-foreground">
                     {option.description}
                   </p>
                 </div>
@@ -113,13 +114,13 @@ export function SelectUserTypePage() {
                   <div
                     className={`h-6 w-6 rounded-full border-2 ${
                       selected === option.type
-                        ? "border-blue-500 bg-blue-500"
-                        : "border-gray-300"
+                        ? "border-primary bg-primary"
+                        : "border-input"
                     }`}
                   >
                     {selected === option.type && (
                       <svg
-                        className="h-5 w-5 text-white"
+                        className="h-5 w-5 text-primary-foreground"
                         fill="none"
                         viewBox="0 0 24 24"
                         stroke="currentColor"
@@ -140,17 +141,20 @@ export function SelectUserTypePage() {
         </div>
 
         {/* Continue Button */}
-        <button
+        <Button
           type="button"
-          onClick={handleContinue}
+          variant="primary"
+          fullWidth
+          isLoading={isLoading}
           disabled={!selected || isLoading}
-          className="mt-8 w-full rounded-md bg-blue-600 px-4 py-3 font-medium text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-blue-300"
+          onClick={handleContinue}
+          className="mt-8"
         >
           {isLoading ? "Setting up..." : "Continue"}
-        </button>
+        </Button>
 
         {/* Note */}
-        <p className="mt-4 text-center text-sm text-gray-500">
+        <p className="mt-4 text-center text-sm text-muted-foreground">
           You can change this later in settings
         </p>
       </div>
