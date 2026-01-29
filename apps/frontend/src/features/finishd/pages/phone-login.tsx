@@ -26,7 +26,7 @@ export function PhoneLoginPage() {
     try {
       await sendOtp(cleanPhone)
       toast.success("OTP sent successfully!")
-      navigate("/finishd/verify-otp", { state: { phone: cleanPhone } })
+      navigate("/verify-otp", { state: { phone: cleanPhone } })
     } catch {
       toast.error(error || "Failed to send OTP")
     }

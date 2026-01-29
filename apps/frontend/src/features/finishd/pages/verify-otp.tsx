@@ -23,7 +23,7 @@ export function VerifyOtpPage() {
   // Redirect if no phone
   useEffect(() => {
     if (!phone) {
-      navigate("/finishd/login")
+      navigate("/login")
     }
   }, [phone, navigate])
 
@@ -81,7 +81,7 @@ export function VerifyOtpPage() {
       await verifyOtp(phone, otpValue)
       toast.success("Logged in successfully!")
       // Navigate based on user type
-      navigate("/finishd/onboarding")
+      navigate("/onboarding")
     } catch {
       // Error is handled in store and displayed
       setOtp(["", "", "", "", "", ""])
@@ -103,7 +103,7 @@ export function VerifyOtpPage() {
 
   const handleBack = () => {
     resetOtpState()
-    navigate("/finishd/login")
+    navigate("/login")
   }
 
   return (

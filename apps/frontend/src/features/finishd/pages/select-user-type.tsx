@@ -45,7 +45,7 @@ export function SelectUserTypePage() {
 
   // Redirect if already has user type
   if (user && !needsOnboarding()) {
-    navigate("/finishd/dashboard")
+    navigate("/dashboard")
     return null
   }
 
@@ -61,11 +61,11 @@ export function SelectUserTypePage() {
 
       // Navigate to appropriate onboarding
       if (selected === "homeowner") {
-        navigate("/finishd/onboarding/homeowner")
+        navigate("/onboarding/homeowner")
       } else if (selected === "designer") {
-        navigate("/finishd/onboarding/designer")
+        navigate("/onboarding/designer")
       } else {
-        navigate("/finishd/onboarding/contractor")
+        navigate("/onboarding/contractor")
       }
     } catch {
       toast.error("Failed to set user type")

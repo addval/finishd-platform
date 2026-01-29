@@ -11,22 +11,21 @@ import { FinishdProtectedRoute } from "./finishd-protected-route"
 
 /**
  * Finishd route definitions
- * All routes are prefixed with /finishd
  */
 export const finishdRoutes: RouteObject[] = [
   // Auth routes
   {
-    path: "/finishd/login",
+    path: "/login",
     element: <PhoneLoginPage />,
   },
   {
-    path: "/finishd/verify-otp",
+    path: "/verify-otp",
     element: <VerifyOtpPage />,
   },
 
   // Onboarding routes
   {
-    path: "/finishd/onboarding",
+    path: "/onboarding",
     element: (
       <FinishdProtectedRoute>
         <SelectUserTypePage />
@@ -36,7 +35,7 @@ export const finishdRoutes: RouteObject[] = [
 
   // Dashboard routes (placeholder for now)
   {
-    path: "/finishd/dashboard",
+    path: "/dashboard",
     element: (
       <FinishdProtectedRoute requireUserType>
         <div className="flex min-h-screen items-center justify-center">
@@ -51,7 +50,7 @@ export const finishdRoutes: RouteObject[] = [
 
   // Homeowner routes
   {
-    path: "/finishd/onboarding/homeowner",
+    path: "/onboarding/homeowner",
     element: (
       <FinishdProtectedRoute requireUserType="homeowner">
         <div className="flex min-h-screen items-center justify-center">
@@ -66,7 +65,7 @@ export const finishdRoutes: RouteObject[] = [
 
   // Designer routes
   {
-    path: "/finishd/onboarding/designer",
+    path: "/onboarding/designer",
     element: (
       <FinishdProtectedRoute requireUserType="designer">
         <div className="flex min-h-screen items-center justify-center">
@@ -81,7 +80,7 @@ export const finishdRoutes: RouteObject[] = [
 
   // Contractor routes
   {
-    path: "/finishd/onboarding/contractor",
+    path: "/onboarding/contractor",
     element: (
       <FinishdProtectedRoute requireUserType="contractor">
         <div className="flex min-h-screen items-center justify-center">
@@ -94,9 +93,15 @@ export const finishdRoutes: RouteObject[] = [
     ),
   },
 
-  // Redirect /finishd to appropriate page
+  // Home redirect
   {
-    path: "/finishd",
-    element: <Navigate to="/finishd/login" replace />,
+    path: "/",
+    element: <Navigate to="/login" replace />,
+  },
+
+  // Catch-all redirect to login
+  {
+    path: "*",
+    element: <Navigate to="/login" replace />,
   },
 ]
