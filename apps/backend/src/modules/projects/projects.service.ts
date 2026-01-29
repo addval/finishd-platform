@@ -214,13 +214,15 @@ export async function createProject(
       const propertyList = await db
         .select()
         .from(properties)
-        .where(
-          and(eq(properties.id, data.propertyId), eq(properties.homeownerId, homeowner.id)),
-        )
+        .where(eq(properties.id, data.propertyId))
         .limit(1)
 
       if (propertyList.length === 0) {
-        return { success: false, error: "Property not found or does not belong to you" }
+        return { success: false, error: "Property not found" }
+      }
+
+      if (propertyList[0].homeownerId !== homeowner.id) {
+        return { success: false, error: "Access denied: property does not belong to you" }
       }
     }
 
@@ -300,13 +302,15 @@ export async function updateProject(
       const propertyList = await db
         .select()
         .from(properties)
-        .where(
-          and(eq(properties.id, data.propertyId), eq(properties.homeownerId, homeownerList[0].id)),
-        )
+        .where(eq(properties.id, data.propertyId))
         .limit(1)
 
       if (propertyList.length === 0) {
-        return { success: false, error: "Property not found or does not belong to you" }
+        return { success: false, error: "Property not found" }
+      }
+
+      if (propertyList[0].homeownerId !== homeownerList[0].id) {
+        return { success: false, error: "Access denied: property does not belong to you" }
       }
     }
 

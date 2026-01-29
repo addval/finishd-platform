@@ -80,8 +80,10 @@ export function VerifyOtpPage() {
     try {
       await verifyOtp(phone, otpValue)
       toast.success("Logged in successfully!")
-      // Navigate based on user type
-      navigate("/finishd/onboarding")
+      // Navigate based on redirect target if provided, otherwise onboarding
+      const state = location.state as { redirectTo?: string } | null
+      const redirectTo = state?.redirectTo
+      navigate(redirectTo || "/finishd/onboarding")
     } catch {
       // Error is handled in store and displayed
       setOtp(["", "", "", "", "", ""])

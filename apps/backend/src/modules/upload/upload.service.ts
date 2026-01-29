@@ -9,7 +9,23 @@ import crypto from "node:crypto"
 
 // Configuration
 const UPLOAD_DIR = process.env.UPLOAD_DIR || "./uploads"
-const MAX_FILE_SIZE = Number.parseInt(process.env.MAX_FILE_SIZE || "10485760", 10) // 10MB default
+const DEFAULT_MAX_FILE_SIZE = 10485760 // 10MB default
+const MAX_FILE_SIZE = (() => {
+  const raw = process.env.MAX_FILE_SIZE
+  if (raw == null || raw.trim() === "") {
+    return DEFAULT_MAX_FILE_SIZE
+  }
+
+  const parsed = Number.parseInt(raw, 10)
+  if (Number.isNaN(parsed) || parsed <= 0) {
+    console.warn(
+      `[Upload] Invalid MAX_FILE_SIZE value "${raw}". Falling back to default (${DEFAULT_MAX_FILE_SIZE} bytes).`,
+    )
+    return DEFAULT_MAX_FILE_SIZE
+  }
+
+  return parsed
+})()
 const ALLOWED_TYPES = (process.env.ALLOWED_FILE_TYPES || "image/jpeg,image/png,image/webp").split(",")
 const BASE_URL = process.env.APP_BASE_URL || "http://localhost:3000"
 

@@ -76,20 +76,20 @@ export async function sendRequest(
       return { success: false, error: "Homeowner profile not found" }
     }
 
-    // Get project and verify ownership
+    // Get project
     const projectList = await db
       .select()
       .from(projects)
-      .where(
-        and(
-          eq(projects.id, data.projectId),
-          eq(projects.homeownerId, homeownerList[0].id),
-        ),
-      )
+      .where(eq(projects.id, data.projectId))
       .limit(1)
 
     if (projectList.length === 0) {
-      return { success: false, error: "Project not found or access denied" }
+      return { success: false, error: "Project not found" }
+    }
+
+    // Verify ownership
+    if (projectList[0].homeownerId !== homeownerList[0].id) {
+      return { success: false, error: "Access denied: you do not own this project" }
     }
 
     const project = projectList[0]
@@ -103,16 +103,15 @@ export async function sendRequest(
     const designerList = await db
       .select()
       .from(designerProfiles)
-      .where(
-        and(
-          eq(designerProfiles.id, data.designerId),
-          eq(designerProfiles.isVerified, true),
-        ),
-      )
+      .where(eq(designerProfiles.id, data.designerId))
       .limit(1)
 
     if (designerList.length === 0) {
-      return { success: false, error: "Designer not found or not verified" }
+      return { success: false, error: "Designer not found" }
+    }
+
+    if (!designerList[0].isVerified) {
+      return { success: false, error: "Designer is not verified" }
     }
 
     // Check if request already exists
@@ -180,16 +179,16 @@ export async function getProjectRequests(
     const projectList = await db
       .select()
       .from(projects)
-      .where(
-        and(
-          eq(projects.id, projectId),
-          eq(projects.homeownerId, homeownerList[0].id),
-        ),
-      )
+      .where(eq(projects.id, projectId))
       .limit(1)
 
     if (projectList.length === 0) {
-      return { success: false, error: "Project not found or access denied" }
+      return { success: false, error: "Project not found" }
+    }
+
+    // Verify ownership
+    if (projectList[0].homeownerId !== homeownerList[0].id) {
+      return { success: false, error: "Access denied: you do not own this project" }
     }
 
     const requests = await db
@@ -550,20 +549,20 @@ export async function acceptProposal(
 
     const request = requestList[0]
 
-    // Verify homeowner owns the project
+    // Get project
     const projectList = await db
       .select()
       .from(projects)
-      .where(
-        and(
-          eq(projects.id, request.projectId),
-          eq(projects.homeownerId, homeownerList[0].id),
-        ),
-      )
+      .where(eq(projects.id, request.projectId))
       .limit(1)
 
     if (projectList.length === 0) {
-      return { success: false, error: "Project not found or access denied" }
+      return { success: false, error: "Project not found" }
+    }
+
+    // Verify homeowner owns the project
+    if (projectList[0].homeownerId !== homeownerList[0].id) {
+      return { success: false, error: "Access denied: you do not own this project" }
     }
 
     // Update proposal status
@@ -669,7 +668,7 @@ export async function rejectProposal(
       return { success: false, error: "Proposal already processed" }
     }
 
-    // Get request and verify ownership
+    // Get request
     const requestList = await db
       .select()
       .from(projectRequests)
@@ -678,19 +677,20 @@ export async function rejectProposal(
 
     const request = requestList[0]
 
+    // Get project
     const projectList = await db
       .select()
       .from(projects)
-      .where(
-        and(
-          eq(projects.id, request.projectId),
-          eq(projects.homeownerId, homeownerList[0].id),
-        ),
-      )
+      .where(eq(projects.id, request.projectId))
       .limit(1)
 
     if (projectList.length === 0) {
-      return { success: false, error: "Project not found or access denied" }
+      return { success: false, error: "Project not found" }
+    }
+
+    // Verify ownership
+    if (projectList[0].homeownerId !== homeownerList[0].id) {
+      return { success: false, error: "Access denied: you do not own this project" }
     }
 
     // Update proposal status
@@ -754,16 +754,16 @@ export async function getProjectProposals(
     const projectList = await db
       .select()
       .from(projects)
-      .where(
-        and(
-          eq(projects.id, projectId),
-          eq(projects.homeownerId, homeownerList[0].id),
-        ),
-      )
+      .where(eq(projects.id, projectId))
       .limit(1)
 
     if (projectList.length === 0) {
-      return { success: false, error: "Project not found or access denied" }
+      return { success: false, error: "Project not found" }
+    }
+
+    // Verify ownership
+    if (projectList[0].homeownerId !== homeownerList[0].id) {
+      return { success: false, error: "Access denied: you do not own this project" }
     }
 
     // Get all requests for this project

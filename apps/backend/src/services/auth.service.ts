@@ -402,8 +402,12 @@ export const refreshToken = async (refreshToken: string): Promise<TokenPair> => 
     // Get user from database
     const user = await getUserById(userId)
 
-    if (!user || user.status !== "active") {
-      throw new UnauthorizedError("User not found or inactive")
+    if (!user) {
+      throw new UnauthorizedError("User not found")
+    }
+
+    if (user.status !== "active") {
+      throw new UnauthorizedError("User account is inactive")
     }
 
     // Generate new token pair

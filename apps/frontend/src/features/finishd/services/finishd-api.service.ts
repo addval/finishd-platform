@@ -98,7 +98,8 @@ export async function getHomeownerProfile(): Promise<HomeownerProfile | null> {
   try {
     const response = await apiClient.get(`${API_BASE}/homeowners/me`)
     return response.data.data.profile
-  } catch {
+  } catch (error: unknown) {
+    console.error("Failed to fetch homeowner profile", error)
     return null
   }
 }

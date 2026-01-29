@@ -269,12 +269,25 @@ export function CreateProjectPage() {
                     onChange={(e) => setPropertyId(e.target.value)}
                     className="w-full rounded-md border border-gray-300 px-4 py-3 focus:border-blue-500 focus:outline-none"
                   >
-                    {properties.map((prop) => (
-                      <option key={prop.id} value={prop.id}>
-                        {prop.type.charAt(0).toUpperCase() + prop.type.slice(1)} -{" "}
-                        {prop.city || "No city"} ({prop.sizeSqft || "N/A"} sq.ft)
-                      </option>
-                    ))}
+                    {properties.map((prop) => {
+                      const propertyType =
+                        prop.type.charAt(0).toUpperCase() + prop.type.slice(1)
+                      const cityText = prop.city || "No city"
+                      const sizeText = prop.sizeSqft
+                        ? `${prop.sizeSqft} square feet`
+                        : "Size not available"
+                      const ariaLabel = `${propertyType} property in ${cityText}, ${sizeText}`
+
+                      return (
+                        <option
+                          key={prop.id}
+                          value={prop.id}
+                          aria-label={ariaLabel}
+                        >
+                          {propertyType} - {cityText} ({prop.sizeSqft || "N/A"} sq.ft)
+                        </option>
+                      )
+                    })}
                   </select>
                 </div>
               )}
