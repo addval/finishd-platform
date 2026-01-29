@@ -7,6 +7,12 @@ import { Navigate, type RouteObject } from "react-router-dom"
 import { PhoneLoginPage } from "../pages/phone-login"
 import { VerifyOtpPage } from "../pages/verify-otp"
 import { SelectUserTypePage } from "../pages/select-user-type"
+import { HomeownerOnboardingPage } from "../pages/onboarding/homeowner-onboarding"
+import { DesignerOnboardingPage } from "../pages/onboarding/designer-onboarding"
+import { ContractorOnboardingPage } from "../pages/onboarding/contractor-onboarding"
+import { BrowseDesignersPage } from "../pages/browse-designers"
+import { CreateProjectPage } from "../pages/create-project"
+import { DashboardPage } from "../pages/dashboard"
 import { FinishdProtectedRoute } from "./finishd-protected-route"
 
 /**
@@ -24,7 +30,7 @@ export const finishdRoutes: RouteObject[] = [
     element: <VerifyOtpPage />,
   },
 
-  // Onboarding routes
+  // User type selection (after first login)
   {
     path: "/finishd/onboarding",
     element: (
@@ -34,17 +40,12 @@ export const finishdRoutes: RouteObject[] = [
     ),
   },
 
-  // Dashboard routes (placeholder for now)
+  // Dashboard - main landing page after login
   {
     path: "/finishd/dashboard",
     element: (
       <FinishdProtectedRoute requireUserType>
-        <div className="flex min-h-screen items-center justify-center">
-          <div className="text-center">
-            <h1 className="text-2xl font-bold">Finishd Dashboard</h1>
-            <p className="mt-2 text-gray-600">Coming soon...</p>
-          </div>
-        </div>
+        <DashboardPage />
       </FinishdProtectedRoute>
     ),
   },
@@ -54,12 +55,7 @@ export const finishdRoutes: RouteObject[] = [
     path: "/finishd/onboarding/homeowner",
     element: (
       <FinishdProtectedRoute requireUserType="homeowner">
-        <div className="flex min-h-screen items-center justify-center">
-          <div className="text-center">
-            <h1 className="text-2xl font-bold">Homeowner Profile Setup</h1>
-            <p className="mt-2 text-gray-600">Coming soon...</p>
-          </div>
-        </div>
+        <HomeownerOnboardingPage />
       </FinishdProtectedRoute>
     ),
   },
@@ -69,12 +65,7 @@ export const finishdRoutes: RouteObject[] = [
     path: "/finishd/onboarding/designer",
     element: (
       <FinishdProtectedRoute requireUserType="designer">
-        <div className="flex min-h-screen items-center justify-center">
-          <div className="text-center">
-            <h1 className="text-2xl font-bold">Designer Profile Setup</h1>
-            <p className="mt-2 text-gray-600">Coming soon...</p>
-          </div>
-        </div>
+        <DesignerOnboardingPage />
       </FinishdProtectedRoute>
     ),
   },
@@ -84,12 +75,27 @@ export const finishdRoutes: RouteObject[] = [
     path: "/finishd/onboarding/contractor",
     element: (
       <FinishdProtectedRoute requireUserType="contractor">
-        <div className="flex min-h-screen items-center justify-center">
-          <div className="text-center">
-            <h1 className="text-2xl font-bold">Contractor Profile Setup</h1>
-            <p className="mt-2 text-gray-600">Coming soon...</p>
-          </div>
-        </div>
+        <ContractorOnboardingPage />
+      </FinishdProtectedRoute>
+    ),
+  },
+
+  // Browse designers (for homeowners)
+  {
+    path: "/finishd/designers",
+    element: (
+      <FinishdProtectedRoute requireUserType>
+        <BrowseDesignersPage />
+      </FinishdProtectedRoute>
+    ),
+  },
+
+  // Create project (for homeowners)
+  {
+    path: "/finishd/projects/new",
+    element: (
+      <FinishdProtectedRoute requireUserType="homeowner">
+        <CreateProjectPage />
       </FinishdProtectedRoute>
     ),
   },
