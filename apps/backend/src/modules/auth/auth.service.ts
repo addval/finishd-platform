@@ -5,7 +5,15 @@
 
 import { eq } from "drizzle-orm"
 import jwt from "jsonwebtoken"
-import { db, users, type User, type NewUser } from "../../db/index.js"
+import {
+  db,
+  users,
+  homeownerProfiles,
+  designerProfiles,
+  contractorProfiles,
+  type User,
+  type NewUser,
+} from "../../db/index.js"
 import { generateOtp, storeOtp, verifyOtp, canSendOtp, deleteOtp } from "./otp.service.js"
 import { sendOtpSms, validatePhoneNumber } from "./sms.service.js"
 
@@ -150,12 +158,14 @@ export async function verifyOtpAndAuthenticate(
 /**
  * Set user type after OTP verification
  * Called during onboarding to set homeowner/designer/contractor
+ * Also creates the corresponding profile record
  */
 export async function setUserType(
   userId: string,
   userType: "homeowner" | "designer" | "contractor",
 ): Promise<{ success: boolean; user?: User; error?: string }> {
   try {
+    // Update user type
     const updatedUsers = await db
       .update(users)
       .set({ userType, updatedAt: new Date() })
@@ -166,7 +176,57 @@ export async function setUserType(
       return { success: false, error: "User not found" }
     }
 
-    return { success: true, user: updatedUsers[0] }
+    const user = updatedUsers[0]
+
+    // Create corresponding profile if it doesn't exist
+    // Use placeholder name that will be updated during onboarding
+    const placeholderName = "New User"
+
+    if (userType === "homeowner") {
+      const existing = await db
+        .select()
+        .from(homeownerProfiles)
+        .where(eq(homeownerProfiles.userId, userId))
+        .limit(1)
+
+      if (existing.length === 0) {
+        await db.insert(homeownerProfiles).values({
+          userId,
+          name: placeholderName,
+        })
+        console.log(`[Auth] Created homeowner profile for user ${userId}`)
+      }
+    } else if (userType === "designer") {
+      const existing = await db
+        .select()
+        .from(designerProfiles)
+        .where(eq(designerProfiles.userId, userId))
+        .limit(1)
+
+      if (existing.length === 0) {
+        await db.insert(designerProfiles).values({
+          userId,
+          name: placeholderName,
+        })
+        console.log(`[Auth] Created designer profile for user ${userId}`)
+      }
+    } else if (userType === "contractor") {
+      const existing = await db
+        .select()
+        .from(contractorProfiles)
+        .where(eq(contractorProfiles.userId, userId))
+        .limit(1)
+
+      if (existing.length === 0) {
+        await db.insert(contractorProfiles).values({
+          userId,
+          name: placeholderName,
+        })
+        console.log(`[Auth] Created contractor profile for user ${userId}`)
+      }
+    }
+
+    return { success: true, user }
   } catch (error) {
     console.error("[Auth] Failed to set user type:", error)
     return { success: false, error: "Failed to update user type" }

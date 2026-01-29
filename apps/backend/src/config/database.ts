@@ -1,69 +1,40 @@
 /**
  * Database Configuration
- * Sequelize ORM with PostgreSQL
+ * Drizzle ORM with PostgreSQL
  */
 
-// Load environment variables FIRST
 import dotenv from "dotenv"
-
 dotenv.config()
 
-import { Sequelize } from "sequelize"
+import { drizzle } from "drizzle-orm/node-postgres"
+import pg from "pg"
+import * as schema from "../db/schema.js"
 import { logger } from "../utils/logger.js"
 
-// Validate required environment variables
-const requiredEnvVars = ["DB_HOST", "DB_PORT", "DB_NAME", "DB_USER", "DB_PASSWORD"]
-const missingEnvVars = requiredEnvVars.filter(varName => process.env[varName] === undefined)
+const { Pool } = pg
 
-if (missingEnvVars.length > 0) {
-  throw new Error(
-    `Missing required database environment variables: ${missingEnvVars.join(", ")}
-Please set the following in your .env file:
-- DB_HOST
-- DB_PORT
-- DB_NAME
-- DB_USER
-- DB_PASSWORD`,
-  )
-}
-
-// Warn if DB_PASSWORD is empty (only in development)
-if (process.env.NODE_ENV === "development" && !process.env.DB_PASSWORD) {
-  logger.warn(
-    "⚠️  DB_PASSWORD is empty. Ensure your PostgreSQL allows passwordless connections (trust auth).",
-  )
-}
-
-const sequelizeInstance = new Sequelize({
-  dialect: "postgres",
-  host: process.env.DB_HOST,
-  port: Number.parseInt(process.env.DB_PORT || "5432", 10),
-  database: process.env.DB_NAME,
-  username: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  logging: msg => logger.debug(msg),
-  pool: {
-    min: Number.parseInt(process.env.DB_POOL_MIN || "2", 10),
-    max: Number.parseInt(process.env.DB_POOL_MAX || "10", 10),
-    acquire: 30000,
-    idle: 10000,
-  },
-  define: {
-    underscored: true,
-    createdAt: "created_at",
-    updatedAt: "updated_at",
-    deletedAt: "deleted_at",
-    timestamps: true,
-    paranoid: true,
-  },
+// Create connection pool
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  max: 20,
+  idleTimeoutMillis: 30000,
+  connectionTimeoutMillis: 2000,
 })
 
-export const sequelize = sequelizeInstance
-export default sequelizeInstance
+// Create drizzle instance with schema
+export const db = drizzle(pool, { schema })
+
+// Export pool for raw queries if needed
+export { pool }
+
+// Export schema for convenience
+export * from "../db/schema.js"
 
 export const initDatabase = async (): Promise<void> => {
   try {
-    await sequelize.authenticate()
+    const client = await pool.connect()
+    await client.query("SELECT NOW()")
+    client.release()
     logger.info("Database connection established successfully")
   } catch (error) {
     logger.error("Unable to connect to database:", error)
@@ -72,6 +43,6 @@ export const initDatabase = async (): Promise<void> => {
 }
 
 export const closeDatabase = async (): Promise<void> => {
-  await sequelize.close()
+  await pool.end()
   logger.info("Database connection closed")
 }

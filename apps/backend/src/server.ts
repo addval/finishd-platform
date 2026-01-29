@@ -1,6 +1,6 @@
 /**
  * Backend Server Entry Point
- * Express.js server with TypeScript, PostgreSQL, Sequelize
+ * Express.js server with TypeScript, PostgreSQL, Drizzle ORM
  */
 
 // Load environment variables FIRST (before any imports that use env vars)
@@ -107,10 +107,6 @@ class Server {
       // Initialize database
       await initDatabase()
 
-      // Initialize models and setup associations
-      const { initializeModels } = await import("./models/index.js")
-      initializeModels()
-
       // Initialize Redis (optional)
       if (process.env.REDIS_URL) {
         const { initRedis } = await import("./config/redis.js")
@@ -141,9 +137,8 @@ class Server {
       this.httpServer.close(async () => {
         try {
           // Close database connection
-          const { sequelize } = await import("./config/database.js")
-          await sequelize.close()
-          logger.info("Database connection closed")
+          const { closeDatabase } = await import("./config/database.js")
+          await closeDatabase()
 
           // Close Redis connection
           if (process.env.REDIS_URL) {

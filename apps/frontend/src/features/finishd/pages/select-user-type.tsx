@@ -3,7 +3,7 @@
  * Onboarding step to choose homeowner, designer, or contractor
  */
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import { toast } from "sonner"
 import { useFinishdAuthStore } from "../store/finishd-auth.store"
@@ -44,10 +44,11 @@ export function SelectUserTypePage() {
   const [selected, setSelected] = useState<UserType | null>(null)
 
   // Redirect if already has user type
-  if (user && !needsOnboarding()) {
-    navigate("/finishd/dashboard")
-    return null
-  }
+  useEffect(() => {
+    if (user && !needsOnboarding()) {
+      navigate("/finishd/dashboard", { replace: true })
+    }
+  }, [user, needsOnboarding, navigate])
 
   const handleContinue = async () => {
     if (!selected) {

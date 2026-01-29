@@ -12,9 +12,23 @@
  * - Sample requests, proposals, tasks, milestones
  */
 
+import dotenv from "dotenv"
+dotenv.config()
+
 import { eq } from "drizzle-orm"
-import { db } from "../db/index.js"
-import {
+import { drizzle } from "drizzle-orm/node-postgres"
+import pg from "pg"
+import * as schema from "./schema.js"
+
+const { Pool } = pg
+
+// Create pool with loaded env
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+})
+const db = drizzle(pool, { schema })
+
+const {
   users,
   homeownerProfiles,
   designerProfiles,
@@ -26,7 +40,7 @@ import {
   tasks,
   milestones,
   costEstimates,
-} from "../db/schema.js"
+} = schema
 
 // ============================================================================
 // SEED DATA

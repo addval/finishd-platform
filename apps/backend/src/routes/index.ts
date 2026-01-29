@@ -13,10 +13,10 @@
 
 import { Router } from "express"
 
-// Legacy routes (keeping for backwards compatibility)
-import authProtectedRoutes from "./auth.protected.routes.js"
-import authPublicRoutes from "./auth.public.routes.js"
-import userRoutes from "./user.routes.js"
+// Legacy routes removed - migrated to Drizzle ORM
+// import authProtectedRoutes from "./auth.protected.routes.js"
+// import authPublicRoutes from "./auth.public.routes.js"
+// import userRoutes from "./user.routes.js"
 
 // New Finishd routes (v1)
 import { authRoutes } from "../modules/auth/index.js"
@@ -63,15 +63,10 @@ router.use("/api/v1/requests", requestsRoutes)
 router.use("/api/v1", tasksRoutes)
 
 // ============================================================================
-// LEGACY ROUTES (to be deprecated)
+// LEGACY ROUTES (removed - migrated to Drizzle ORM)
 // ============================================================================
-
-// Mount legacy public routes (no authentication required)
-router.use("/auth", authPublicRoutes)
-
-// Mount legacy protected routes (authentication required)
-router.use("/api", authProtectedRoutes)
-router.use("/api/users", userRoutes)
+// Legacy Sequelize-based routes have been removed.
+// Use /api/v1/* routes instead.
 
 // ============================================================================
 // HEALTH CHECK
