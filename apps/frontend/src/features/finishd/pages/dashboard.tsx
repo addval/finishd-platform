@@ -5,7 +5,9 @@
 
 import { useState, useEffect } from "react"
 import { useNavigate, Link } from "react-router-dom"
+import { Plus, Search, CircleCheck, LogOut } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { Card, CardContent } from "@/components/ui/card"
 import { useFinishdAuthStore } from "../store/finishd-auth.store"
 import {
   getProjects,
@@ -32,11 +34,11 @@ function getStatusColor(status: string): string {
     case "draft":
       return "bg-muted text-foreground"
     case "seeking_designer":
-      return "bg-yellow-100 text-yellow-700"
+      return "bg-accent text-accent-foreground"
     case "in_progress":
       return "bg-primary/10 text-primary"
     case "completed":
-      return "bg-green-100 text-green-700"
+      return "bg-primary/10 text-primary"
     case "cancelled":
       return "bg-destructive/10 text-destructive"
     default:
@@ -134,9 +136,7 @@ function HomeownerDashboard() {
           className="flex items-center gap-4 rounded-lg bg-primary p-6 text-left text-primary-foreground transition-colors hover:bg-primary/90"
         >
           <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white/20">
-            <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-            </svg>
+            <Plus className="h-6 w-6" />
           </div>
           <div>
             <h3 className="font-semibold">New Project</h3>
@@ -148,10 +148,8 @@ function HomeownerDashboard() {
           onClick={() => navigate("/finishd/designers")}
           className="flex items-center gap-4 rounded-lg bg-card p-6 text-left shadow-sm transition-colors hover:bg-muted"
         >
-          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-purple-100">
-            <svg className="h-6 w-6 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
+          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-secondary">
+            <Search className="h-6 w-6 text-secondary-foreground" />
           </div>
           <div>
             <h3 className="font-semibold text-foreground">Find Designers</h3>
@@ -314,48 +312,48 @@ function DesignerDashboard() {
   if (!isVerified) {
     return (
       <div className="space-y-6">
-        <div className="rounded-lg bg-yellow-50 border border-yellow-200 p-6">
-          <h2 className="text-lg font-semibold text-yellow-800">Verification Pending</h2>
-          <p className="mt-2 text-yellow-700">
-            Your profile is under review. Once verified, you'll start receiving project requests
-            from homeowners. This usually takes 24-48 hours.
-          </p>
-        </div>
+        <Card className="border-accent">
+          <CardContent className="p-6">
+            <h2 className="text-lg font-semibold text-foreground">Verification Pending</h2>
+            <p className="mt-2 text-muted-foreground">
+              Your profile is under review. Once verified, you'll start receiving project requests
+              from homeowners. This usually takes 24-48 hours.
+            </p>
+          </CardContent>
+        </Card>
 
-        <div className="rounded-lg bg-card p-6 shadow-sm">
-          <h3 className="font-semibold text-foreground">While you wait...</h3>
-          <ul className="mt-4 space-y-2 text-sm text-muted-foreground">
-            <li className="flex items-center gap-2">
-              <svg className="h-4 w-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-              </svg>
-              Add portfolio images to showcase your work
-            </li>
-            <li className="flex items-center gap-2">
-              <svg className="h-4 w-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-              </svg>
-              Complete your bio with more details
-            </li>
-            <li className="flex items-center gap-2">
-              <svg className="h-4 w-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-              </svg>
-              Add more service cities to reach more homeowners
-            </li>
-          </ul>
-        </div>
+        <Card>
+          <CardContent className="p-6">
+            <h3 className="font-semibold text-foreground">While you wait...</h3>
+            <ul className="mt-4 space-y-2 text-sm text-muted-foreground">
+              <li className="flex items-center gap-2">
+                <CircleCheck className="h-4 w-4 text-primary" />
+                Add portfolio images to showcase your work
+              </li>
+              <li className="flex items-center gap-2">
+                <CircleCheck className="h-4 w-4 text-primary" />
+                Complete your bio with more details
+              </li>
+              <li className="flex items-center gap-2">
+                <CircleCheck className="h-4 w-4 text-primary" />
+                Add more service cities to reach more homeowners
+              </li>
+            </ul>
+          </CardContent>
+        </Card>
       </div>
     )
   }
 
   return (
     <div className="space-y-6">
-      <div className="rounded-lg bg-green-50 border border-green-200 p-4">
-        <p className="text-green-700">
-          <strong>Profile verified!</strong> You're now visible to homeowners looking for designers.
-        </p>
-      </div>
+      <Card className="border-primary bg-primary/5">
+        <CardContent className="p-4">
+          <p className="text-foreground">
+            <strong>Profile verified!</strong> You're now visible to homeowners looking for designers.
+          </p>
+        </CardContent>
+      </Card>
 
       <div className="rounded-lg bg-card p-6 shadow-sm">
         <h2 className="text-lg font-semibold text-foreground">Incoming Requests</h2>
@@ -422,23 +420,27 @@ function ContractorDashboard() {
 
   if (!isVerified) {
     return (
-      <div className="rounded-lg bg-yellow-50 border border-yellow-200 p-6">
-        <h2 className="text-lg font-semibold text-yellow-800">Verification Pending</h2>
-        <p className="mt-2 text-yellow-700">
-          Your profile is under review. Once verified, designers will be able to invite you to
-          projects. This usually takes 24-48 hours.
-        </p>
-      </div>
+      <Card className="border-accent">
+        <CardContent className="p-6">
+          <h2 className="text-lg font-semibold text-foreground">Verification Pending</h2>
+          <p className="mt-2 text-muted-foreground">
+            Your profile is under review. Once verified, designers will be able to invite you to
+            projects. This usually takes 24-48 hours.
+          </p>
+        </CardContent>
+      </Card>
     )
   }
 
   return (
     <div className="space-y-6">
-      <div className="rounded-lg bg-green-50 border border-green-200 p-4">
-        <p className="text-green-700">
-          <strong>Profile verified!</strong> Designers can now invite you to projects.
-        </p>
-      </div>
+      <Card className="border-primary bg-primary/5">
+        <CardContent className="p-4">
+          <p className="text-foreground">
+            <strong>Profile verified!</strong> Designers can now invite you to projects.
+          </p>
+        </CardContent>
+      </Card>
 
       <div className="rounded-lg bg-card p-6 shadow-sm">
         <h2 className="text-lg font-semibold text-foreground">Project Invitations</h2>
@@ -466,17 +468,18 @@ export function DashboardPage() {
   return (
     <div className="min-h-screen bg-muted">
       {/* Header */}
-      <header className="bg-card border-b">
+      <header className="sticky top-0 z-50 bg-card border-b border-border">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4">
           <h1 className="text-xl font-bold text-foreground">Finishd</h1>
           <div className="flex items-center gap-4">
-            <span className="text-sm text-muted-foreground">
+            <span className="rounded-full bg-secondary px-3 py-1 text-xs font-medium text-secondary-foreground">
               {user?.userType ? user.userType.charAt(0).toUpperCase() + user.userType.slice(1) : "User"}
             </span>
             <button
               onClick={handleLogout}
-              className="text-sm text-muted-foreground hover:text-foreground"
+              className="flex items-center gap-2 rounded-lg border border-input px-3 py-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
             >
+              <LogOut className="h-4 w-4" />
               Logout
             </button>
           </div>

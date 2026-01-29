@@ -7,9 +7,13 @@ import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
+import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { SuccessScreen } from "@/components/ui/success-screen"
+import { Textarea } from "@/components/ui/textarea"
+import { ToggleChip, ToggleChipGroup } from "@/components/ui/toggle-chip"
 import { createContractorProfile } from "../../services/finishd-api.service"
 
 const CITIES = [
@@ -105,45 +109,16 @@ export function ContractorOnboardingPage() {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center bg-muted px-4 py-8">
         <div className="w-full max-w-lg">
-          <div className="rounded-lg bg-card p-8 text-center shadow-md">
-            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
-              <svg
-                className="h-8 w-8 text-green-600"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M5 13l4 4L19 7"
-                />
-              </svg>
-            </div>
-
-            <h2 className="mb-2 text-2xl font-bold text-foreground">Profile submitted!</h2>
-            <p className="mb-6 text-muted-foreground">
-              Your profile is under review. Once verified, designers will be able to invite you to
-              projects.
-            </p>
-
-            <div className="mb-6 rounded-md bg-yellow-50 p-4 text-left">
-              <p className="text-sm text-yellow-800">
-                <strong>Verification pending:</strong> Our team will review your profile within 24-48
-                hours. You'll be notified once your profile is live.
-              </p>
-            </div>
-
-            <Button
-              onClick={handleComplete}
-              variant="primary"
-              fullWidth
-              className="py-3"
-            >
-              Go to Dashboard
-            </Button>
-          </div>
+          <SuccessScreen
+            title="Profile submitted!"
+            description="Your profile is under review. Once verified, designers will be able to invite you to projects."
+            actionLabel="Go to Dashboard"
+            onAction={handleComplete}
+            notice={{
+              title: "Verification pending:",
+              message: "Our team will review your profile within 24-48 hours. You'll be notified once your profile is live.",
+            }}
+          />
         </div>
       </div>
     )
@@ -160,7 +135,8 @@ export function ContractorOnboardingPage() {
           </p>
         </div>
 
-        <div className="rounded-lg bg-card p-8 shadow-md">
+        <Card className="shadow-md">
+          <CardContent className="p-8">
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Basic Info */}
             <div className="space-y-4">
@@ -201,12 +177,12 @@ export function ContractorOnboardingPage() {
                 <Label className="mb-1 block">
                   About Your Work
                 </Label>
-                <textarea
+                <Textarea
                   value={bio}
                   onChange={(e) => setBio(e.target.value)}
                   placeholder="Describe your experience, specializations, and what makes you reliable..."
                   rows={3}
-                  className="w-full rounded-md border border-input px-4 py-3 focus:border-primary focus:outline-none"
+                  className="px-4 py-3"
                 />
               </div>
             </div>
@@ -218,19 +194,16 @@ export function ContractorOnboardingPage() {
               </Label>
               <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
                 {TRADES.map((trade) => (
-                  <button
+                  <ToggleChip
                     key={trade.value}
-                    type="button"
+                    variant="card"
+                    selected={selectedTrades.includes(trade.value)}
                     onClick={() => toggleTrade(trade.value)}
-                    className={`flex items-center gap-2 rounded-md border px-4 py-3 text-left text-sm font-medium transition-colors ${
-                      selectedTrades.includes(trade.value)
-                        ? "border-primary bg-primary/10 text-primary"
-                        : "border-input hover:border-input/80"
-                    }`}
+                    className="flex items-center gap-2"
                   >
                     <span>{trade.icon}</span>
                     <span>{trade.label}</span>
-                  </button>
+                  </ToggleChip>
                 ))}
               </div>
             </div>
@@ -240,22 +213,17 @@ export function ContractorOnboardingPage() {
               <Label className="mb-2 block">
                 Areas you serve *
               </Label>
-              <div className="flex flex-wrap gap-2">
+              <ToggleChipGroup>
                 {CITIES.map((city) => (
-                  <button
+                  <ToggleChip
                     key={city.value}
-                    type="button"
+                    selected={selectedCities.includes(city.value)}
                     onClick={() => toggleCity(city.value)}
-                    className={`rounded-full border px-4 py-2 text-sm font-medium transition-colors ${
-                      selectedCities.includes(city.value)
-                        ? "border-primary bg-primary/10 text-primary"
-                        : "border-input hover:border-input/80"
-                    }`}
                   >
                     {city.label}
-                  </button>
+                  </ToggleChip>
                 ))}
-              </div>
+              </ToggleChipGroup>
             </div>
 
             <Button
@@ -268,7 +236,8 @@ export function ContractorOnboardingPage() {
               {isLoading ? "Creating..." : "Create Profile"}
             </Button>
           </form>
-        </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   )

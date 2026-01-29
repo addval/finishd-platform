@@ -1,5 +1,51 @@
 @import "tailwindcss";
 
+@config "../../../tailwind.config.js";
+
+@custom-variant dark (&:is(.dark *));
+
+/**
+ * ========================================
+ * TAILWIND V4 THEME - SHADCN COLOR MAP
+ * ========================================
+ * Maps CSS variables to Tailwind utility classes.
+ * Required for Tailwind v4: without this, utilities like
+ * bg-popover, bg-card, text-foreground don't resolve.
+ */
+@theme inline {
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
+  --color-popover: hsl(var(--popover));
+  --color-popover-foreground: hsl(var(--popover-foreground));
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+  --color-secondary: hsl(var(--secondary));
+  --color-secondary-foreground: hsl(var(--secondary-foreground));
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+  --color-destructive: hsl(var(--destructive));
+  --color-destructive-foreground: hsl(var(--destructive-foreground));
+  --color-border: hsl(var(--border));
+  --color-input: hsl(var(--input));
+  --color-ring: hsl(var(--ring));
+  --color-chart-1: hsl(var(--chart-1));
+  --color-chart-2: hsl(var(--chart-2));
+  --color-chart-3: hsl(var(--chart-3));
+  --color-chart-4: hsl(var(--chart-4));
+  --color-chart-5: hsl(var(--chart-5));
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 16px);
+  --radius-full: 9999px;
+}
+
 /**
  * ========================================
  * SHADCN UI VARIABLES
@@ -94,14 +140,7 @@
     --spacing-20: 5rem; /* 80px */
     --spacing-24: 6rem; /* 96px */
 
-    /* Border radius - Mapped in Tailwind config */
-    --radius-sm: 0.25rem; /* 4px */
-    --radius-md: 0.5rem; /* 8px */
-    --radius-lg: 0.75rem; /* 12px */
-    --radius-xl: 1rem; /* 16px */
-    --radius-2xl: 1.5rem; /* 24px */
-    --radius-3xl: 2rem; /* 32px */
-    --radius-full: 9999px;
+    /* Border radius - Defined in @theme inline block above (derived from --radius) */
 
     /* Shadows - Mapped in Tailwind config */
     --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);

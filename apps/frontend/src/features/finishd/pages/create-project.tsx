@@ -7,9 +7,13 @@ import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
+import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { StepProgress } from "@/components/ui/step-progress"
+import { Textarea } from "@/components/ui/textarea"
+import { ToggleChip, ToggleChipGroup } from "@/components/ui/toggle-chip"
 import {
   getProperties,
   createProject,
@@ -149,65 +153,43 @@ export function CreateProjectPage() {
     <div className="min-h-screen bg-muted py-8">
       <div className="mx-auto max-w-2xl px-4">
         {/* Progress */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between text-sm">
-            <span className={step === "scope" ? "font-medium text-primary" : "text-muted-foreground"}>
-              Scope
-            </span>
-            <span className={step === "details" ? "font-medium text-primary" : "text-muted-foreground"}>
-              Details
-            </span>
-            <span className={step === "budget" ? "font-medium text-primary" : "text-muted-foreground"}>
-              Budget
-            </span>
-            <span className={step === "review" ? "font-medium text-primary" : "text-muted-foreground"}>
-              Review
-            </span>
-          </div>
-          <div className="mt-2 flex gap-1">
-            <div className={`h-1 flex-1 rounded ${step === "scope" ? "bg-primary" : "bg-primary/20"}`} />
-            <div className={`h-1 flex-1 rounded ${step === "details" ? "bg-primary" : step === "budget" || step === "review" ? "bg-primary/20" : "bg-muted-foreground/20"}`} />
-            <div className={`h-1 flex-1 rounded ${step === "budget" ? "bg-primary" : step === "review" ? "bg-primary/20" : "bg-muted-foreground/20"}`} />
-            <div className={`h-1 flex-1 rounded ${step === "review" ? "bg-primary" : "bg-muted-foreground/20"}`} />
-          </div>
-        </div>
+        <StepProgress
+          steps={["Scope", "Details", "Budget", "Review"]}
+          currentStep={step === "scope" ? "Scope" : step === "details" ? "Details" : step === "budget" ? "Budget" : "Review"}
+          className="mb-8"
+        />
 
         {/* Scope Step */}
         {step === "scope" && (
-          <div className="rounded-lg bg-card p-8 shadow-sm">
+          <Card className="shadow-sm">
+            <CardContent className="p-8">
             <h2 className="mb-2 text-2xl font-bold text-foreground">What do you want to design?</h2>
             <p className="mb-6 text-muted-foreground">Tell us the scope of your project</p>
 
             <div className="space-y-4">
-              <button
-                type="button"
+              <ToggleChip
+                variant="card"
+                selected={scope === "full_home"}
                 onClick={() => setScope("full_home")}
-                className={`w-full rounded-lg border-2 p-6 text-left transition-colors ${
-                  scope === "full_home"
-                    ? "border-primary bg-primary/10"
-                    : "border-input hover:border-input/80"
-                }`}
+                className="w-full rounded-lg border-2 p-6"
               >
                 <h3 className="text-lg font-semibold">Full Home Interior</h3>
                 <p className="mt-1 text-sm text-muted-foreground">
                   Complete interior design for your entire home
                 </p>
-              </button>
+              </ToggleChip>
 
-              <button
-                type="button"
+              <ToggleChip
+                variant="card"
+                selected={scope === "partial"}
                 onClick={() => setScope("partial")}
-                className={`w-full rounded-lg border-2 p-6 text-left transition-colors ${
-                  scope === "partial"
-                    ? "border-primary bg-primary/10"
-                    : "border-input hover:border-input/80"
-                }`}
+                className="w-full rounded-lg border-2 p-6"
               >
                 <h3 className="text-lg font-semibold">Specific Rooms</h3>
                 <p className="mt-1 text-sm text-muted-foreground">
                   Design only selected rooms or areas
                 </p>
-              </button>
+              </ToggleChip>
             </div>
 
             {scope === "partial" && (
@@ -215,22 +197,17 @@ export function CreateProjectPage() {
                 <Label className="mb-2 block">
                   Select rooms to design
                 </Label>
-                <div className="flex flex-wrap gap-2">
+                <ToggleChipGroup>
                   {ROOMS.map((room) => (
-                    <button
+                    <ToggleChip
                       key={room}
-                      type="button"
+                      selected={selectedRooms.includes(room)}
                       onClick={() => toggleRoom(room)}
-                      className={`rounded-full border px-4 py-2 text-sm font-medium transition-colors ${
-                        selectedRooms.includes(room)
-                          ? "border-primary bg-primary/10 text-primary"
-                          : "border-input hover:border-input/80"
-                      }`}
                     >
                       {room}
-                    </button>
+                    </ToggleChip>
                   ))}
-                </div>
+                </ToggleChipGroup>
               </div>
             )}
 
@@ -242,12 +219,14 @@ export function CreateProjectPage() {
             >
               Continue
             </Button>
-          </div>
+            </CardContent>
+          </Card>
         )}
 
         {/* Details Step */}
         {step === "details" && (
-          <div className="rounded-lg bg-card p-8 shadow-sm">
+          <Card className="shadow-sm">
+            <CardContent className="p-8">
             <h2 className="mb-2 text-2xl font-bold text-foreground">Project details</h2>
             <p className="mb-6 text-muted-foreground">Give your project a name and add any notes</p>
 
@@ -295,12 +274,12 @@ export function CreateProjectPage() {
                 <Label className="mb-1 block">
                   Additional Notes
                 </Label>
-                <textarea
+                <Textarea
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
                   placeholder="Any specific requirements, preferences, or things you want the designer to know..."
                   rows={4}
-                  className="w-full rounded-md border border-input px-4 py-3 focus:border-primary focus:outline-none"
+                  className="px-4 py-3"
                 />
               </div>
             </div>
@@ -321,19 +300,21 @@ export function CreateProjectPage() {
                 Continue
               </Button>
             </div>
-          </div>
+            </CardContent>
+          </Card>
         )}
 
         {/* Budget Step */}
         {step === "budget" && (
-          <div className="rounded-lg bg-card p-8 shadow-sm">
+          <Card className="shadow-sm">
+            <CardContent className="p-8">
             <h2 className="mb-2 text-2xl font-bold text-foreground">Budget & Timeline</h2>
             <p className="mb-6 text-muted-foreground">Help designers understand your expectations</p>
 
             <div className="space-y-6">
               <div>
                 <Label className="mb-2 block">
-                  Budget Range (in ₹) *
+                  Budget Range (in Rs.) *
                 </Label>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
@@ -369,18 +350,14 @@ export function CreateProjectPage() {
                 </Label>
                 <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
                   {TIMELINE_OPTIONS.map((option) => (
-                    <button
+                    <ToggleChip
                       key={option.value}
-                      type="button"
+                      variant="card"
+                      selected={startTimeline === option.value}
                       onClick={() => setStartTimeline(option.value)}
-                      className={`rounded-md border px-4 py-3 text-sm font-medium transition-colors ${
-                        startTimeline === option.value
-                          ? "border-primary bg-primary/10 text-primary"
-                          : "border-input hover:border-input/80"
-                      }`}
                     >
                       {option.label}
-                    </button>
+                    </ToggleChip>
                   ))}
                 </div>
               </div>
@@ -415,12 +392,14 @@ export function CreateProjectPage() {
                 Review
               </Button>
             </div>
-          </div>
+            </CardContent>
+          </Card>
         )}
 
         {/* Review Step */}
         {step === "review" && (
-          <div className="rounded-lg bg-card p-8 shadow-sm">
+          <Card className="shadow-sm">
+            <CardContent className="p-8">
             <h2 className="mb-2 text-2xl font-bold text-foreground">Review your project</h2>
             <p className="mb-6 text-muted-foreground">Make sure everything looks good before creating</p>
 
@@ -448,7 +427,7 @@ export function CreateProjectPage() {
                 <h3 className="text-sm font-medium text-muted-foreground">Timeline</h3>
                 <p className="mt-1">
                   Start: {TIMELINE_OPTIONS.find((t) => t.value === startTimeline)?.label}
-                  {timelineWeeks && ` • Duration: ${timelineWeeks} weeks`}
+                  {timelineWeeks && ` -- Duration: ${timelineWeeks} weeks`}
                 </p>
               </div>
 
@@ -477,7 +456,8 @@ export function CreateProjectPage() {
                 {isLoading ? "Creating..." : "Create Project"}
               </Button>
             </div>
-          </div>
+            </CardContent>
+          </Card>
         )}
       </div>
     </div>

@@ -5,9 +5,13 @@
 
 import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
+import { BadgeCheck, Clock, CircleCheck, IndianRupee } from "lucide-react"
+import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Skeleton } from "@/components/ui/skeleton"
+import { ToggleChip } from "@/components/ui/toggle-chip"
 import { browseDesigners, type DesignerProfile } from "../services/finishd-api.service"
 
 const CITIES = [
@@ -51,8 +55,8 @@ function DesignerCard({ designer }: { designer: DesignerProfile }) {
   const navigate = useNavigate()
 
   return (
-    <div
-      className="cursor-pointer rounded-lg border border-input bg-card p-6 transition-shadow hover:shadow-md"
+    <Card
+      className="cursor-pointer p-6 transition-shadow hover:shadow-md"
       onClick={() => navigate(`/finishd/designers/${designer.id}`)}
     >
       <div className="flex items-start gap-4">
@@ -74,13 +78,7 @@ function DesignerCard({ designer }: { designer: DesignerProfile }) {
           <div className="flex items-center gap-2">
             <h3 className="text-lg font-semibold text-foreground truncate">{designer.name}</h3>
             {designer.isVerified && (
-              <svg className="h-5 w-5 text-primary shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                <path
-                  fillRule="evenodd"
-                  d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                  clipRule="evenodd"
-                />
-              </svg>
+              <BadgeCheck className="h-5 w-5 text-primary shrink-0" />
             )}
           </div>
 
@@ -98,27 +96,21 @@ function DesignerCard({ designer }: { designer: DesignerProfile }) {
       <div className="mt-4 flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
         {designer.experienceYears && (
           <span className="flex items-center gap-1">
-            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
+            <Clock className="h-4 w-4" />
             {designer.experienceYears} yrs exp
           </span>
         )}
 
         {designer.projectsCompleted && designer.projectsCompleted > 0 && (
           <span className="flex items-center gap-1">
-            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
+            <CircleCheck className="h-4 w-4" />
             {designer.projectsCompleted} projects
           </span>
         )}
 
         {designer.priceRangeMin && designer.priceRangeMax && (
           <span className="flex items-center gap-1">
-            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
+            <IndianRupee className="h-4 w-4" />
             {formatPrice(designer.priceRangeMin)} - {formatPrice(designer.priceRangeMax)}
           </span>
         )}
@@ -149,7 +141,7 @@ function DesignerCard({ designer }: { designer: DesignerProfile }) {
           Serves: {designer.serviceCities.join(", ")}
         </div>
       )}
-    </div>
+    </Card>
   )
 }
 
@@ -229,7 +221,7 @@ export function BrowseDesignersPage() {
         <div className="flex flex-col gap-6 lg:flex-row">
           {/* Filters Sidebar */}
           <div className="w-full lg:w-64 shrink-0">
-            <div className="rounded-lg bg-card p-4 shadow-sm">
+            <Card className="p-4 shadow-sm">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="font-semibold text-foreground">Filters</h2>
                 {hasFilters && (
@@ -294,25 +286,21 @@ export function BrowseDesignersPage() {
                 </Label>
                 <div className="flex flex-wrap gap-1">
                   {DESIGN_STYLES.map((style) => (
-                    <button
+                    <ToggleChip
                       key={style}
-                      type="button"
+                      selected={selectedStyles.includes(style)}
                       onClick={() => {
                         toggleStyle(style)
                         setPage(1)
                       }}
-                      className={`rounded-full px-2 py-1 text-xs font-medium transition-colors ${
-                        selectedStyles.includes(style)
-                          ? "bg-primary/10 text-primary"
-                          : "bg-muted text-muted-foreground hover:bg-muted/80"
-                      }`}
+                      className="px-2 py-1 text-xs"
                     >
                       {style}
-                    </button>
+                    </ToggleChip>
                   ))}
                 </div>
               </div>
-            </div>
+            </Card>
           </div>
 
           {/* Results */}
@@ -328,11 +316,11 @@ export function BrowseDesignersPage() {
             {isLoading ? (
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 {[1, 2, 3, 4].map((i) => (
-                  <div key={i} className="h-48 animate-pulse rounded-lg bg-muted" />
+                  <Skeleton key={i} className="h-48 rounded-lg" />
                 ))}
               </div>
             ) : designers.length === 0 ? (
-              <div className="rounded-lg bg-card p-12 text-center">
+              <Card className="p-12 text-center">
                 <p className="text-muted-foreground">No designers found matching your criteria</p>
                 {hasFilters && (
                   <button
@@ -342,7 +330,7 @@ export function BrowseDesignersPage() {
                     Clear filters
                   </button>
                 )}
-              </div>
+              </Card>
             ) : (
               <>
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">

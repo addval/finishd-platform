@@ -9,7 +9,12 @@ import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Card, CardContent } from "@/components/ui/card"
+import { StepProgress } from "@/components/ui/step-progress"
+import { SuccessScreen } from "@/components/ui/success-screen"
+import { ToggleChip, ToggleChipGroup } from "@/components/ui/toggle-chip"
 import { createDesignerProfile } from "../../services/finishd-api.service"
 
 const CITIES = [
@@ -146,18 +151,16 @@ export function DesignerOnboardingPage() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-muted px-4 py-8">
       <div className="w-full max-w-2xl">
-        {/* Progress indicator */}
-        <div className="mb-8">
-          <div className="flex items-center justify-center gap-2">
-            <div className={`h-2 w-24 rounded-full ${step === "basic" ? "bg-primary" : "bg-primary/20"}`} />
-            <div className={`h-2 w-24 rounded-full ${step === "expertise" ? "bg-primary" : step === "complete" ? "bg-primary/20" : "bg-muted-foreground/20"}`} />
-            <div className={`h-2 w-24 rounded-full ${step === "complete" ? "bg-primary" : "bg-muted-foreground/20"}`} />
-          </div>
-        </div>
+        <StepProgress
+          steps={["Basic Info", "Expertise", "Complete"]}
+          currentStep={step === "basic" ? "Basic Info" : step === "expertise" ? "Expertise" : "Complete"}
+          className="mb-8"
+        />
 
         {/* Basic Info Step */}
         {step === "basic" && (
-          <div className="rounded-lg bg-card p-8 shadow-md">
+          <Card className="shadow-md">
+            <CardContent className="p-8">
             <h2 className="mb-2 text-2xl font-bold text-foreground">Create your designer profile</h2>
             <p className="mb-6 text-muted-foreground">Let homeowners know about you and your work</p>
 
@@ -210,12 +213,12 @@ export function DesignerOnboardingPage() {
                 <Label className="mb-1 block">
                   About You / Your Work
                 </Label>
-                <textarea
+                <Textarea
                   value={bio}
                   onChange={(e) => setBio(e.target.value)}
                   placeholder="Tell homeowners about your design philosophy, specializations, and what makes you unique..."
                   rows={4}
-                  className="w-full rounded-md border border-input px-4 py-3 focus:border-primary focus:outline-none"
+                  className="px-4 py-3"
                 />
               </div>
 
@@ -228,104 +231,79 @@ export function DesignerOnboardingPage() {
                 Continue
               </Button>
             </form>
-          </div>
+            </CardContent>
+          </Card>
         )}
 
         {/* Expertise Step */}
         {step === "expertise" && (
-          <div className="rounded-lg bg-card p-8 shadow-md">
+          <Card className="shadow-md">
+            <CardContent className="p-8">
             <h2 className="mb-2 text-2xl font-bold text-foreground">Your expertise</h2>
             <p className="mb-6 text-muted-foreground">Help homeowners find you based on their needs</p>
 
             <form onSubmit={handleExpertiseSubmit} className="space-y-6">
               {/* Cities */}
               <div>
-                <Label className="mb-2 block">
-                  Cities you serve *
-                </Label>
-                <div className="flex flex-wrap gap-2">
+                <Label className="mb-2 block">Cities you serve *</Label>
+                <ToggleChipGroup>
                   {CITIES.map((city) => (
-                    <button
+                    <ToggleChip
                       key={city.value}
-                      type="button"
+                      selected={selectedCities.includes(city.value)}
                       onClick={() => toggleCity(city.value)}
-                      className={`rounded-full border px-4 py-2 text-sm font-medium transition-colors ${
-                        selectedCities.includes(city.value)
-                          ? "border-primary bg-primary/10 text-primary"
-                          : "border-input hover:border-input/80"
-                      }`}
                     >
                       {city.label}
-                    </button>
+                    </ToggleChip>
                   ))}
-                </div>
+                </ToggleChipGroup>
               </div>
 
               {/* Design Styles */}
               <div>
-                <Label className="mb-2 block">
-                  Design styles you specialize in *
-                </Label>
-                <div className="flex flex-wrap gap-2">
+                <Label className="mb-2 block">Design styles you specialize in *</Label>
+                <ToggleChipGroup>
                   {DESIGN_STYLES.map((style) => (
-                    <button
+                    <ToggleChip
                       key={style}
-                      type="button"
+                      selected={selectedStyles.includes(style)}
                       onClick={() => toggleStyle(style)}
-                      className={`rounded-full border px-4 py-2 text-sm font-medium transition-colors ${
-                        selectedStyles.includes(style)
-                          ? "border-primary bg-primary/10 text-primary"
-                          : "border-input hover:border-input/80"
-                      }`}
                     >
                       {style}
-                    </button>
+                    </ToggleChip>
                   ))}
-                </div>
+                </ToggleChipGroup>
               </div>
 
               {/* Services */}
               <div>
-                <Label className="mb-2 block">
-                  Services you offer
-                </Label>
-                <div className="flex flex-wrap gap-2">
+                <Label className="mb-2 block">Services you offer</Label>
+                <ToggleChipGroup>
                   {SERVICES.map((service) => (
-                    <button
+                    <ToggleChip
                       key={service}
-                      type="button"
+                      selected={selectedServices.includes(service)}
                       onClick={() => toggleService(service)}
-                      className={`rounded-full border px-4 py-2 text-sm font-medium transition-colors ${
-                        selectedServices.includes(service)
-                          ? "border-primary bg-primary/10 text-primary"
-                          : "border-input hover:border-input/80"
-                      }`}
                     >
                       {service}
-                    </button>
+                    </ToggleChip>
                   ))}
-                </div>
+                </ToggleChipGroup>
               </div>
 
               {/* Budget Range */}
               <div>
-                <Label className="mb-2 block">
-                  Typical project budget range
-                </Label>
+                <Label className="mb-2 block">Typical project budget range</Label>
                 <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
                   {BUDGET_RANGES.map((range) => (
-                    <button
+                    <ToggleChip
                       key={range.label}
-                      type="button"
+                      variant="card"
+                      selected={budgetRange?.min === range.min}
                       onClick={() => setBudgetRange(range)}
-                      className={`rounded-md border px-4 py-3 text-sm font-medium transition-colors ${
-                        budgetRange?.min === range.min
-                          ? "border-primary bg-primary/10 text-primary"
-                          : "border-input hover:border-input/80"
-                      }`}
                     >
                       {range.label}
-                    </button>
+                    </ToggleChip>
                   ))}
                 </div>
               </div>
@@ -349,40 +327,22 @@ export function DesignerOnboardingPage() {
                 </Button>
               </div>
             </form>
-          </div>
+            </CardContent>
+          </Card>
         )}
 
         {/* Complete Step */}
         {step === "complete" && (
-          <div className="rounded-lg bg-card p-8 text-center shadow-md">
-            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
-              <svg className="h-8 w-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-              </svg>
-            </div>
-
-            <h2 className="mb-2 text-2xl font-bold text-foreground">Profile submitted!</h2>
-            <p className="mb-6 text-muted-foreground">
-              Your profile is under review. Once verified, you'll start receiving project requests
-              from homeowners.
-            </p>
-
-            <div className="mb-6 rounded-md bg-yellow-50 p-4 text-left">
-              <p className="text-sm text-yellow-800">
-                <strong>Verification pending:</strong> Our team will review your profile within 24-48
-                hours. You'll be notified once your profile is live.
-              </p>
-            </div>
-
-            <Button
-              onClick={handleComplete}
-              variant="primary"
-              fullWidth
-              className="py-3"
-            >
-              Go to Dashboard
-            </Button>
-          </div>
+          <SuccessScreen
+            title="Profile submitted!"
+            description="Your profile is under review. Once verified, you'll start receiving project requests from homeowners."
+            actionLabel="Go to Dashboard"
+            onAction={handleComplete}
+            notice={{
+              title: "Verification pending:",
+              message: "Our team will review your profile within 24-48 hours. You'll be notified once your profile is live.",
+            }}
+          />
         )}
       </div>
     </div>

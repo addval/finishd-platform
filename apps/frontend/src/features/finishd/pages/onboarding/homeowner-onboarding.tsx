@@ -11,6 +11,10 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Card, CardContent } from "@/components/ui/card"
+import { StepProgress } from "@/components/ui/step-progress"
+import { SuccessScreen } from "@/components/ui/success-screen"
+import { ToggleChip } from "@/components/ui/toggle-chip"
 
 const CITIES = [
   { value: "Delhi", label: "Delhi" },
@@ -119,30 +123,16 @@ export function HomeownerOnboardingPage() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-muted px-4 py-8">
       <div className="w-full max-w-lg">
-        {/* Progress indicator */}
-        <div className="mb-8">
-          <div className="flex items-center justify-center gap-2">
-            <div
-              className={`h-2 w-16 rounded-full ${
-                step === "profile" ? "bg-primary" : "bg-primary/30"
-              }`}
-            />
-            <div
-              className={`h-2 w-16 rounded-full ${
-                step === "property" ? "bg-primary" : step === "complete" ? "bg-primary/30" : "bg-muted-foreground/20"
-              }`}
-            />
-            <div
-              className={`h-2 w-16 rounded-full ${
-                step === "complete" ? "bg-primary" : "bg-muted-foreground/20"
-              }`}
-            />
-          </div>
-        </div>
+        <StepProgress
+          steps={["Profile", "Property", "Complete"]}
+          currentStep={step === "profile" ? "Profile" : step === "property" ? "Property" : "Complete"}
+          className="mb-8"
+        />
 
         {/* Profile Step */}
         {step === "profile" && (
-          <div className="rounded-lg bg-card p-8 shadow-md">
+          <Card className="shadow-md">
+            <CardContent className="p-8">
             <h2 className="mb-2 text-2xl font-bold text-foreground">Tell us about yourself</h2>
             <p className="mb-6 text-muted-foreground">
               Create your profile to start finding interior designers
@@ -219,12 +209,14 @@ export function HomeownerOnboardingPage() {
                 {isLoading ? "Creating..." : "Continue"}
               </Button>
             </form>
-          </div>
+            </CardContent>
+          </Card>
         )}
 
         {/* Property Step */}
         {step === "property" && (
-          <div className="rounded-lg bg-card p-8 shadow-md">
+          <Card className="shadow-md">
+            <CardContent className="p-8">
             <h2 className="mb-2 text-2xl font-bold text-foreground">Add your property</h2>
             <p className="mb-6 text-muted-foreground">
               Tell us about the property you want to design
@@ -237,18 +229,14 @@ export function HomeownerOnboardingPage() {
                 </Label>
                 <div className="grid grid-cols-3 gap-2">
                   {PROPERTY_TYPES.map((type) => (
-                    <button
+                    <ToggleChip
                       key={type.value}
-                      type="button"
+                      variant="card"
+                      selected={propertyType === type.value}
                       onClick={() => setPropertyType(type.value as typeof propertyType)}
-                      className={`rounded-md border-2 px-4 py-3 text-sm font-medium transition-colors ${
-                        propertyType === type.value
-                          ? "border-primary bg-primary/10 text-primary"
-                          : "border-input hover:border-muted-foreground"
-                      }`}
                     >
                       {type.label}
-                    </button>
+                    </ToggleChip>
                   ))}
                 </div>
               </div>
@@ -358,42 +346,18 @@ export function HomeownerOnboardingPage() {
                 </Button>
               </div>
             </form>
-          </div>
+            </CardContent>
+          </Card>
         )}
 
         {/* Complete Step */}
         {step === "complete" && (
-          <div className="rounded-lg bg-card p-8 text-center shadow-md">
-            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
-              <svg
-                className="h-8 w-8 text-green-600"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M5 13l4 4L19 7"
-                />
-              </svg>
-            </div>
-
-            <h2 className="mb-2 text-2xl font-bold text-foreground">You're all set!</h2>
-            <p className="mb-6 text-muted-foreground">
-              Your profile is ready. Start exploring interior designers and bring your dream home to
-              life.
-            </p>
-
-            <Button
-              variant="primary"
-              fullWidth
-              onClick={handleComplete}
-            >
-              Go to Dashboard
-            </Button>
-          </div>
+          <SuccessScreen
+            title="You're all set!"
+            description="Your profile is ready. Start exploring interior designers and bring your dream home to life."
+            actionLabel="Go to Dashboard"
+            onAction={handleComplete}
+          />
         )}
       </div>
     </div>
