@@ -188,8 +188,8 @@ Comprehensive security audit and hardening of the authentication system to meet 
 ### JWT Configuration
 - Access token expiry: 15 minutes (configurable via JWT_ACCESS_EXPIRY)
 - Refresh token expiry: 7 days (configurable via JWT_REFRESH_EXPIRY)
-- Issuer: rituality-api
-- Audience: rituality-client
+- Issuer: finishd-api
+- Audience: finishd-client
 - Missing: Token versioning, blacklist support
 
 ### Password Hashing

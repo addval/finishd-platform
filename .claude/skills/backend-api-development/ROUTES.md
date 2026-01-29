@@ -138,7 +138,7 @@ import jwt from 'jsonwebtoken';
 
 export interface AuthRequest extends Request {
   user?: {
-    id: number;
+    id: string;
     email: string;
     role: string;
   };
@@ -218,22 +218,17 @@ router.post('/login',
 
 ```typescript
 // middlewares/validateRequest.ts
-import Joi from 'joi';
+import { z } from 'zod';
 import { Request, Response, NextFunction } from 'express';
 
-export type JoiSchema = Record<string, Joi.Schema>;
-
-export const validate = (schema: JoiSchema, property: 'body' | 'query' | 'params' = 'body') => {
+export const validate = (schema: z.ZodSchema, property: 'body' | 'query' | 'params' = 'body') => {
   return (req: Request, res: Response, next: NextFunction) => {
-    const { error, value } = Joi.validate(req[property], schema, {
-      abortEarly: false,
-      stripUnknown: true
-    });
+    const result = schema.safeParse(req[property]);
 
-    if (error) {
-      const errors = error.details.map(detail => ({
-        field: detail.path.join('.'),
-        message: detail.message
+    if (!result.success) {
+      const errors = result.error.issues.map(issue => ({
+        field: issue.path.join('.'),
+        message: issue.message
       }));
 
       return res.status(400).json({
@@ -243,7 +238,7 @@ export const validate = (schema: JoiSchema, property: 'body' | 'query' | 'params
       });
     }
 
-    req[property] = value;
+    req[property] = result.data;
     next();
   };
 };
@@ -254,7 +249,15 @@ export const validate = (schema: JoiSchema, property: 'body' | 'query' | 'params
 ```typescript
 // middlewares/errorHandler.ts
 import { Request, Response, NextFunction } from 'express';
-import { ValidationError, NotFoundError, AppError } from '../utils/errors';
+import { AppError, ValidationError, NotFoundError } from '../utils/errors';
+
+// PostgreSQL error codes
+const PG_ERROR_CODES = {
+  UNIQUE_VIOLATION: '23505',
+  FOREIGN_KEY_VIOLATION: '23503',
+  NOT_NULL_VIOLATION: '23502',
+  CHECK_VIOLATION: '23514',
+};
 
 export const errorHandler = (
   error: Error,
@@ -273,11 +276,37 @@ export const errorHandler = (
     });
   }
 
-  // Handle Sequelize errors
-  if (error.name === 'SequelizeValidationError') {
+  // Handle PostgreSQL errors (from Drizzle)
+  if ('code' in error && typeof error.code === 'string') {
+    const pgError = error as { code: string; constraint?: string; column?: string };
+
+    switch (pgError.code) {
+      case PG_ERROR_CODES.UNIQUE_VIOLATION:
+        return res.status(400).json({
+          success: false,
+          error: 'A record with this information already exists',
+          details: pgError.constraint
+        });
+      case PG_ERROR_CODES.FOREIGN_KEY_VIOLATION:
+        return res.status(400).json({
+          success: false,
+          error: 'Referenced record does not exist',
+          details: pgError.constraint
+        });
+      case PG_ERROR_CODES.NOT_NULL_VIOLATION:
+        return res.status(400).json({
+          success: false,
+          error: 'Required field is missing',
+          details: pgError.column
+        });
+    }
+  }
+
+  // Handle Zod validation errors
+  if (error.name === 'ZodError') {
     return res.status(400).json({
       success: false,
-      error: 'Database validation error',
+      error: 'Validation error',
       details: error.message
     });
   }

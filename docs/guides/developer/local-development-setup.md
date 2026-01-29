@@ -1,8 +1,8 @@
-# Local Development Setup - Rituality Platform
+# Local Development Setup - Finishd Platform
 
 ## 📋 Overview
 
-Complete guide to setting up the Rituality Platform for local development.
+Complete guide to setting up the Finishd Platform for local development.
 
 **Last Updated**: January 12, 2026
 **Version**: 1.0.0
@@ -38,7 +38,7 @@ redis-cli --version  # 6.x (optional)
 
 ```bash
 git clone <repository-url>
-cd rituality-platform
+cd finishd-platform
 ```
 
 ### 2. Install Dependencies
@@ -57,7 +57,7 @@ npm install
 
 ```bash
 # Create database
-psql -U postgres -c "CREATE DATABASE rituality_platform;"
+psql -U postgres -c "CREATE DATABASE finishd_platform;"
 
 # Run migrations
 cd apps/backend
@@ -72,7 +72,7 @@ npm run seed
 **Backend** (`apps/backend/.env`):
 ```bash
 # Database
-DB_NAME=rituality_platform
+DB_NAME=finishd_platform
 DB_USERNAME=postgres
 DB_PASSWORD=your_password
 DB_HOST=localhost

@@ -1,19 +1,19 @@
-# Rituality Platform
+# Finishd Platform
 
-> A modern full-stack JavaScript application built with Node.js, React, PostgreSQL, and Sequelize in a monorepo architecture.
+> A modern full-stack JavaScript application built with Node.js, React, PostgreSQL, and Drizzle ORM in a monorepo architecture.
 
-## 🚀 Tech Stack
+## Tech Stack
 
 ### Backend
 - **Runtime**: Node.js 20+
 - **Framework**: Express.js
 - **Language**: TypeScript
 - **Database**: PostgreSQL 16+
-- **ORM**: Sequelize
+- **ORM**: Drizzle ORM
 - **Caching**: Redis (optional)
 - **Authentication**: JWT
 - **Testing**: Vitest
-- **Validation**: Joi/Zod
+- **Validation**: Zod
 
 ### Frontend
 - **Framework**: React 18+
@@ -34,7 +34,7 @@
 ## 📁 Project Structure
 
 ```
-rituality-platform/
+finishd-platform/
 ├── .claude/                    # Claude Skills configuration
 ├── apps/
 │   ├── backend/               # Node.js/Express API
@@ -63,7 +63,7 @@ rituality-platform/
 ```bash
 # Clone the repository
 git clone <repository-url>
-cd rituality-platform
+cd finishd-platform
 
 # Install dependencies
 pnpm install
@@ -99,8 +99,11 @@ pnpm format           # Format code
 ```bash
 pnpm --filter backend dev              # Start backend
 pnpm --filter backend test             # Run tests
+pnpm --filter backend db:push          # Push schema to database
+pnpm --filter backend db:generate      # Generate migrations
 pnpm --filter backend db:migrate       # Run migrations
-pnpm --filter backend db:seed          # Seed database
+pnpm --filter backend db:studio        # Open Drizzle Studio
+pnpm --filter backend db:seed:finishd  # Seed database
 ```
 
 ### Frontend Commands
@@ -160,7 +163,7 @@ This project follows **world-class best practices**:
 - **Comprehensive error handling**
 - **Input validation** on all endpoints
 - **Transaction management** for data integrity
-- **Migration-based** schema management
+- **Schema-first** database design with Drizzle
 
 ### Frontend
 - **Feature-based** component organization
@@ -187,7 +190,7 @@ This project follows **world-class best practices**:
 - **Input validation** and sanitization
 - **Password hashing** with bcrypt
 - **Environment variables** for secrets
-- **SQL injection prevention** (Sequelize)
+- **SQL injection prevention** (Drizzle ORM)
 
 ## 🚀 Deployment
 
@@ -195,8 +198,8 @@ This project follows **world-class best practices**:
 
 ```bash
 # Build production images
-docker build -f docker/Dockerfile.backend -t rituality-backend:latest .
-docker build -f docker/Dockerfile.frontend -t rituality-frontend:latest .
+docker build -f docker/Dockerfile.backend -t finishd-backend:latest .
+docker build -f docker/Dockerfile.frontend -t finishd-frontend:latest .
 
 # Run with Docker Compose
 docker-compose -f docker/docker-compose.prod.yml up -d
@@ -252,6 +255,6 @@ This project is licensed under the MIT License.
 
 ---
 
-**Made with ❤️ by the Rituality Platform Team**
+**Made with ❤️ by the Finishd Platform Team**
 
 For questions or support, please open a [GitHub Issue](../../issues)

@@ -1,8 +1,8 @@
-# Frontend Development Guide - Rituality Platform
+# Frontend Development Guide - Finishd Platform
 
 ## 📋 Overview
 
-This guide covers the development workflow for adding new features to the Rituality Platform frontend.
+This guide covers the development workflow for adding new features to the Finishd Platform frontend.
 
 **Last Updated**: January 12, 2026
 **Version**: 1.0.0

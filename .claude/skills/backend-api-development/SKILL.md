@@ -1,6 +1,6 @@
 ---
 name: backend-api-development
-description: Generate Express.js routes, controllers, and services following MVC + Service Layer architecture with TypeScript, Sequelize ORM, and best practices. Use when creating API endpoints, RESTful controllers, or backend business logic.
+description: Generate Express.js routes, controllers, and services following MVC + Service Layer architecture with TypeScript, Drizzle ORM, and best practices. Use when creating API endpoints, RESTful controllers, or backend business logic.
 allowed-tools:
   - Read
   - Write
@@ -11,7 +11,7 @@ allowed-tools:
 
 # Backend API Development
 
-Generates production-ready backend code for Node.js/Express applications with TypeScript and Sequelize.
+Generates production-ready backend code for Node.js/Express applications with TypeScript and Drizzle ORM.
 
 ## Architecture Pattern
 
@@ -20,18 +20,18 @@ This project follows **MVC + Service Layer** architecture:
 1. **Routes** - Define endpoints and map to controllers
 2. **Controllers** - Handle HTTP requests/responses (thin layer)
 3. **Services** - Contain business logic (fat layer)
-4. **Models** - Sequelize database models
+4. **Schema** - Drizzle database schema definitions
 5. **Middlewares** - Request processing pipeline
 
 ## Quick Start
 
 When creating a new API endpoint, I will:
 
-1. Create **Sequelize model** (if not exists)
+1. Define/update **Drizzle schema** (if needed)
 2. Create **service** with business logic
 3. Create **controller** with request/response handling
 4. Create **route** and register with Express
-5. Add **validation** using Joi or Zod
+5. Add **validation** using Zod
 6. Add **error handling** and status codes
 7. Create **TypeScript types** for request/response
 
@@ -40,15 +40,16 @@ When creating a new API endpoint, I will:
 ```
 backend/src/
 ├── routes/
-│   └── {resource}.routes.ts    # Route definitions
+│   └── {resource}.routes.ts     # Route definitions
 ├── controllers/
 │   └── {resource}.controller.ts # Request handlers
 ├── services/
 │   └── {resource}.service.ts    # Business logic
-├── models/
-│   └── {resource}.model.ts      # Sequelize model
+├── db/
+│   ├── schema.ts                # Drizzle schema
+│   └── index.ts                 # Database client
 ├── middlewares/
-│   └── validateRequest.ts       # Validation middleware
+│   └── validation.middleware.ts # Validation middleware
 └── types/
     └── {resource}.types.ts      # TypeScript types
 ```
@@ -60,32 +61,44 @@ backend/src/
 Services should:
 - Contain all business logic
 - Be independent of HTTP concerns
-- Handle database operations through models
+- Handle database operations through Drizzle
 - Throw custom errors with status codes
 - Use transactions for multi-step operations
 
 ```typescript
 // services/user.service.ts
-import { User } from '../models';
+import { db } from '../db';
+import { users } from '../db/schema';
+import { eq } from 'drizzle-orm';
 import { ValidationError, NotFoundError } from '../utils/errors';
 
 export class UserService {
   async createUser(data: CreateUserInput) {
-    // Business logic here
-    const existingUser = await User.findOne({ where: { email: data.email } });
-    if (existingUser) {
+    // Check for existing user
+    const [existing] = await db.select()
+      .from(users)
+      .where(eq(users.email, data.email));
+
+    if (existing) {
       throw new ValidationError('Email already exists');
     }
 
-    const user = await User.create(data);
+    const [user] = await db.insert(users)
+      .values(data)
+      .returning();
+
     return user;
   }
 
-  async getUserById(id: number) {
-    const user = await User.findByPk(id);
+  async getUserById(id: string) {
+    const [user] = await db.select()
+      .from(users)
+      .where(eq(users.id, id));
+
     if (!user) {
       throw new NotFoundError('User not found');
     }
+
     return user;
   }
 }
@@ -103,34 +116,28 @@ Controllers should:
 ```typescript
 // controllers/user.controller.ts
 import { Request, Response, NextFunction } from 'express';
-import { UserService } from '../services';
+import { UserService } from '../services/user.service';
 import { successResponse } from '../utils/response';
 
-export class UserController {
-  private userService: UserService;
+const userService = new UserService();
 
-  constructor() {
-    this.userService = new UserService();
+export const createUser = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const user = await userService.createUser(req.body);
+    res.status(201).json(successResponse(user, 'User created successfully'));
+  } catch (error) {
+    next(error);
   }
+};
 
-  createUser = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const user = await this.userService.createUser(req.body);
-      return successResponse(res, user, 'User created successfully', 201);
-    } catch (error) {
-      next(error);
-    }
-  };
-
-  getUserById = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const user = await this.userService.getUserById(Number(req.params.id));
-      return successResponse(res, user);
-    } catch (error) {
-      next(error);
-    }
-  };
-}
+export const getUserById = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const user = await userService.getUserById(req.params.id);
+    res.status(200).json(successResponse(user));
+  } catch (error) {
+    next(error);
+  }
+};
 ```
 
 ### 3. Routes Definition
@@ -140,39 +147,20 @@ Routes should:
 - Apply middleware appropriately
 - Use RESTful conventions
 - Include validation middleware
-- Follow semantic versioning
 
 ```typescript
 // routes/user.routes.ts
 import { Router } from 'express';
-import { UserController } from '../controllers';
-import { validate } from '../middlewares/validateRequest';
+import * as userController from '../controllers/user.controller';
+import { validate } from '../middlewares/validation.middleware';
 import { createUserSchema, updateUserSchema } from '../types/user.types';
 
 const router = Router();
-const userController = new UserController();
 
-router.post(
-  '/',
-  validate(createUserSchema),
-  userController.createUser
-);
-
-router.get(
-  '/:id',
-  userController.getUserById
-);
-
-router.put(
-  '/:id',
-  validate(updateUserSchema),
-  userController.updateUser
-);
-
-router.delete(
-  '/:id',
-  userController.deleteUser
-);
+router.post('/', validate(createUserSchema), userController.createUser);
+router.get('/:id', userController.getUserById);
+router.put('/:id', validate(updateUserSchema), userController.updateUser);
+router.delete('/:id', userController.deleteUser);
 
 export default router;
 ```
@@ -183,33 +171,19 @@ Use consistent response structure:
 
 ```typescript
 // utils/response.ts
-export const successResponse = (
-  res: Response,
-  data: any,
-  message: string = 'Success',
-  statusCode: number = 200
-) => {
-  return res.status(statusCode).json({
-    success: true,
-    data,
-    message,
-    error: null
-  });
-};
+export const successResponse = (data: any, message: string = 'Success') => ({
+  success: true,
+  data,
+  message,
+  error: null,
+});
 
-export const errorResponse = (
-  res: Response,
-  message: string,
-  statusCode: number = 500,
-  error: any = null
-) => {
-  return res.status(statusCode).json({
-    success: false,
-    data: null,
-    message,
-    error
-  });
-};
+export const errorResponse = (message: string, error: any = null) => ({
+  success: false,
+  data: null,
+  message,
+  error,
+});
 ```
 
 ### 5. Custom Error Classes
@@ -252,27 +226,21 @@ export class ForbiddenError extends AppError {
 }
 ```
 
-### 6. Request Validation
-
-Use Joi or Zod for validation:
+### 6. Request Validation with Zod
 
 ```typescript
 // types/user.types.ts
-import { JoiSchema } from '../middlewares/validateRequest';
+import { z } from 'zod';
 
-export const createUserSchema: JoiSchema = {
-  email: Joi.string().email().required().messages({
-    'string.email': 'Must be a valid email',
-    'any.required': 'Email is required'
-  }),
-  password: Joi.string().min(8).pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/)
-    .required()
-    .messages({
-      'string.min': 'Password must be at least 8 characters',
-      'string.pattern.base': 'Password must contain uppercase, lowercase, and number'
-    }),
-  name: Joi.string().min(2).max(100).required()
-};
+export const createUserSchema = z.object({
+  email: z.string().email('Must be a valid email'),
+  password: z.string()
+    .min(8, 'Password must be at least 8 characters')
+    .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/, 'Password must contain uppercase, lowercase, and number'),
+  name: z.string().min(2).max(100),
+});
+
+export type CreateUserInput = z.infer<typeof createUserSchema>;
 ```
 
 ## RESTful API Conventions
@@ -295,34 +263,28 @@ GET /api/v1/users?page=1&limit=10&sort=name:asc&search=john
 - limit: Items per page (default: 10, max: 100)
 - sort: field:order (default: id:asc)
 - search: Search term for filtering
-- filter[field]: Exact match filter (e.g., filter[status]=active)
 ```
 
 ## Best Practices
 
 ### DO's:
-- ✅ Use async/await for asynchronous operations
-- ✅ Implement proper error handling with try-catch
-- ✅ Add TypeScript types for all function parameters and returns
-- ✅ Use environment variables for configuration
-- ✅ Add logging for debugging and monitoring
-- ✅ Write unit tests for services
-- ✅ Write integration tests for endpoints
-- ✅ Use HTTP status codes appropriately
-- ✅ Implement rate limiting for public endpoints
-- ✅ Add request ID for tracing
+- Use async/await for asynchronous operations
+- Implement proper error handling with try-catch
+- Add TypeScript types for all function parameters and returns
+- Use environment variables for configuration
+- Add logging for debugging and monitoring
+- Write unit tests for services
+- Use HTTP status codes appropriately
+- Implement rate limiting for public endpoints
 
 ### DON'Ts:
-- ❌ Put business logic in controllers
-- ❌ Use `any` type (use `unknown` if needed)
-- ❌ Hardcode configuration values
-- ❌ Expose sensitive data in responses
-- ❌ Use synchronous functions for I/O operations
-- ❌ Return inconsistent response formats
-- ❌ Skip input validation
-- ❌ Forget to handle errors
-- ❌ Write deeply nested code (use early returns)
-- ❌ Ignore TypeScript errors
+- Put business logic in controllers
+- Use `any` type (use `unknown` if needed)
+- Hardcode configuration values
+- Expose sensitive data in responses
+- Return inconsistent response formats
+- Skip input validation
+- Ignore TypeScript errors
 
 ## Additional Resources
 
@@ -330,12 +292,3 @@ For detailed implementation examples, see:
 - [ROUTES.md](ROUTES.md) - Route patterns and middleware
 - [CONTROLLERS.md](CONTROLLERS.md) - Controller patterns and examples
 - [SERVICES.md](SERVICES.md) - Service layer patterns
-
-## Utility Scripts
-
-Generate a complete CRUD module:
-```bash
-node .claude/skills/backend-api-development/scripts/generate-crud.js [resource-name]
-```
-
-This will create all necessary files for a new resource with proper structure.

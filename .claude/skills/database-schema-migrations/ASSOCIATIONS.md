@@ -1,549 +1,439 @@
-# Sequelize Associations - Complete Guide
+# Drizzle Relations - Complete Guide
 
-## Association Types
+## Relation Types
 
-Sequelize supports four types of associations:
+Drizzle ORM supports all standard relationship types through the `relations` function:
 
-1. **Has One** - One-to-one relationship
-2. **Belongs To** - Many-to-one relationship
-3. **Has Many** - One-to-many relationship
-4. **Belongs To Many** - Many-to-many relationship
+1. **One-to-One** - User has one Profile
+2. **One-to-Many** - User has many Posts
+3. **Many-to-One** - Post belongs to User
+4. **Many-to-Many** - Post has many Tags (through junction table)
 
-## 1. Belongs To (Many-to-One)
-
-### Example: User has many Posts, Post belongs to User
-
-```javascript
-// models/user.model.js
-const User = sequelize.define('User', {
-  id: { type: Sequelize.INTEGER, primaryKey: true },
-  firstName: Sequelize.STRING,
-  lastName: Sequelize.STRING
-});
-
-// models/post.model.js
-const Post = sequelize.define('Post', {
-  id: { type: Sequelize.INTEGER, primaryKey: true },
-  title: Sequelize.STRING,
-  content: Sequelize.TEXT,
-  authorId: { // Foreign key
-    type: Sequelize.INTEGER,
-    allowNull: false,
-    references: {
-      model: 'users',
-      key: 'id'
-    }
-  }
-});
-
-// Define association
-User.hasMany(Post, {
-  foreignKey: 'authorId',
-  as: 'posts',
-  onDelete: 'RESTRICT',
-  onUpdate: 'CASCADE'
-});
-
-Post.belongsTo(User, {
-  foreignKey: 'authorId',
-  as: 'author'
-});
-```
-
-### Usage
-
-```javascript
-// Create post with user association
-const post = await Post.create({
-  title: 'My First Post',
-  content: 'Hello World',
-  authorId: 1 // Direct foreign key assignment
-});
-
-// Or using build
-const user = await User.findByPk(1);
-const post = await Post.create({
-  title: 'Another Post',
-  content: 'Content here'
-});
-await user.addPost(post);
-
-// Fetch post with author
-const postWithAuthor = await Post.findByPk(1, {
-  include: [{
-    model: User,
-    as: 'author',
-    attributes: ['id', 'firstName', 'lastName']
-  ]
-});
-
-console.log(postWithAuthor.author.firstName); // Access associated user
-
-// Fetch user with posts
-const userWithPosts = await User.findByPk(1, {
-  include: [{
-    model: Post,
-    as: 'posts',
-    where: { status: 'published' } // Filter related records
-  }]
-});
-
-console.log(userWithPosts.posts); // Array of posts
-```
-
-## 2. Has One (One-to-One)
+## 1. One-to-One Relations
 
 ### Example: User has one Profile
 
-```javascript
-// models/user.model.js
-const User = sequelize.define('User', {
-  id: { type: Sequelize.INTEGER, primaryKey: true },
-  email: Sequelize.STRING
-});
+```typescript
+// db/schema.ts
+import { relations } from "drizzle-orm"
+import { pgTable, uuid, varchar, text, timestamp, index } from "drizzle-orm/pg-core"
 
-// models/profile.model.js
-const Profile = sequelize.define('Profile', {
-  id: { type: Sequelize.INTEGER, primaryKey: true },
-  bio: Sequelize.TEXT,
-  avatar: Sequelize.STRING,
-  userId: {
-    type: Sequelize.INTEGER,
-    allowNull: false,
-    unique: true,
-    references: {
-      model: 'users',
-      key: 'id'
-    }
-  }
-});
+// Users table
+export const users = pgTable("users", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  email: varchar("email", { length: 255 }).notNull().unique(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+})
 
-// Define association
-User.hasOne(Profile, {
-  foreignKey: 'userId',
-  as: 'profile',
-  onDelete: 'CASCADE'
-});
+// Profiles table (one-to-one with users)
+export const profiles = pgTable(
+  "profiles",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    userId: uuid("user_id")
+      .notNull()
+      .unique() // Unique constraint enforces one-to-one
+      .references(() => users.id, { onDelete: "cascade" }),
+    bio: text("bio"),
+    avatar: varchar("avatar", { length: 500 }),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [index("idx_profiles_user_id").on(table.userId)]
+)
 
-Profile.belongsTo(User, {
-  foreignKey: 'userId',
-  as: 'user'
-});
+// Define relations
+export const usersRelations = relations(users, ({ one }) => ({
+  profile: one(profiles, {
+    fields: [users.id],
+    references: [profiles.userId],
+  }),
+}))
+
+export const profilesRelations = relations(profiles, ({ one }) => ({
+  user: one(users, {
+    fields: [profiles.userId],
+    references: [users.id],
+  }),
+}))
+
+// Types
+export type User = typeof users.$inferSelect
+export type Profile = typeof profiles.$inferSelect
 ```
 
 ### Usage
 
-```javascript
+```typescript
+import { db } from "./db"
+import { users, profiles } from "./schema"
+import { eq } from "drizzle-orm"
+
 // Create user with profile
-const user = await User.create({
-  email: 'user@example.com'
-});
+async function createUserWithProfile(email: string, bio: string) {
+  return await db.transaction(async (tx) => {
+    const [user] = await tx.insert(users).values({ email }).returning()
 
-await Profile.create({
-  bio: 'Software developer',
-  avatar: 'avatar.jpg',
-  userId: user.id
-});
+    const [profile] = await tx
+      .insert(profiles)
+      .values({ userId: user.id, bio })
+      .returning()
 
-// Or using set
-const profile = await Profile.create({
-  bio: 'Software developer'
-});
-await user.setProfile(profile);
+    return { user, profile }
+  })
+}
 
 // Fetch user with profile
-const userWithProfile = await User.findByPk(1, {
-  include: [{
-    model: Profile,
-    as: 'profile'
-  }]
-});
-
-console.log(userWithProfile.profile.bio);
+async function getUserWithProfile(userId: string) {
+  return await db.query.users.findFirst({
+    where: eq(users.id, userId),
+    with: {
+      profile: true,
+    },
+  })
+}
 ```
 
-## 3. Has Many (One-to-Many)
+## 2. One-to-Many Relations
 
-### Example: User has many Addresses
+### Example: User has many Posts
 
-```javascript
-// models/user.model.js
-const User = sequelize.define('User', {
-  id: { type: Sequelize.INTEGER, primaryKey: true },
-  email: Sequelize.STRING
-});
+```typescript
+// db/schema.ts
+import { relations } from "drizzle-orm"
+import { pgTable, uuid, varchar, text, timestamp, index } from "drizzle-orm/pg-core"
 
-// models/address.model.js
-const Address = sequelize.define('Address', {
-  id: { type: Sequelize.INTEGER, primaryKey: true },
-  street: Sequelize.STRING,
-  city: Sequelize.STRING,
-  country: Sequelize.STRING,
-  userId: {
-    type: Sequelize.INTEGER,
-    allowNull: false,
-    references: {
-      model: 'users',
-      key: 'id'
-    }
-  }
-});
+export const users = pgTable("users", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  name: varchar("name", { length: 100 }).notNull(),
+  email: varchar("email", { length: 255 }).notNull().unique(),
+})
 
-// Define association
-User.hasMany(Address, {
-  foreignKey: 'userId',
-  as: 'addresses',
-  onDelete: 'CASCADE'
-});
+export const posts = pgTable(
+  "posts",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    title: varchar("title", { length: 200 }).notNull(),
+    content: text("content"),
+    authorId: uuid("author_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [index("idx_posts_author_id").on(table.authorId)]
+)
 
-Address.belongsTo(User, {
-  foreignKey: 'userId',
-  as: 'user'
-});
+// One-to-many: User has many posts
+export const usersRelations = relations(users, ({ many }) => ({
+  posts: many(posts),
+}))
+
+// Many-to-one: Post belongs to user
+export const postsRelations = relations(posts, ({ one }) => ({
+  author: one(users, {
+    fields: [posts.authorId],
+    references: [users.id],
+  }),
+}))
+
+export type User = typeof users.$inferSelect
+export type Post = typeof posts.$inferSelect
 ```
 
 ### Usage
 
-```javascript
-// Create multiple addresses
-const user = await User.findByPk(1);
+```typescript
+import { db } from "./db"
+import { users, posts } from "./schema"
+import { eq, desc } from "drizzle-orm"
 
-await Address.bulkCreate([
-  {
-    street: '123 Main St',
-    city: 'New York',
-    country: 'USA',
-    userId: user.id
-  },
-  {
-    street: '456 Oak Ave',
-    city: 'Los Angeles',
-    country: 'USA',
-    userId: user.id
-  }
-]);
+// Create post for user
+async function createPost(authorId: string, title: string, content: string) {
+  const [post] = await db
+    .insert(posts)
+    .values({ authorId, title, content })
+    .returning()
+  return post
+}
 
-// Or using add
-await user.addAddresses([
-  address1,
-  address2
-]);
+// Get user with all posts
+async function getUserWithPosts(userId: string) {
+  return await db.query.users.findFirst({
+    where: eq(users.id, userId),
+    with: {
+      posts: {
+        orderBy: [desc(posts.createdAt)],
+      },
+    },
+  })
+}
 
-// Fetch with addresses
-const userWithAddresses = await User.findByPk(1, {
-  include: [{
-    model: Address,
-    as: 'addresses'
-  }]
-});
+// Get post with author
+async function getPostWithAuthor(postId: string) {
+  return await db.query.posts.findFirst({
+    where: eq(posts.id, postId),
+    with: {
+      author: true,
+    },
+  })
+}
 
-// Count associations
-const addressCount = await user.countAddresses();
-
-// Check if has association
-const hasAddresses = await user.hasAddresses();
-
-// Remove association
-await user.removeAddress(address1);
-
-// Remove all associations
-await user.setAddresses([]);
+// Get posts with filtering
+async function getUserPublishedPosts(userId: string) {
+  return await db.query.users.findFirst({
+    where: eq(users.id, userId),
+    with: {
+      posts: {
+        where: eq(posts.status, "published"),
+        orderBy: [desc(posts.createdAt)],
+        limit: 10,
+      },
+    },
+  })
+}
 ```
 
-## 4. Belongs To Many (Many-to-Many)
+## 3. Many-to-Many Relations
 
-### Example: Post belongs to many Tags, Tag belongs to many Posts
+### Example: Posts have many Tags
 
-```javascript
-// models/post.model.js
-const Post = sequelize.define('Post', {
-  id: { type: Sequelize.INTEGER, primaryKey: true },
-  title: Sequelize.STRING,
-  content: Sequelize.TEXT
-});
+```typescript
+// db/schema.ts
+import { relations } from "drizzle-orm"
+import { pgTable, uuid, varchar, timestamp, primaryKey } from "drizzle-orm/pg-core"
 
-// models/tag.model.js
-const Tag = sequelize.define('Tag', {
-  id: { type: Sequelize.INTEGER, primaryKey: true },
-  name: { type: Sequelize.STRING, unique: true }
-});
+export const posts = pgTable("posts", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  title: varchar("title", { length: 200 }).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+})
 
-// Junction table (through table)
-const PostTag = sequelize.define('PostTag', {
-  postId: {
-    type: Sequelize.INTEGER,
-    primaryKey: true,
-    references: {
-      model: 'posts',
-      key: 'id'
-    }
+export const tags = pgTable("tags", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  name: varchar("name", { length: 50 }).notNull().unique(),
+})
+
+// Junction table for many-to-many
+export const postsTags = pgTable(
+  "posts_tags",
+  {
+    postId: uuid("post_id")
+      .notNull()
+      .references(() => posts.id, { onDelete: "cascade" }),
+    tagId: uuid("tag_id")
+      .notNull()
+      .references(() => tags.id, { onDelete: "cascade" }),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
   },
-  tagId: {
-    type: Sequelize.INTEGER,
-    primaryKey: true,
-    references: {
-      model: 'tags',
-      key: 'id'
-    }
-  },
-  createdAt: {
-    type: Sequelize.DATE,
-    defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
-  }
-});
+  (table) => [
+    primaryKey({ columns: [table.postId, table.tagId] }),
+  ]
+)
 
-// Define associations
-Post.belongsToMany(Tag, {
-  through: PostTag,
-  foreignKey: 'postId',
-  otherKey: 'tagId',
-  as: 'tags',
-  onDelete: 'CASCADE'
-});
+// Relations
+export const postsRelations = relations(posts, ({ many }) => ({
+  postsTags: many(postsTags),
+}))
 
-Tag.belongsToMany(Post, {
-  through: PostTag,
-  foreignKey: 'tagId',
-  otherKey: 'postId',
-  as: 'posts',
-  onDelete: 'CASCADE'
-});
+export const tagsRelations = relations(tags, ({ many }) => ({
+  postsTags: many(postsTags),
+}))
+
+export const postsTagsRelations = relations(postsTags, ({ one }) => ({
+  post: one(posts, {
+    fields: [postsTags.postId],
+    references: [posts.id],
+  }),
+  tag: one(tags, {
+    fields: [postsTags.tagId],
+    references: [tags.id],
+  }),
+}))
 ```
 
 ### Usage
 
-```javascript
-// Create post with tags
-const post = await Post.create({
-  title: 'JavaScript Tips',
-  content: 'Great JS tips'
-});
-
-const tags = await Tag.bulkCreate([
-  { name: 'javascript' },
-  { name: 'programming' },
-  { name: 'web-dev' }
-]);
+```typescript
+import { db } from "./db"
+import { posts, tags, postsTags } from "./schema"
+import { eq, inArray } from "drizzle-orm"
 
 // Add tags to post
-await post.addTags(tags);
+async function addTagsToPost(postId: string, tagIds: string[]) {
+  await db.insert(postsTags).values(
+    tagIds.map((tagId) => ({ postId, tagId }))
+  )
+}
 
-// Or create with tags
-const postWithTags = await Post.create({
-  title: 'React Guide',
-  content: 'React tutorial'
-}, {
-  include: [{
-    model: Tag,
-    as: 'tags'
-  }]
-});
+// Remove tag from post
+async function removeTagFromPost(postId: string, tagId: string) {
+  await db
+    .delete(postsTags)
+    .where(and(eq(postsTags.postId, postId), eq(postsTags.tagId, tagId)))
+}
 
-// Fetch post with tags
-const postWithTags = await Post.findByPk(1, {
-  include: [{
-    model: Tag,
-    as: 'tags',
-    through: { attributes: [] } // Exclude junction table data
-  }]
-});
-
-console.log(postWithTags.tags); // Array of tags
-
-// Add single tag
-await post.addTag(tag1);
-
-// Remove tag
-await post.removeTag(tag1);
-
-// Set tags (replace all)
-await post.setTags([tag1, tag2]);
-
-// Check if has tag
-const hasTag = await post.hasTag(tag1);
-
-// Count tags
-const tagCount = await post.countTags();
-```
-
-## Advanced Association Patterns
-
-### Self-Referential Associations
-
-```javascript
-// User follows users (many-to-many self-reference)
-const User = sequelize.define('User', {
-  id: { type: Sequelize.INTEGER, primaryKey: true },
-  username: Sequelize.STRING
-});
-
-const UserFollower = sequelize.define('UserFollower', {
-  followerId: {
-    type: Sequelize.INTEGER,
-    references: { model: 'users', key: 'id' }
-  },
-  followeeId: {
-    type: Sequelize.INTEGER,
-    references: { model: 'users', key: 'id' }
-  }
-});
-
-User.belongsToMany(User, {
-  through: UserFollower,
-  as: 'followers',
-  foreignKey: 'followeeId',
-  otherKey: 'followerId'
-});
-
-User.belongsToMany(User, {
-  through: UserFollower,
-  as: 'following',
-  foreignKey: 'followerId',
-  otherKey: 'followeeId'
-});
-
-// Usage
-const user = await User.findByPk(1);
-const followers = await user.getFollowers();
-const following = await user.getFollowing();
-```
-
-### Polymorphic Associations
-
-```javascript
-// Comment can belong to Post or Video
-const Comment = sequelize.define('Comment', {
-  id: { type: Sequelize.INTEGER, primaryKey: true },
-  content: Sequelize.TEXT,
-  commentableId: Sequelize.INTEGER, // ID of commented item
-  commentableType: Sequelize.STRING // Type: 'post' or 'video'
-});
-
-const Post = sequelize.define('Post', {
-  id: { type: Sequelize.INTEGER, primaryKey: true },
-  title: Sequelize.STRING
-});
-
-const Video = sequelize.define('Video', {
-  id: { type: Sequelize.INTEGER, primaryKey: true },
-  title: Sequelize.STRING,
-  url: Sequelize.STRING
-});
-
-// Define associations manually
-Post.hasMany(Comment, {
-  foreignKey: 'commentableId',
-  constraints: false,
-  scope: {
-    commentableType: 'post'
-  },
-  as: 'comments'
-});
-
-Comment.belongsTo(Post, {
-  foreignKey: 'commentableId',
-  constraints: false,
-  as: 'post'
-});
-
-Video.hasMany(Comment, {
-  foreignKey: 'commentableId',
-  constraints: false,
-  scope: {
-    commentableType: 'video'
-  },
-  as: 'comments'
-});
-
-Comment.belongsTo(Video, {
-  foreignKey: 'commentableId',
-  constraints: false,
-  as: 'video'
-});
-
-// Helper method to get comments
-Comment.prototype.getCommentable = async function() {
-  if (this.commentableType === 'post') {
-    return await this.getPost();
-  } else if (this.commentableType === 'video') {
-    return await this.getVideo();
-  }
-};
-```
-
-### Nested Associations
-
-```javascript
-// Fetch post with author, comments, and comment authors
-const post = await Post.findByPk(1, {
-  include: [{
-    model: User,
-    as: 'author',
-    attributes: ['id', 'firstName', 'lastName']
-  }, {
-    model: Comment,
-    as: 'comments',
-    include: [{
-      model: User,
-      as: 'author',
-      attributes: ['id', 'firstName', 'lastName']
-    }],
-    where: { status: 'approved' },
-    required: false
-  }]
-});
-```
-
-### Association Scopes
-
-```javascript
-User.hasMany(Post, {
-  foreignKey: 'authorId',
-  as: 'posts',
-  scope: {
-    status: 'published' // Only fetch published posts by default
-  }
-});
-
-// Override scope
-const user = await User.findByPk(1, {
-  include: [{
-    model: Post,
-    as: 'posts',
-    where: { status: 'draft' } // Override default scope
-  }]
-});
-```
-
-### Association Hooks
-
-```javascript
-Post.hasMany(Comment, {
-  foreignKey: 'postId',
-  as: 'comments',
-  hooks: {
-    beforeAdd: (comment, options) => {
-      console.log('Adding comment to post');
+// Get post with tags
+async function getPostWithTags(postId: string) {
+  return await db.query.posts.findFirst({
+    where: eq(posts.id, postId),
+    with: {
+      postsTags: {
+        with: {
+          tag: true,
+        },
+      },
     },
-    afterAdd: (comment, options) => {
-      // Update post comment count
-      Post.increment('commentCount', {
-        where: { id: comment.postId }
-      });
+  })
+}
+
+// Get posts by tag
+async function getPostsByTag(tagName: string) {
+  const tag = await db.query.tags.findFirst({
+    where: eq(tags.name, tagName),
+    with: {
+      postsTags: {
+        with: {
+          post: true,
+        },
+      },
+    },
+  })
+
+  return tag?.postsTags.map((pt) => pt.post) ?? []
+}
+
+// Replace all tags on a post
+async function setPostTags(postId: string, tagIds: string[]) {
+  await db.transaction(async (tx) => {
+    // Remove existing tags
+    await tx.delete(postsTags).where(eq(postsTags.postId, postId))
+
+    // Add new tags
+    if (tagIds.length > 0) {
+      await tx.insert(postsTags).values(
+        tagIds.map((tagId) => ({ postId, tagId }))
+      )
     }
-  }
-});
+  })
+}
+```
+
+## 4. Self-Referential Relations
+
+### Example: User follows Users
+
+```typescript
+// db/schema.ts
+import { relations } from "drizzle-orm"
+import { pgTable, uuid, varchar, timestamp, primaryKey } from "drizzle-orm/pg-core"
+
+export const users = pgTable("users", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  username: varchar("username", { length: 50 }).notNull().unique(),
+})
+
+// Self-referential junction table
+export const userFollows = pgTable(
+  "user_follows",
+  {
+    followerId: uuid("follower_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    followingId: uuid("following_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    primaryKey({ columns: [table.followerId, table.followingId] }),
+  ]
+)
+
+export const usersRelations = relations(users, ({ many }) => ({
+  // Users this user follows
+  following: many(userFollows, { relationName: "following" }),
+  // Users following this user
+  followers: many(userFollows, { relationName: "followers" }),
+}))
+
+export const userFollowsRelations = relations(userFollows, ({ one }) => ({
+  follower: one(users, {
+    fields: [userFollows.followerId],
+    references: [users.id],
+    relationName: "following",
+  }),
+  following: one(users, {
+    fields: [userFollows.followingId],
+    references: [users.id],
+    relationName: "followers",
+  }),
+}))
+```
+
+### Usage
+
+```typescript
+// Follow a user
+async function followUser(followerId: string, followingId: string) {
+  await db.insert(userFollows).values({ followerId, followingId })
+}
+
+// Get user with followers and following
+async function getUserWithFollows(userId: string) {
+  return await db.query.users.findFirst({
+    where: eq(users.id, userId),
+    with: {
+      followers: {
+        with: { follower: true },
+      },
+      following: {
+        with: { following: true },
+      },
+    },
+  })
+}
+```
+
+## 5. Nested Relations
+
+### Example: Deep nesting
+
+```typescript
+// Fetch post with author, comments, and comment authors
+async function getPostWithComments(postId: string) {
+  return await db.query.posts.findFirst({
+    where: eq(posts.id, postId),
+    with: {
+      author: {
+        columns: {
+          id: true,
+          name: true,
+        },
+      },
+      comments: {
+        with: {
+          author: {
+            columns: {
+              id: true,
+              name: true,
+            },
+          },
+        },
+        orderBy: [desc(comments.createdAt)],
+      },
+    },
+  })
+}
 ```
 
 ## Best Practices
 
-1. **Always define both sides** of the association
-2. **Use descriptive aliases** with `as` option
-3. **Set proper foreign key constraints** (onDelete, onUpdate)
-4. **Use through tables** for many-to-many with extra fields
-5. **Leverage scopes** to filter associated records
-6. **Use eager loading** (include) to avoid N+1 queries
-7. **Add indexes** on foreign keys for performance
-8. **Use paranoid: true** for soft deletes with associations
-9. **Consider caching** frequently accessed associations
-10. **Test associations** thoroughly, especially cascading deletes
+1. **Define Relations Separately**: Keep relation definitions in a separate section for clarity
+2. **Use Descriptive Relation Names**: Name relations clearly (e.g., `author` instead of `user`)
+3. **Foreign Key Constraints**: Always add `references()` for referential integrity
+4. **Cascade Deletes**: Use `onDelete: "cascade"` for dependent records
+5. **Index Foreign Keys**: Add indexes on foreign key columns
+6. **Limit Deep Nesting**: Avoid deeply nested `with` queries for performance
+7. **Use Transactions**: Wrap related inserts/updates in transactions
+8. **Select Only Needed Columns**: Use `columns` to limit returned data
+9. **Handle Nullability**: Consider nullable foreign keys for optional relations
+10. **Test Relations**: Verify cascade behavior in tests

@@ -64,7 +64,7 @@ export function AuthHeader({
           )}
 
           {/* Logo - Centered */}
-          <img src={logo} alt="Rituality" style={{ height: "auto", width: "130px" }} />
+          <img src={logo} alt="Finishd" style={{ height: "auto", width: "130px" }} />
 
           {/* Extra Content */}
           {extraContent}
@@ -107,7 +107,7 @@ export function AuthHeader({
           )}
 
           {/* Logo Branding - Centered */}
-          <img src={logo} alt="Rituality" style={{ height: "auto", width: "130px" }} />
+          <img src={logo} alt="Finishd" style={{ height: "auto", width: "130px" }} />
         </div>
       </header>
       <LogoutConfirmationModal

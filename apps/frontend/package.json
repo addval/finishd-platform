@@ -1,7 +1,7 @@
 {
-  "name": "@rituality/frontend",
+  "name": "@finishd/frontend",
   "version": "1.0.0",
-  "description": "Rituality Platform Frontend - React + TypeScript + Vite",
+  "description": "Finishd Platform Frontend - React + TypeScript + Vite",
   "private": true,
   "type": "module",
   "scripts": {
@@ -39,6 +39,7 @@
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.18",
     "@tailwindcss/vite": "^4.1.18",
+    "tailwindcss": "^4.1.18",
     "@testing-library/jest-dom": "^6.7.0",
     "@testing-library/react": "^16.3.1",
     "@testing-library/user-event": "^14.6.1",

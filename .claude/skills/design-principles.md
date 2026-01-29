@@ -1,11 +1,11 @@
 ---
 name: design-principles
-description: Custom design principles for Rituality Platform - Sophistication & Trust direction with warm cream backgrounds and professional depth. Maintains brand consistency while applying enterprise-grade craft.
+description: Custom design principles for Finishd Platform - Sophistication & Trust direction with warm cream backgrounds and professional depth. Maintains brand consistency while applying enterprise-grade craft.
 ---
 
-# Rituality Platform Design System
+# Finishd Platform Design System
 
-Build interfaces for Rituality Platform with sophisticated craftsmanship, intentional depth, and consistent brand identity. This skill enforces design decisions specific to Rituality's wellness/rituality context while maintaining professional polish.
+Build interfaces for Finishd Platform with sophisticated craftsmanship, intentional depth, and consistent brand identity. This skill enforces design decisions specific to Finishd's wellness/finishd context while maintaining professional polish.
 
 ## Design Direction
 
@@ -243,7 +243,7 @@ Use all four consistently.
 - ❌ Using color just to "add interest"
 
 ### Always Question
-- "Did I think about what Rituality needs, or did I default?"
+- "Did I think about what Finishd needs, or did I default?"
 - "Does this element feel crafted and intentional?"
 - "Is my depth strategy consistent?"
 - "Are all elements on the 4px grid?"
@@ -286,7 +286,7 @@ All tokens defined in: `apps/frontend/src/assets/styles/index.css`
 
 ## Usage
 
-When building UI for Rituality Platform:
+When building UI for Finishd Platform:
 
 1. **Check existing patterns** in `.design-engineer/system.md` (if exists)
 2. **Apply craft principles** from this file
@@ -296,15 +296,15 @@ When building UI for Rituality Platform:
 
 **Example command**:
 ```
-"Build a ritual tracking card using rituality-design skill"
+"Build a ritual tracking card using finishd-design skill"
 ```
 
-This will apply all Rituality-specific patterns while maintaining craft principles.
+This will apply all Finishd-specific patterns while maintaining craft principles.
 
 ---
 
 ## Standard
 
-Every Rituality interface should look designed by a team that obsesses over details. Not generic — *crafted*. The warm cream background establishes calm, white cards provide professional structure, and layered shadows add sophistication.
+Every Finishd interface should look designed by a team that obsesses over details. Not generic — *crafted*. The warm cream background establishes calm, white cards provide professional structure, and layered shadows add sophistication.
 
 The goal: Wellness-focused products can be both warm AND professional. Users should feel safe sharing data while enjoying a beautiful, intentional experience.
