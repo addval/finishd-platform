@@ -1,5 +1,5 @@
 # Docker Compose Configuration
-# Development environment orchestration
+# Development environment orchestration for Finishd Platform
 
 version: '3.8'
 
@@ -7,28 +7,28 @@ services:
   # PostgreSQL Database
   postgres:
     image: postgres:16-alpine
-    container_name: rituality-postgres
+    container_name: finishd-postgres
     restart: unless-stopped
     environment:
-      POSTGRES_USER: rituality
-      POSTGRES_PASSWORD: rituality123
-      POSTGRES_DB: rituality_db
+      POSTGRES_USER: finishd
+      POSTGRES_PASSWORD: finishd123
+      POSTGRES_DB: finishd_db
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U rituality"]
+      test: ["CMD-SHELL", "pg_isready -U finishd"]
       interval: 10s
       timeout: 5s
       retries: 5
     networks:
-      - rituality-network
+      - finishd-network
 
-  # Redis (Caching)
+  # Redis (Caching & OTP Storage)
   redis:
     image: redis:7-alpine
-    container_name: rituality-redis
+    container_name: finishd-redis
     restart: unless-stopped
     ports:
       - "6379:6379"
@@ -41,21 +41,45 @@ services:
       timeout: 5s
       retries: 5
     networks:
-      - rituality-network
+      - finishd-network
+
+  # Typesense (Search Engine)
+  typesense:
+    image: typesense/typesense:0.25.2
+    container_name: finishd-typesense
+    restart: unless-stopped
+    environment:
+      TYPESENSE_API_KEY: finishd-typesense-api-key
+      TYPESENSE_DATA_DIR: /data
+    ports:
+      - "8108:8108"
+    volumes:
+      - typesense_data:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8108/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - finishd-network
 
   # Backend API
   backend:
     build:
       context: ..
       dockerfile: docker/Dockerfile.backend
-    container_name: rituality-backend
+    container_name: finishd-backend
     restart: unless-stopped
     environment:
       NODE_ENV: development
       PORT: 3000
-      DATABASE_URL: postgresql://rituality:rituality123@postgres:5432/rituality_db
+      DATABASE_URL: postgresql://finishd:finishd123@postgres:5432/finishd_db
       REDIS_URL: redis://redis:6379
       JWT_SECRET: ${JWT_SECRET}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
+      TYPESENSE_API_KEY: finishd-typesense-api-key
+      TYPESENSE_HOST: typesense
+      TYPESENSE_PORT: 8108
       CORS_ORIGIN: http://localhost:5173
     ports:
       - "3000:3000"
@@ -68,8 +92,10 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+      typesense:
+        condition: service_healthy
     networks:
-      - rituality-network
+      - finishd-network
     command: pnpm run dev
 
   # Frontend
@@ -77,7 +103,7 @@ services:
     build:
       context: ..
       dockerfile: docker/Dockerfile.frontend
-    container_name: rituality-frontend
+    container_name: finishd-frontend
     restart: unless-stopped
     environment:
       VITE_API_URL: http://localhost:3000
@@ -90,7 +116,7 @@ services:
     depends_on:
       - backend
     networks:
-      - rituality-network
+      - finishd-network
     command: pnpm run dev
 
 volumes:
@@ -98,7 +124,9 @@ volumes:
     driver: local
   redis_data:
     driver: local
+  typesense_data:
+    driver: local
 
 networks:
-  rituality-network:
+  finishd-network:
     driver: bridge

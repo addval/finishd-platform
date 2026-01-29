@@ -103,7 +103,7 @@ Comprehensive security audit and hardening of the backend authentication system 
 - ❌ No database query result limiting
 - ❌ Missing database indexes on frequently queried fields
 - ❌ No data encryption at rest (for sensitive fields)
-- ❌ Soft delete implemented manually instead of using Sequelize paranoid
+- ❌ Soft delete implemented manually (consider Drizzle soft delete pattern)
 
 #### 11. **Code Quality & Architecture**
 - ❌ Mixed use of console.log and logger

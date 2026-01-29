@@ -2,7 +2,7 @@
 
 ## Executive Summary
 
-Implementing a comprehensive JWT-based authentication system with OTP email verification for the Rituality Platform. The system provides secure user registration, login, email verification, token management, and device tracking capabilities.
+Implementing a comprehensive JWT-based authentication system with OTP email verification for the Finishd Platform. The system provides secure user registration, login, email verification, token management, and device tracking capabilities.
 
 **Key Features:**
 - JWT-based authentication (access tokens + refresh tokens)
@@ -17,7 +17,7 @@ Implementing a comprehensive JWT-based authentication system with OTP email veri
 ### Completed Components ✅
 
 **Database Layer:**
-- PostgreSQL database configured with Sequelize ORM
+- PostgreSQL database configured with Drizzle ORM
 - All core models created and migrated to TypeScript:
   - `User` model with comprehensive fields (email, password, profile, verification codes)
   - `Role` model for RBAC
@@ -538,7 +538,7 @@ Implementing a comprehensive JWT-based authentication system with OTP email veri
 ### NPM Packages
 - **jsonwebtoken** - JWT generation/validation
 - **bcrypt** - Password hashing
-- **sequelize** - Database ORM
+- **drizzle-orm** - Database ORM
 - **redis** - Redis client
 - **nodemailer** - Email sending (via Brevo SMTP)
 - **express** - HTTP framework

@@ -4,7 +4,7 @@
 Accepted
 
 ## Context
-The Rituality Platform frontend needs a scalable folder structure to accommodate growth and multiple developers.
+The Finishd Platform frontend needs a scalable folder structure to accommodate growth and multiple developers.
 
 ## Decision
 Organize frontend code by **features** rather than file types:

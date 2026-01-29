@@ -1,22 +1,22 @@
-# Claude Skills for Rituality Platform
+# Claude Skills for Finishd Platform
 
-This directory contains world-class Claude Skills tailored for a Node.js, React, PostgreSQL, and Sequelize project.
+This directory contains world-class Claude Skills tailored for a Node.js, React, PostgreSQL, and Drizzle ORM project.
 
-## 📁 Structure
+## Structure
 
 ```
 .claude/
 ├── CLAUDE.md                          # Project-specific guidelines
 ├── README.md                          # This file
 └── skills/
-    ├── backend-api-development/       # Express.js, TypeScript, Sequelize
-    ├── database-schema-migrations/    # PostgreSQL, Sequelize migrations
+    ├── backend-api-development/       # Express.js, TypeScript, Drizzle
+    ├── database-schema-migrations/    # PostgreSQL, Drizzle migrations
     ├── react-component-development/   # React, TypeScript, Hooks
     ├── code-quality-testing/          # Vitest, Biome
     └── git-workflow/                  # Conventional commits, PRs
 ```
 
-## 🚀 Skills Overview
+## Skills Overview
 
 ### 1. Backend API Development
 **Location**: `.claude/skills/backend-api-development/`
@@ -43,17 +43,17 @@ Generates production-ready backend code following MVC + Service Layer architectu
 ### 2. Database Schema & Migrations
 **Location**: `.claude/skills/database-schema-migrations/`
 
-Handles PostgreSQL database design with Sequelize ORM and migrations.
+Handles PostgreSQL database design with Drizzle ORM schema and migrations.
 
 **What it does**:
-- Designs database schemas
-- Generates Sequelize migrations
-- Creates model definitions
-- Implements associations (hasOne, belongsTo, hasMany, belongsToMany)
+- Designs database schemas using Drizzle schema definitions
+- Generates Drizzle migrations with `drizzle-kit`
+- Creates type-safe schema definitions
+- Implements relations (one-to-one, one-to-many, many-to-many)
 - Adds indexes and constraints
 
 **Supporting files**:
-- `MODELS.md` - Model definitions and patterns
+- `MODELS.md` - Schema definitions and patterns
 - `ASSOCIATIONS.md` - Relationship types and examples
 
 **Example usage**:
@@ -122,7 +122,7 @@ Standardizes Git practices with conventional commits and code review standards.
 
 ---
 
-## 🎯 How Skills Work
+## How Skills Work
 
 ### Automatic Activation
 Claude automatically activates skills based on your request context. You don't need to manually invoke them.
@@ -137,25 +137,25 @@ Each skill has:
 ### Best Practices
 
 **DO's**:
-- ✅ Be specific in your requests
-- ✅ Provide context about what you're building
-- ✅ Reference existing code when making changes
-- ✅ Ask for explanations if needed
-- ✅ Test generated code before committing
+- Be specific in your requests
+- Provide context about what you're building
+- Reference existing code when making changes
+- Ask for explanations if needed
+- Test generated code before committing
 
 **DON'Ts**:
-- ❌ Run migrations without reviewing them first
-- ❌ Commit sensitive data
-- ❌ Skip testing generated code
-- ❌ Make breaking changes without understanding impact
+- Run migrations without reviewing them first
+- Commit sensitive data
+- Skip testing generated code
+- Make breaking changes without understanding impact
 
-## 🔧 Quick Start Examples
+## Quick Start Examples
 
 ### Backend Development
 ```
 > Create a REST API for blog posts with CRUD operations
 > Add authentication middleware to protected routes
-> Generate a Sequelize model for users with email validation
+> Generate a Drizzle schema for users with email validation
 ```
 
 ### Frontend Development
@@ -167,7 +167,7 @@ Each skill has:
 
 ### Database
 ```
-> Create a migration for posts table with author foreign key
+> Create a schema for posts table with author foreign key
 > Add a many-to-many relationship between posts and tags
 > Generate a seeder for initial users data
 ```
@@ -186,7 +186,7 @@ Each skill has:
 > Create a feature branch for user registration
 ```
 
-## 📚 Project Guidelines
+## Project Guidelines
 
 See `CLAUDE.md` for:
 - Architecture patterns
@@ -195,18 +195,18 @@ See `CLAUDE.md` for:
 - Security best practices
 - Performance optimization tips
 
-## 🛠️ Configuration
+## Configuration
 
 ### Environment Setup
 
-1. **Backend** (`backend/`)
+1. **Backend** (`apps/backend/`)
    - TypeScript with strict mode
    - Express.js server
-   - Sequelize ORM
+   - Drizzle ORM with PostgreSQL
    - PostgreSQL database
    - Vitest for testing
 
-2. **Frontend** (`frontend/`)
+2. **Frontend** (`apps/frontend/`)
    - React with TypeScript
    - Vite build tool
    - React Testing Library
@@ -220,7 +220,7 @@ See `CLAUDE.md` for:
 - GitLens
 - Thunder Client (API testing)
 
-## 🤝 Contributing
+## Contributing
 
 When adding new features:
 1. Create feature branch: `feat/PROJ-101-description`
@@ -229,16 +229,16 @@ When adding new features:
 4. Create PR with description
 5. Address review feedback
 
-## 📖 Additional Resources
+## Additional Resources
 
 - [Claude Code Documentation](https://code.claude.com/docs)
-- [Sequelize Documentation](https://sequelize.org/)
+- [Drizzle ORM Documentation](https://orm.drizzle.team/)
 - [React Documentation](https://react.dev/)
 - [Vitest Documentation](https://vitest.dev/)
 - [Conventional Commits](https://www.conventionalcommits.org/)
 
 ---
 
-**Version**: 1.0.0
+**Version**: 2.0.0
 **Last Updated**: January 2025
-**Maintained by**: Rituality Platform Team
+**Maintained by**: Finishd Platform Team

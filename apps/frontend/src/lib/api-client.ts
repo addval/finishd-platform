@@ -13,7 +13,9 @@ import {
 } from "./token-manager"
 
 // Get API URL from environment
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3001"
+// In development, use empty string to leverage Vite proxy
+// In production, use the configured VITE_API_URL
+const API_URL = import.meta.env.VITE_API_URL || ""
 
 // Create axios instance
 export const apiClient = axios.create({
@@ -117,17 +119,17 @@ apiClient.interceptors.response.use(
       const refreshToken = getRefreshToken()
       const deviceId = getDeviceId()
 
-      const response = await axios.post(`${API_URL}/auth/refresh-token`, {
+      // Use relative URL to go through Vite proxy in development
+      const response = await axios.post("/api/v1/auth/refresh-token", {
         refreshToken,
-        deviceId,
       })
 
-      const { accessToken, refreshToken: newRefreshToken } = response.data.data.tokens
+      const { accessToken } = response.data.data
 
-      // Update stored tokens
+      // Update stored tokens (Finishd API returns only accessToken)
       setTokens({
         accessToken,
-        refreshToken: newRefreshToken,
+        refreshToken: refreshToken || "",
         deviceId: deviceId || "",
       })
 

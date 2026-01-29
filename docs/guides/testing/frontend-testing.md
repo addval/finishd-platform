@@ -1,4 +1,4 @@
-# Frontend Testing Guide - Rituality Platform
+# Frontend Testing Guide - Finishd Platform
 
 ## 📋 Overview
 

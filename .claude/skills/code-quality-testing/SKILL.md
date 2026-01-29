@@ -154,18 +154,38 @@ Object.defineProperty(window, 'matchMedia', {
 // tests/unit/user.service.test.ts
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { UserService } from '../src/services/user.service';
-import { User } from '../src/models';
+import { db } from '../src/db';
+import { users } from '../src/db/schema';
 import bcrypt from 'bcrypt';
 import { ValidationError, NotFoundError } from '../src/utils/errors';
 
-// Mock the User model
-vi.mock('../src/models', () => ({
-  User: {
-    findOne: vi.fn(),
-    findByPk: vi.fn(),
-    create: vi.fn(),
-    findAndCountAll: vi.fn()
-  }
+// Mock the database module
+vi.mock('../src/db', () => ({
+  db: {
+    query: {
+      users: {
+        findFirst: vi.fn(),
+        findMany: vi.fn(),
+      },
+    },
+    insert: vi.fn(() => ({
+      values: vi.fn(() => ({
+        returning: vi.fn(),
+      })),
+    })),
+    update: vi.fn(() => ({
+      set: vi.fn(() => ({
+        where: vi.fn(() => ({
+          returning: vi.fn(),
+        })),
+      })),
+    })),
+    select: vi.fn(() => ({
+      from: vi.fn(() => ({
+        where: vi.fn(),
+      })),
+    })),
+  },
 }));
 
 // Mock bcrypt
@@ -193,22 +213,24 @@ describe('UserService', () => {
         lastName: 'Doe'
       };
 
-      vi.mocked(User.findOne).mockResolvedValue(null);
+      vi.mocked(db.query.users.findFirst).mockResolvedValue(null);
       vi.mocked(bcrypt.hash).mockResolvedValue('hashed_password');
-      vi.mocked(User.create).mockResolvedValue({
-        id: 1,
-        ...userData,
-        toJSON: () => ({ id: 1, ...userData })
-      });
+
+      const mockInsertChain = {
+        values: vi.fn().mockReturnThis(),
+        returning: vi.fn().mockResolvedValue([{
+          id: '123e4567-e89b-12d3-a456-426614174000',
+          ...userData,
+          passwordHash: 'hashed_password',
+        }]),
+      };
+      vi.mocked(db.insert).mockReturnValue(mockInsertChain as any);
 
       const result = await userService.createUser(userData);
 
       expect(bcrypt.hash).toHaveBeenCalledWith('Password123', 10);
-      expect(User.create).toHaveBeenCalledWith({
-        ...userData,
-        password: 'hashed_password'
-      });
-      expect(result).toHaveProperty('id', 1);
+      expect(db.insert).toHaveBeenCalled();
+      expect(result).toHaveProperty('id');
     });
 
     it('should throw ValidationError if email already exists', async () => {
@@ -219,10 +241,10 @@ describe('UserService', () => {
         lastName: 'Doe'
       };
 
-      vi.mocked(User.findOne).mockResolvedValue({
-        id: 1,
-        email: 'test@example.com'
-      });
+      vi.mocked(db.query.users.findFirst).mockResolvedValue({
+        id: '123e4567-e89b-12d3-a456-426614174000',
+        email: 'test@example.com',
+      } as any);
 
       await expect(userService.createUser(userData)).rejects.toThrow(ValidationError);
       await expect(userService.createUser(userData)).rejects.toThrow(
@@ -238,7 +260,7 @@ describe('UserService', () => {
         lastName: 'Doe'
       };
 
-      vi.mocked(User.findOne).mockRejectedValue(new Error('Database error'));
+      vi.mocked(db.query.users.findFirst).mockRejectedValue(new Error('Database error'));
 
       await expect(userService.createUser(userData)).rejects.toThrow('Database error');
     });
@@ -247,31 +269,31 @@ describe('UserService', () => {
   describe('getUserById', () => {
     it('should return user without password', async () => {
       const mockUser = {
-        id: 1,
+        id: '123e4567-e89b-12d3-a456-426614174000',
         email: 'test@example.com',
         firstName: 'John',
         lastName: 'Doe'
       };
 
-      vi.mocked(User.findByPk).mockResolvedValue({
-        ...mockUser,
-        toJSON: () => mockUser
-      });
+      vi.mocked(db.query.users.findFirst).mockResolvedValue(mockUser as any);
 
-      const result = await userService.getUserById(1);
+      const result = await userService.getUserById('123e4567-e89b-12d3-a456-426614174000');
 
       expect(result).toEqual(mockUser);
-      expect(User.findByPk).toHaveBeenCalledWith(1, {
-        attributes: { exclude: ['password'] }
+      expect(db.query.users.findFirst).toHaveBeenCalledWith({
+        where: expect.any(Object),
+        columns: {
+          passwordHash: false,
+        },
       });
     });
 
     it('should throw NotFoundError if user does not exist', async () => {
-      vi.mocked(User.findByPk).mockResolvedValue(null);
+      vi.mocked(db.query.users.findFirst).mockResolvedValue(null);
 
-      await expect(userService.getUserById(999)).rejects.toThrow(NotFoundError);
-      await expect(userService.getUserById(999)).rejects.toThrow(
-        'User with ID 999 not found'
+      await expect(userService.getUserById('nonexistent-id')).rejects.toThrow(NotFoundError);
+      await expect(userService.getUserById('nonexistent-id')).rejects.toThrow(
+        'User with ID nonexistent-id not found'
       );
     });
   });
@@ -279,19 +301,22 @@ describe('UserService', () => {
   describe('getAllUsers', () => {
     it('should return paginated users', async () => {
       const mockUsers = [
-        { id: 1, email: 'user1@example.com' },
-        { id: 2, email: 'user2@example.com' }
+        { id: '1', email: 'user1@example.com' },
+        { id: '2', email: 'user2@example.com' }
       ];
 
-      vi.mocked(User.findAndCountAll).mockResolvedValue({
-        count: 2,
-        rows: mockUsers
-      });
+      vi.mocked(db.query.users.findMany).mockResolvedValue(mockUsers as any);
+
+      const mockSelectChain = {
+        from: vi.fn().mockReturnThis(),
+        where: vi.fn().mockResolvedValue([{ count: 2 }]),
+      };
+      vi.mocked(db.select).mockReturnValue(mockSelectChain as any);
 
       const result = await userService.getAllUsers({
         page: 1,
         limit: 10,
-        sort: 'id:asc'
+        sort: 'createdAt:desc'
       });
 
       expect(result).toEqual({
@@ -308,23 +333,26 @@ describe('UserService', () => {
     });
 
     it('should handle search queries', async () => {
-      vi.mocked(User.findAndCountAll).mockResolvedValue({
-        count: 1,
-        rows: [{ id: 1, email: 'john@example.com' }]
-      });
+      vi.mocked(db.query.users.findMany).mockResolvedValue([
+        { id: '1', email: 'john@example.com' }
+      ] as any);
+
+      const mockSelectChain = {
+        from: vi.fn().mockReturnThis(),
+        where: vi.fn().mockResolvedValue([{ count: 1 }]),
+      };
+      vi.mocked(db.select).mockReturnValue(mockSelectChain as any);
 
       await userService.getAllUsers({
         page: 1,
         limit: 10,
-        sort: 'id:asc',
+        sort: 'createdAt:desc',
         search: 'john'
       });
 
-      expect(User.findAndCountAll).toHaveBeenCalledWith(
+      expect(db.query.users.findMany).toHaveBeenCalledWith(
         expect.objectContaining({
-          where: expect.objectContaining({
-            [expect.any(String)]: expect.any(Object)
-          })
+          where: expect.any(Object)
         })
       );
     });
@@ -339,22 +367,22 @@ describe('UserService', () => {
 import { describe, it, expect, beforeAll, afterAll, beforeEach } from 'vitest';
 import request from 'supertest';
 import { app } from '../src/server';
-import { sequelize } from '../src/config/database';
+import { db } from '../src/db';
+import { users } from '../src/db/schema';
+import { sql } from 'drizzle-orm';
 
 describe('Auth Routes Integration Tests', () => {
   beforeAll(async () => {
-    // Setup test database
-    await sequelize.authenticate();
-    await sequelize.sync({ force: true });
+    // Database connection is established via db module
   });
 
   afterAll(async () => {
-    await sequelize.close();
+    // Close connection if needed
   });
 
   beforeEach(async () => {
     // Clean database before each test
-    await sequelize.truncate({ cascade: true });
+    await db.delete(users);
   });
 
   describe('POST /api/v1/auth/register', () => {
@@ -380,7 +408,7 @@ describe('Auth Routes Integration Tests', () => {
         },
         message: 'Registration successful'
       });
-      expect(response.body.data.user).not.toHaveProperty('password');
+      expect(response.body.data.user).not.toHaveProperty('passwordHash');
     });
 
     it('should return 400 for invalid email', async () => {
@@ -493,6 +521,109 @@ describe('Auth Routes Integration Tests', () => {
         .expect(401);
 
       expect(response.body.success).toBe(false);
+    });
+  });
+});
+```
+
+### Testing with Transactions
+
+```typescript
+// tests/unit/transaction.service.test.ts
+import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { TransactionService } from '../src/services/transaction.service';
+import { db } from '../src/db';
+
+// Mock the database with transaction support
+vi.mock('../src/db', () => ({
+  db: {
+    transaction: vi.fn(),
+    query: {
+      accounts: {
+        findFirst: vi.fn(),
+      },
+    },
+    update: vi.fn(() => ({
+      set: vi.fn(() => ({
+        where: vi.fn(),
+      })),
+    })),
+    insert: vi.fn(() => ({
+      values: vi.fn(() => ({
+        returning: vi.fn(),
+      })),
+    })),
+  },
+}));
+
+describe('TransactionService', () => {
+  let transactionService: TransactionService;
+
+  beforeEach(() => {
+    transactionService = new TransactionService();
+    vi.clearAllMocks();
+  });
+
+  describe('transferFunds', () => {
+    it('should transfer funds between accounts', async () => {
+      const fromAccount = { id: '1', balance: 1000 };
+      const toAccount = { id: '2', balance: 500 };
+
+      // Mock transaction callback execution
+      vi.mocked(db.transaction).mockImplementation(async (callback) => {
+        const tx = {
+          query: {
+            accounts: {
+              findFirst: vi.fn()
+                .mockResolvedValueOnce(fromAccount)
+                .mockResolvedValueOnce(toAccount),
+            },
+          },
+          update: vi.fn(() => ({
+            set: vi.fn(() => ({
+              where: vi.fn(),
+            })),
+          })),
+          insert: vi.fn(() => ({
+            values: vi.fn(() => ({
+              returning: vi.fn().mockResolvedValue([{
+                id: 'txn-123',
+                fromAccountId: '1',
+                toAccountId: '2',
+                amount: 100,
+              }]),
+            })),
+          })),
+        };
+        return callback(tx as any);
+      });
+
+      const result = await transactionService.transferFunds('1', '2', 100);
+
+      expect(db.transaction).toHaveBeenCalled();
+      expect(result).toHaveProperty('transactionId');
+    });
+
+    it('should throw error for insufficient funds', async () => {
+      const fromAccount = { id: '1', balance: 50 };
+      const toAccount = { id: '2', balance: 500 };
+
+      vi.mocked(db.transaction).mockImplementation(async (callback) => {
+        const tx = {
+          query: {
+            accounts: {
+              findFirst: vi.fn()
+                .mockResolvedValueOnce(fromAccount)
+                .mockResolvedValueOnce(toAccount),
+            },
+          },
+        };
+        return callback(tx as any);
+      });
+
+      await expect(
+        transactionService.transferFunds('1', '2', 100)
+      ).rejects.toThrow('Insufficient funds');
     });
   });
 });
@@ -739,25 +870,25 @@ describe('useFetch Hook', () => {
 
 ```bash
 # Run all tests
-npm test
+pnpm test
 
 # Run tests in watch mode
-npm test:watch
+pnpm test:watch
 
 # Run tests with coverage
-npm test:coverage
+pnpm test:coverage
 
 # Run specific test file
-npm test -- user.service.test.ts
+pnpm test -- user.service.test.ts
 
 # Run tests matching pattern
-npm test -- --grep "UserService"
+pnpm test -- --grep "UserService"
 
 # Run tests for frontend only
-npm run test:frontend
+pnpm run test:frontend
 
 # Run tests for backend only
-npm run test:backend
+pnpm run test:backend
 ```
 
 ## Code Quality Tools

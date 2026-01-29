@@ -1,8 +1,8 @@
-# Frontend State Management - Rituality Platform
+# Frontend State Management - Finishd Platform
 
 ## 📋 Overview
 
-This document covers state management strategies in the Rituality Platform frontend using React Query and Zustand.
+This document covers state management strategies in the Finishd Platform frontend using React Query and Zustand.
 
 **Last Updated**: January 12, 2026
 **Version**: 1.0.0

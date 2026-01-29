@@ -1,6 +1,6 @@
 /**
  * Backend Server Entry Point
- * Express.js server with TypeScript, PostgreSQL, Sequelize
+ * Express.js server with TypeScript, PostgreSQL, Drizzle ORM
  */
 
 // Load environment variables FIRST (before any imports that use env vars)
@@ -9,11 +9,17 @@ import dotenv from "dotenv"
 dotenv.config()
 
 import { createServer } from "node:http"
+import path from "node:path"
+import { fileURLToPath } from "node:url"
 import compression from "compression"
 import cors from "cors"
 import express, { type Application } from "express"
 import helmet from "helmet"
 import type { HttpServerType } from "./types/index.js"
+
+// Get __dirname equivalent for ES modules
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
 
 class Server {
   private app: Application
@@ -46,6 +52,10 @@ class Server {
 
     // Compression middleware
     this.app.use(compression())
+
+    // Static file serving for uploads
+    const uploadsDir = process.env.UPLOAD_DIR || path.join(__dirname, "..", "uploads")
+    this.app.use("/uploads", express.static(uploadsDir))
 
     // Request logging
     this.app.use(requestLogger)
@@ -85,21 +95,17 @@ class Server {
 
   public async start(): Promise<void> {
     try {
-      // Import database and logger using dynamic import for CommonJS modules
-      const { initDatabase } = await import("./config/database.js")
+      // Import database and logger
+      const { testConnection } = await import("./db/index.js")
       const { default: logger } = await import("./utils/logger.js")
 
       // Initialize all middlewares
       await this.initializeMiddlewares()
-      await this.initializeRoutes() // Add await here
+      await this.initializeRoutes()
       await this.initializeErrorHandling()
 
-      // Initialize database
-      await initDatabase()
-
-      // Initialize models and setup associations
-      const { initializeModels } = await import("./models/index.js")
-      initializeModels()
+      // Test database connection
+      await testConnection()
 
       // Initialize Redis (optional)
       if (process.env.REDIS_URL) {
@@ -131,8 +137,8 @@ class Server {
       this.httpServer.close(async () => {
         try {
           // Close database connection
-          const { sequelize } = await import("./config/database.js")
-          await sequelize.close()
+          const { closeConnection } = await import("./db/index.js")
+          await closeConnection()
           logger.info("Database connection closed")
 
           // Close Redis connection

@@ -1,8 +1,8 @@
-# Backend API Reference - Rituality Platform
+# Backend API Reference - Finishd Platform
 
 ## 📋 Overview
 
-This document provides a comprehensive reference for all available API endpoints in the Rituality Platform backend.
+This document provides a comprehensive reference for all available API endpoints in the Finishd Platform backend.
 
 **Last Updated**: January 12, 2026
 **Version**: 1.0.0

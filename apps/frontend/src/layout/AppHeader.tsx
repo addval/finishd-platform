@@ -37,7 +37,7 @@ export function AppHeader() {
           {/* Logo - Left */}
           <img
             src={logo}
-            alt="Rituality"
+            alt="Finishd"
             style={{ height: "auto", width: "130px" }}
             className="ms-10"
           />

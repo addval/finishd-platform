@@ -6,25 +6,30 @@
 
 ```typescript
 // services/user.service.ts
-import { User } from '../models';
+import { db } from '../db';
+import { users, type User, type NewUser } from '../db/schema';
+import { eq, and, or, ilike, sql, desc, asc } from 'drizzle-orm';
 import { ValidationError, NotFoundError } from '../utils/errors';
-import { CreateUserInput, UpdateUserInput, UserFilters } from '../types/user.types';
 import bcrypt from 'bcrypt';
-import { Op } from 'sequelize';
+
+export interface UserFilters {
+  page?: number;
+  limit?: number;
+  sort?: string;
+  search?: string;
+}
 
 export class UserService {
   /**
    * Create a new user with validation and password hashing
    */
-  async createUser(data: CreateUserInput) {
+  async createUser(data: NewUser & { password: string }) {
     // Check if user already exists
-    const existingUser = await User.findOne({
-      where: {
-        [Op.or]: [
-          { email: data.email },
-          { username: data.username }
-        ]
-      }
+    const existingUser = await db.query.users.findFirst({
+      where: or(
+        eq(users.email, data.email),
+        data.username ? eq(users.username, data.username) : undefined
+      ),
     });
 
     if (existingUser) {
@@ -35,24 +40,28 @@ export class UserService {
     const hashedPassword = await bcrypt.hash(data.password, 10);
 
     // Create user
-    const user = await User.create({
-      ...data,
-      password: hashedPassword
-    });
+    const [user] = await db
+      .insert(users)
+      .values({
+        ...data,
+        passwordHash: hashedPassword,
+      })
+      .returning();
 
     // Remove password from response
-    const userJSON = user.toJSON();
-    delete userJSON.password;
-
-    return userJSON;
+    const { passwordHash, ...userWithoutPassword } = user;
+    return userWithoutPassword;
   }
 
   /**
    * Get user by ID with error handling
    */
-  async getUserById(id: number) {
-    const user = await User.findByPk(id, {
-      attributes: { exclude: ['password'] }
+  async getUserById(id: string) {
+    const user = await db.query.users.findFirst({
+      where: eq(users.id, id),
+      columns: {
+        passwordHash: false, // Exclude password
+      },
     });
 
     if (!user) {
@@ -66,84 +75,104 @@ export class UserService {
    * Get all users with filtering and pagination
    */
   async getAllUsers(filters: UserFilters) {
-    const { page = 1, limit = 10, sort = 'id:asc', search } = filters;
+    const { page = 1, limit = 10, sort = 'createdAt:desc', search } = filters;
 
     const offset = (page - 1) * limit;
     const [sortField, sortOrder] = sort.split(':');
 
-    const whereClause = search ? {
-      [Op.or]: [
-        { name: { [Op.iLike]: `%${search}%` } },
-        { email: { [Op.iLike]: `%${search}%` } }
-      ]
-    } : {};
+    // Build where clause for search
+    const whereClause = search
+      ? or(
+          ilike(users.firstName, `%${search}%`),
+          ilike(users.lastName, `%${search}%`),
+          ilike(users.email, `%${search}%`)
+        )
+      : undefined;
 
-    const { count, rows } = await User.findAndCountAll({
-      where: whereClause,
-      limit,
-      offset,
-      order: [[sortField, sortOrder.toUpperCase()]],
-      attributes: { exclude: ['password'] }
-    });
+    // Get paginated data and count in parallel
+    const [data, countResult] = await Promise.all([
+      db.query.users.findMany({
+        where: whereClause,
+        limit,
+        offset,
+        orderBy: sortOrder === 'desc'
+          ? [desc(users[sortField as keyof typeof users])]
+          : [asc(users[sortField as keyof typeof users])],
+        columns: {
+          passwordHash: false,
+        },
+      }),
+      db
+        .select({ count: sql<number>`count(*)::int` })
+        .from(users)
+        .where(whereClause),
+    ]);
+
+    const total = countResult[0].count;
 
     return {
-      data: rows,
+      data,
       pagination: {
-        total: count,
+        total,
         page,
         limit,
-        totalPages: Math.ceil(count / limit),
-        hasNext: page < Math.ceil(count / limit),
-        hasPrev: page > 1
-      }
+        totalPages: Math.ceil(total / limit),
+        hasNext: page < Math.ceil(total / limit),
+        hasPrev: page > 1,
+      },
     };
   }
 
   /**
    * Update user with partial data support
    */
-  async updateUser(id: number, data: UpdateUserInput) {
-    const user = await User.findByPk(id);
+  async updateUser(id: string, data: Partial<NewUser>) {
+    const existingUser = await db.query.users.findFirst({
+      where: eq(users.id, id),
+    });
 
-    if (!user) {
+    if (!existingUser) {
       throw new NotFoundError(`User with ID ${id} not found`);
     }
 
     // Check if email is being changed and if it's already taken
-    if (data.email && data.email !== user.email) {
-      const existingUser = await User.findOne({
-        where: { email: data.email }
+    if (data.email && data.email !== existingUser.email) {
+      const userWithEmail = await db.query.users.findFirst({
+        where: eq(users.email, data.email),
       });
 
-      if (existingUser) {
+      if (userWithEmail) {
         throw new ValidationError('Email already in use');
       }
     }
 
-    // Update password if provided
-    if (data.password) {
-      data.password = await bcrypt.hash(data.password, 10);
-    }
+    // Update user
+    const [updated] = await db
+      .update(users)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(users.id, id))
+      .returning();
 
-    await user.update(data);
-
-    const userJSON = user.toJSON();
-    delete userJSON.password;
-
-    return userJSON;
+    const { passwordHash, ...userWithoutPassword } = updated;
+    return userWithoutPassword;
   }
 
   /**
    * Soft delete user
    */
-  async deleteUser(id: number) {
-    const user = await User.findByPk(id);
+  async deleteUser(id: string) {
+    const user = await db.query.users.findFirst({
+      where: eq(users.id, id),
+    });
 
     if (!user) {
       throw new NotFoundError(`User with ID ${id} not found`);
     }
 
-    await user.update({ deletedAt: new Date() });
+    await db
+      .update(users)
+      .set({ deletedAt: new Date(), isActive: false })
+      .where(eq(users.id, id));
 
     return { message: 'User deleted successfully' };
   }
@@ -154,27 +183,24 @@ export class UserService {
 
 ```typescript
 // services/transaction.service.ts
-import { sequelize } from '../config/database';
-import { User, Account, Transaction } from '../models';
-import { InsufficientFundsError } from '../utils/errors';
+import { db } from '../db';
+import { accounts, transactions } from '../db/schema';
+import { eq, sql } from 'drizzle-orm';
+import { NotFoundError, InsufficientFundsError } from '../utils/errors';
 
 export class TransactionService {
   /**
    * Transfer funds between accounts with transaction
    */
-  async transferFunds(fromAccountId: number, toAccountId: number, amount: number) {
-    const t = await sequelize.transaction();
-
-    try {
-      // Lock rows for update
-      const fromAccount = await Account.findByPk(fromAccountId, {
-        transaction: t,
-        lock: t.LOCK.UPDATE
+  async transferFunds(fromAccountId: string, toAccountId: string, amount: number) {
+    return await db.transaction(async (tx) => {
+      // Get accounts
+      const fromAccount = await tx.query.accounts.findFirst({
+        where: eq(accounts.id, fromAccountId),
       });
 
-      const toAccount = await Account.findByPk(toAccountId, {
-        transaction: t,
-        lock: t.LOCK.UPDATE
+      const toAccount = await tx.query.accounts.findFirst({
+        where: eq(accounts.id, toAccountId),
       });
 
       if (!fromAccount || !toAccount) {
@@ -186,36 +212,34 @@ export class TransactionService {
       }
 
       // Perform transfer
-      await fromAccount.update({
-        balance: fromAccount.balance - amount
-      }, { transaction: t });
+      await tx
+        .update(accounts)
+        .set({ balance: sql`${accounts.balance} - ${amount}` })
+        .where(eq(accounts.id, fromAccountId));
 
-      await toAccount.update({
-        balance: toAccount.balance + amount
-      }, { transaction: t });
+      await tx
+        .update(accounts)
+        .set({ balance: sql`${accounts.balance} + ${amount}` })
+        .where(eq(accounts.id, toAccountId));
 
       // Create transaction record
-      await Transaction.create({
-        fromAccountId,
-        toAccountId,
-        amount,
-        type: 'TRANSFER',
-        status: 'COMPLETED'
-      }, { transaction: t });
-
-      // Commit transaction
-      await t.commit();
+      const [record] = await tx
+        .insert(transactions)
+        .values({
+          fromAccountId,
+          toAccountId,
+          amount,
+          type: 'TRANSFER',
+          status: 'COMPLETED',
+        })
+        .returning();
 
       return {
-        fromAccount: fromAccount.balance,
-        toAccount: toAccount.balance,
-        transactionId: transaction.id
+        fromBalance: fromAccount.balance - amount,
+        toBalance: toAccount.balance + amount,
+        transactionId: record.id,
       };
-    } catch (error) {
-      // Rollback on error
-      await t.rollback();
-      throw error;
-    }
+    });
   }
 }
 ```
@@ -224,14 +248,17 @@ export class TransactionService {
 
 ```typescript
 // services/cached.service.ts
-import { User } from '../models';
+import { db } from '../db';
+import { users } from '../db/schema';
+import { eq } from 'drizzle-orm';
 import { cache } from '../utils/cache';
+import { NotFoundError } from '../utils/errors';
 
 export class CachedUserService {
   private cachePrefix = 'user:';
   private cacheTTL = 3600; // 1 hour
 
-  async getUserById(id: number) {
+  async getUserById(id: string) {
     // Check cache first
     const cacheKey = `${this.cachePrefix}${id}`;
     const cached = await cache.get(cacheKey);
@@ -241,8 +268,11 @@ export class CachedUserService {
     }
 
     // Fetch from database
-    const user = await User.findByPk(id, {
-      attributes: { exclude: ['password'] }
+    const user = await db.query.users.findFirst({
+      where: eq(users.id, id),
+      columns: {
+        passwordHash: false,
+      },
     });
 
     if (!user) {
@@ -255,14 +285,16 @@ export class CachedUserService {
     return user;
   }
 
-  async updateUser(id: number, data: any) {
-    const user = await User.findByPk(id);
+  async updateUser(id: string, data: any) {
+    const [user] = await db
+      .update(users)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(users.id, id))
+      .returning();
 
     if (!user) {
       throw new NotFoundError(`User with ID ${id} not found`);
     }
-
-    await user.update(data);
 
     // Invalidate cache
     const cacheKey = `${this.cachePrefix}${id}`;
@@ -278,7 +310,8 @@ export class CachedUserService {
 ```typescript
 // services/event.service.ts
 import { EventEmitter } from 'events';
-import { User } from '../models';
+import { db } from '../db';
+import { users, type NewUser } from '../db/schema';
 import { EmailService } from './email.service';
 
 export class UserServiceWithEvents extends EventEmitter {
@@ -293,8 +326,8 @@ export class UserServiceWithEvents extends EventEmitter {
     this.on('user:deleted', this.handleUserDeleted);
   }
 
-  async createUser(data: any) {
-    const user = await User.create(data);
+  async createUser(data: NewUser) {
+    const [user] = await db.insert(users).values(data).returning();
 
     // Emit event
     this.emit('user:created', user);
@@ -325,8 +358,10 @@ export class UserServiceWithEvents extends EventEmitter {
 ```typescript
 // services/payment.service.ts
 import axios from 'axios';
-import { Payment } from '../models';
-import { PaymentError } from '../utils/errors';
+import { db } from '../db';
+import { payments } from '../db/schema';
+import { eq } from 'drizzle-orm';
+import { PaymentError, NotFoundError } from '../utils/errors';
 
 export class PaymentService {
   private stripeApiKey: string;
@@ -336,7 +371,7 @@ export class PaymentService {
     this.stripeApiKey = process.env.STRIPE_SECRET_KEY!;
   }
 
-  async createPayment(userId: number, amount: number, currency: string = 'usd') {
+  async createPayment(userId: string, amount: number, currency: string = 'usd') {
     try {
       // Call external API
       const response = await axios.post(
@@ -354,14 +389,17 @@ export class PaymentService {
       );
 
       // Save to database
-      const payment = await Payment.create({
-        userId,
-        amount,
-        currency,
-        status: response.data.status,
-        transactionId: response.data.id,
-        metadata: response.data
-      });
+      const [payment] = await db
+        .insert(payments)
+        .values({
+          userId,
+          amount,
+          currency,
+          status: response.data.status,
+          transactionId: response.data.id,
+          metadata: response.data,
+        })
+        .returning();
 
       return payment;
     } catch (error) {
@@ -374,8 +412,10 @@ export class PaymentService {
     }
   }
 
-  async refundPayment(paymentId: number) {
-    const payment = await Payment.findByPk(paymentId);
+  async refundPayment(paymentId: string) {
+    const payment = await db.query.payments.findFirst({
+      where: eq(payments.id, paymentId),
+    });
 
     if (!payment) {
       throw new NotFoundError('Payment not found');
@@ -398,9 +438,13 @@ export class PaymentService {
         }
       );
 
-      await payment.update({ status: 'refunded' });
+      const [updated] = await db
+        .update(payments)
+        .set({ status: 'refunded' })
+        .where(eq(payments.id, paymentId))
+        .returning();
 
-      return payment;
+      return updated;
     } catch (error) {
       throw new PaymentError('Refund failed');
     }
@@ -412,12 +456,14 @@ export class PaymentService {
 
 ```typescript
 // services/validated.service.ts
-import { User } from '../models';
+import { db } from '../db';
+import { users, type NewUser } from '../db/schema';
+import { eq, sql } from 'drizzle-orm';
 import { ValidationError } from '../utils/errors';
 import { validateEmail, validatePassword } from '../utils/validators';
 
 export class ValidatedUserService {
-  async createUser(data: any) {
+  async createUser(data: NewUser & { password: string; dateOfBirth?: Date; organizationId?: string }) {
     // Validate email
     if (!validateEmail(data.email)) {
       throw new ValidationError('Invalid email format');
@@ -430,20 +476,30 @@ export class ValidatedUserService {
     }
 
     // Validate age
-    const age = this.calculateAge(data.dateOfBirth);
-    if (age < 18) {
-      throw new ValidationError('Must be at least 18 years old');
+    if (data.dateOfBirth) {
+      const age = this.calculateAge(data.dateOfBirth);
+      if (age < 18) {
+        throw new ValidationError('Must be at least 18 years old');
+      }
     }
 
     // Business rule validation
-    const userCount = await User.count({ where: { organizationId: data.organizationId } });
-    const maxUsers = await this.getMaxUsersForOrganization(data.organizationId);
+    if (data.organizationId) {
+      const userCountResult = await db
+        .select({ count: sql<number>`count(*)::int` })
+        .from(users)
+        .where(eq(users.organizationId, data.organizationId));
 
-    if (userCount >= maxUsers) {
-      throw new ValidationError('Organization has reached maximum user limit');
+      const userCount = userCountResult[0].count;
+      const maxUsers = await this.getMaxUsersForOrganization(data.organizationId);
+
+      if (userCount >= maxUsers) {
+        throw new ValidationError('Organization has reached maximum user limit');
+      }
     }
 
-    return await User.create(data);
+    const [user] = await db.insert(users).values(data).returning();
+    return user;
   }
 
   private calculateAge(dateOfBirth: Date): number {
@@ -459,7 +515,7 @@ export class ValidatedUserService {
     return age;
   }
 
-  private async getMaxUsersForOrganization(organizationId: number): Promise<number> {
+  private async getMaxUsersForOrganization(organizationId: string): Promise<number> {
     // Fetch organization plan limits
     // This is a placeholder
     return 10;
@@ -471,7 +527,9 @@ export class ValidatedUserService {
 
 ```typescript
 // services/order.service.ts
-import { Order, OrderItem, Product, User } from '../models';
+import { db } from '../db';
+import { orders, orderItems } from '../db/schema';
+import { eq, sql } from 'drizzle-orm';
 import { ProductService } from './product.service';
 import { UserService } from './user.service';
 import { InventoryService } from './inventory.service';
@@ -490,13 +548,13 @@ export class OrderService {
     this.notificationService = new NotificationService();
   }
 
-  async createOrder(userId: number, items: Array<{ productId: number; quantity: number }>) {
+  async createOrder(userId: string, items: Array<{ productId: string; quantity: number }>) {
     // Use composed services
     const user = await this.userService.getUserById(userId);
 
     // Validate products and calculate total
     let total = 0;
-    const orderItems = [];
+    const orderItemsData = [];
 
     for (const item of items) {
       const product = await this.productService.getProductById(item.productId);
@@ -506,45 +564,41 @@ export class OrderService {
       await this.inventoryService.checkAvailability(item.productId, item.quantity);
 
       total += price * item.quantity;
-      orderItems.push({
+      orderItemsData.push({
         productId: item.productId,
         quantity: item.quantity,
-        price
+        price,
       });
     }
 
     // Create order with transaction
-    const t = await sequelize.transaction();
-
-    try {
-      const order = await Order.create({
-        userId,
-        total,
-        status: 'pending'
-      }, { transaction: t });
+    return await db.transaction(async (tx) => {
+      const [order] = await tx
+        .insert(orders)
+        .values({
+          userId,
+          total,
+          status: 'pending',
+        })
+        .returning();
 
       // Create order items
-      await OrderItem.bulkCreate(
-        orderItems.map(item => ({ ...item, orderId: order.id })),
-        { transaction: t }
+      await tx.insert(orderItems).values(
+        orderItemsData.map((item) => ({ ...item, orderId: order.id }))
       );
 
       // Deduct from inventory
       for (const item of items) {
-        await this.inventoryService.deductStock(item.productId, item.quantity, t);
+        await this.inventoryService.deductStock(item.productId, item.quantity, tx);
       }
 
-      await t.commit();
-
       // Send notification (non-critical, don't block)
-      this.notificationService.sendOrderConfirmation(user.email, order.id)
+      this.notificationService
+        .sendOrderConfirmation(user.email, order.id)
         .catch(console.error);
 
       return order;
-    } catch (error) {
-      await t.rollback();
-      throw error;
-    }
+    });
   }
 }
 ```

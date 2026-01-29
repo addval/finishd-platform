@@ -1,12 +1,12 @@
-# Rituality Platform - Claude Guidelines
+# Finishd Platform - Claude Guidelines
 
 ## Project Overview
 
 This is a full-stack JavaScript application built with:
-- **Backend**: Node.js, Express, TypeScript, PostgreSQL, Sequelize ORM
+- **Backend**: Node.js, Express, TypeScript, PostgreSQL, Drizzle ORM
 - **Frontend**: React, TypeScript
 - **Architecture**: MVC + Service Layer pattern
-- **Database**: PostgreSQL with Sequelize migrations
+- **Database**: PostgreSQL with Drizzle migrations
 
 ## Code Conventions
 
@@ -37,12 +37,15 @@ backend/src/
 ├── config/         # Configuration files (database, environment)
 ├── controllers/    # Request handlers (thin layer)
 ├── services/       # Business logic (fat layer)
-├── models/         # Sequelize models
+├── db/             # Drizzle schema, migrations, and database setup
+│   ├── schema.ts   # Drizzle schema definitions
+│   ├── index.ts    # Database connection
+│   └── migrate.ts  # Migration runner
 ├── routes/         # Express route definitions
 ├── middlewares/    # Custom middleware functions
 ├── utils/          # Utility functions and helpers
 ├── types/          # TypeScript type definitions
-├── tests/          # Test files (Jest)
+├── tests/          # Test files (Vitest)
 └── server.ts       # Application entry point
 ```
 
@@ -61,15 +64,16 @@ frontend/src/
 └── App.tsx           # Root component
 ```
 
-### Sequelize Best Practices
-- Use **Migrations** for all schema changes (never modify schema manually)
-- Keep models separate from migrations
-- Use **camelCase** for model field names in JavaScript
-- Use **snake_case** for database column names
-- Define scopes for common queries
-- Use transactions for multi-step operations
-- Implement proper indexes for performance
-- Add validations at model level
+### Drizzle ORM Best Practices
+- Define schema in `src/db/schema.ts` using Drizzle's type-safe schema builder
+- Use **camelCase** for TypeScript field names, **snake_case** for database columns
+- Use `pnpm db:generate` to generate migrations from schema changes
+- Use `pnpm db:push` for development (pushes schema directly)
+- Use `pnpm db:migrate` for production (runs generated migrations)
+- Use transactions for multi-step operations with `db.transaction()`
+- Define relations in schema for type-safe joins
+- Use Drizzle's query builder or raw SQL for complex queries
+- Implement proper indexes in schema definitions
 
 ### API Design Standards
 - Use RESTful conventions for endpoints
@@ -126,7 +130,7 @@ frontend/src/
 - Implement proper authentication (JWT)
 - Add rate limiting to prevent abuse
 - Validate and sanitize all user inputs
-- Use parameterized queries (Sequelize handles this)
+- Use parameterized queries (Drizzle handles this)
 - Implement CORS policies
 - Add helmet.js for security headers
 - Keep dependencies updated
@@ -226,7 +230,7 @@ dev/active/[task-name]/
 
 This project includes specialized Claude Skills for:
 1. **Backend API Development** - Express routes, controllers, services
-2. **Database Schema & Migrations** - Sequelize models and migrations
+2. **Database Schema & Migrations** - Drizzle schema and migrations
 3. **React Component Development** - React components and hooks
 4. **Code Quality & Testing** - Tests and linting
 5. **Git Workflow** - Commits and PRs

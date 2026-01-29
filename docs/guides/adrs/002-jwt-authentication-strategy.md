@@ -4,7 +4,7 @@
 Accepted
 
 ## Context
-The Rituality Platform needs a secure, scalable authentication system that supports multiple devices and token refresh.
+The Finishd Platform needs a secure, scalable authentication system that supports multiple devices and token refresh.
 
 ## Decision
 Implement **JWT (JSON Web Token)** based authentication:

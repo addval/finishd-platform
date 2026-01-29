@@ -39,7 +39,7 @@ export class UserController {
   getUserById = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { id } = req.params;
-      const user = await this.userService.getUserById(Number(id));
+      const user = await this.userService.getUserById(id);
 
       return successResponse(res, user);
     } catch (error) {
@@ -62,7 +62,7 @@ export class UserController {
   updateUser = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { id } = req.params;
-      const user = await this.userService.updateUser(Number(id), req.body);
+      const user = await this.userService.updateUser(id, req.body);
 
       return successResponse(res, user, 'User updated successfully');
     } catch (error) {
@@ -74,7 +74,7 @@ export class UserController {
   deleteUser = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { id } = req.params;
-      await this.userService.deleteUser(Number(id));
+      await this.userService.deleteUser(id);
 
       return res.status(204).send();
     } catch (error) {
@@ -89,7 +89,6 @@ export class UserController {
 ```typescript
 // controllers/base.controller.ts
 import { Request, Response, NextFunction } from 'express';
-import { Op } from 'sequelize';
 
 export interface PaginationOptions {
   page: number;
@@ -311,7 +310,7 @@ export class AuthController {
   };
 
   private sanitizeUser(user: any) {
-    const { password, ...sanitized } = user.toJSON();
+    const { password, passwordHash, ...sanitized } = user;
     return sanitized;
   }
 }
@@ -399,19 +398,19 @@ export class BatchController {
 Controllers should only handle HTTP concerns:
 
 ```typescript
-// ❌ BAD - Business logic in controller
+// BAD - Business logic in controller
 getUserById = async (req: Request, res: Response) => {
-  const user = await User.findByPk(req.params.id);
+  const user = await db.query.users.findFirst({ where: eq(users.id, req.params.id) });
   if (!user) return res.status(404).json({ error: 'Not found' });
   if (user.deletedAt) return res.status(404).json({ error: 'User deleted' });
   if (!user.verified) return res.status(403).json({ error: 'Not verified' });
   res.json(user);
 };
 
-// ✅ GOOD - Delegates to service
+// GOOD - Delegates to service
 getUserById = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const user = await this.userService.getUserById(Number(req.params.id));
+    const user = await this.userService.getUserById(req.params.id);
     return successResponse(res, user);
   } catch (error) {
     next(error);

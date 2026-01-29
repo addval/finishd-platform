@@ -1,8 +1,8 @@
-# Backend Authentication Flow - Rituality Platform
+# Backend Authentication Flow - Finishd Platform
 
 ## 📋 Overview
 
-This document provides a detailed explanation of the authentication system in the Rituality Platform, including all authentication flows, security measures, and implementation details.
+This document provides a detailed explanation of the authentication system in the Finishd Platform, including all authentication flows, security measures, and implementation details.
 
 **Last Updated**: January 12, 2026
 **Version**: 1.0.0
@@ -541,7 +541,7 @@ const isValid = await bcrypt.compare(submittedCode, storedHashedCode);
 
 **Example Template**:
 ```typescript
-Subject: Verify your email for Rituality Platform
+Subject: Verify your email for Finishd Platform
 
 Hello {{name}},
 
@@ -554,7 +554,7 @@ This code will expire in 15 minutes.
 If you didn't create an account, please ignore this email.
 
 Best regards,
-Rituality Platform Team
+Finishd Platform Team
 ```
 
 ---

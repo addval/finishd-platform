@@ -1,8 +1,8 @@
-# Frontend API Integration - Rituality Platform
+# Frontend API Integration - Finishd Platform
 
 ## 📋 Overview
 
-This document covers API integration patterns using Axios and React Query in the Rituality Platform frontend.
+This document covers API integration patterns using Axios and React Query in the Finishd Platform frontend.
 
 **Last Updated**: January 12, 2026
 **Version**: 1.0.0

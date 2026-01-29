@@ -56,7 +56,7 @@ export function PermissionSetupScreen() {
     {
       key: "contactsEnabled" as const,
       label: "Contacts access",
-      description: "Find and connect with friends who are already part of Rituality.",
+      description: "Find and connect with friends who are already part of Finishd.",
     },
     {
       key: "locationEnabled" as const,

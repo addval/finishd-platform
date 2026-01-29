@@ -17,7 +17,7 @@ interface PhoneVerificationScreenProps {
  *
  * Design specs:
  * - Close icon (X) top-left: 24px, black
- * - "RITUALITY" centered top: 24px, uppercase, bold
+ * - "Finishd" centered top: 24px, uppercase, bold
  * - Title: "Verify your phone number": 20px, bold, #333333
  * - Subtitle: 14px, #666666, 2 lines
  * - 6 OTP boxes: 48px × 48px, border 1px solid #E0E0E0, rounded 8px, 4px gap
@@ -108,7 +108,7 @@ export function PhoneVerificationScreen({
       {/* Brand Header - Centered Top */}
       <div className="text-center mb-8">
         <h1 className="text-xl font-bold uppercase tracking-wider" style={{ color: "#333333" }}>
-          RITUALITY
+          Finishd
         </h1>
       </div>
 

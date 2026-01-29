@@ -8,7 +8,7 @@ import { useNavigate } from "react-router-dom"
  * - Background: #F8F5F2 with scattered decorative diamonds
  * - Decorative elements: rotated squares (45deg), sizes 8-12px, varied colors
  * - Centered white card (620px max-width for wider look)
- * - "RITUALITY" in header: Medium weight (500), 24px, letter-spacing: 0.05em
+ * - "Finishd" in header: Medium weight (500), 24px, letter-spacing: 0.05em
  */
 export function WelcomeScreen() {
   const navigate = useNavigate()
@@ -207,7 +207,7 @@ export function WelcomeScreen() {
                 letterSpacing: "0.1em",
               }}
             >
-              RITUALITY
+              Finishd
             </h2>
           </div>
 

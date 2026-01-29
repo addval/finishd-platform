@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: staging
-      url: https://staging.rituality.com
+      url: https://staging.finishd.com
 
     steps:
       - name: Checkout code
@@ -33,7 +33,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: production
-      url: https://rituality.com
+      url: https://finishd.com
 
     steps:
       - name: Checkout code
