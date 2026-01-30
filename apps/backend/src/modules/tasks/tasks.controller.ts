@@ -3,8 +3,7 @@
  * HTTP handlers for tasks, milestones, and cost estimates
  */
 
-import type { Response } from "express"
-import type { AuthenticatedRequest } from "../auth/auth.middleware.js"
+import type { Request, Response } from "express"
 import {
   createTask,
   getProjectTasks,
@@ -35,7 +34,7 @@ import {
  * POST /api/v1/projects/:projectId/tasks
  * Create task for project
  */
-export async function createTaskHandler(req: AuthenticatedRequest, res: Response): Promise<void> {
+export async function createTaskHandler(req: Request, res: Response): Promise<void> {
   const userId = req.user!.id
   const projectId = req.params.projectId
   const { title, description, assignedTo, dueDate } = req.body
@@ -81,7 +80,7 @@ export async function createTaskHandler(req: AuthenticatedRequest, res: Response
  * GET /api/v1/projects/:projectId/tasks
  * Get tasks for project
  */
-export async function getTasksHandler(req: AuthenticatedRequest, res: Response): Promise<void> {
+export async function getTasksHandler(req: Request, res: Response): Promise<void> {
   const userId = req.user!.id
   const projectId = req.params.projectId
   const status = req.query.status as TaskStatus | undefined
@@ -110,7 +109,7 @@ export async function getTasksHandler(req: AuthenticatedRequest, res: Response):
  * PATCH /api/v1/tasks/:taskId
  * Update task details
  */
-export async function updateTaskHandler(req: AuthenticatedRequest, res: Response): Promise<void> {
+export async function updateTaskHandler(req: Request, res: Response): Promise<void> {
   const userId = req.user!.id
   const taskId = req.params.taskId
   const { title, description, assignedTo, dueDate } = req.body
@@ -146,7 +145,7 @@ export async function updateTaskHandler(req: AuthenticatedRequest, res: Response
  * Update task status
  */
 export async function updateTaskStatusHandler(
-  req: AuthenticatedRequest,
+  req: Request,
   res: Response,
 ): Promise<void> {
   const userId = req.user!.id
@@ -187,7 +186,7 @@ export async function updateTaskStatusHandler(
  * DELETE /api/v1/tasks/:taskId
  * Delete task
  */
-export async function deleteTaskHandler(req: AuthenticatedRequest, res: Response): Promise<void> {
+export async function deleteTaskHandler(req: Request, res: Response): Promise<void> {
   const userId = req.user!.id
   const taskId = req.params.taskId
 
@@ -220,7 +219,7 @@ export async function deleteTaskHandler(req: AuthenticatedRequest, res: Response
  * Create milestone for project
  */
 export async function createMilestoneHandler(
-  req: AuthenticatedRequest,
+  req: Request,
   res: Response,
 ): Promise<void> {
   const userId = req.user!.id
@@ -267,7 +266,7 @@ export async function createMilestoneHandler(
  * GET /api/v1/projects/:projectId/milestones
  * Get milestones for project
  */
-export async function getMilestonesHandler(req: AuthenticatedRequest, res: Response): Promise<void> {
+export async function getMilestonesHandler(req: Request, res: Response): Promise<void> {
   const userId = req.user!.id
   const projectId = req.params.projectId
 
@@ -296,7 +295,7 @@ export async function getMilestonesHandler(req: AuthenticatedRequest, res: Respo
  * Update milestone details
  */
 export async function updateMilestoneHandler(
-  req: AuthenticatedRequest,
+  req: Request,
   res: Response,
 ): Promise<void> {
   const userId = req.user!.id
@@ -333,7 +332,7 @@ export async function updateMilestoneHandler(
  * Update milestone status
  */
 export async function updateMilestoneStatusHandler(
-  req: AuthenticatedRequest,
+  req: Request,
   res: Response,
 ): Promise<void> {
   const userId = req.user!.id
@@ -375,7 +374,7 @@ export async function updateMilestoneStatusHandler(
  * Update milestone payment status (homeowner only)
  */
 export async function updateMilestonePaymentHandler(
-  req: AuthenticatedRequest,
+  req: Request,
   res: Response,
 ): Promise<void> {
   const userId = req.user!.id
@@ -417,7 +416,7 @@ export async function updateMilestonePaymentHandler(
  * Delete milestone
  */
 export async function deleteMilestoneHandler(
-  req: AuthenticatedRequest,
+  req: Request,
   res: Response,
 ): Promise<void> {
   const userId = req.user!.id
@@ -452,7 +451,7 @@ export async function deleteMilestoneHandler(
  * Create cost estimate
  */
 export async function createCostEstimateHandler(
-  req: AuthenticatedRequest,
+  req: Request,
   res: Response,
 ): Promise<void> {
   const userId = req.user!.id
@@ -511,7 +510,7 @@ export async function createCostEstimateHandler(
  * Get cost estimates for project with summary
  */
 export async function getCostEstimatesHandler(
-  req: AuthenticatedRequest,
+  req: Request,
   res: Response,
 ): Promise<void> {
   const userId = req.user!.id
@@ -545,7 +544,7 @@ export async function getCostEstimatesHandler(
  * Update cost estimate
  */
 export async function updateCostEstimateHandler(
-  req: AuthenticatedRequest,
+  req: Request,
   res: Response,
 ): Promise<void> {
   const userId = req.user!.id
@@ -581,7 +580,7 @@ export async function updateCostEstimateHandler(
  * Delete cost estimate
  */
 export async function deleteCostEstimateHandler(
-  req: AuthenticatedRequest,
+  req: Request,
   res: Response,
 ): Promise<void> {
   const userId = req.user!.id

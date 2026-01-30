@@ -29,7 +29,7 @@ export async function getMyProfileHandler(
   next: NextFunction,
 ): Promise<void> {
   try {
-    const userId = req.user?.userId
+    const userId = req.user?.id
 
     if (!userId) {
       res.status(401).json({
@@ -74,7 +74,7 @@ export async function createMyProfileHandler(
   next: NextFunction,
 ): Promise<void> {
   try {
-    const userId = req.user?.userId
+    const userId = req.user?.id
 
     if (!userId) {
       res.status(401).json({
@@ -137,7 +137,7 @@ export async function updateMyProfileHandler(
   next: NextFunction,
 ): Promise<void> {
   try {
-    const userId = req.user?.userId
+    const userId = req.user?.id
 
     if (!userId) {
       res.status(401).json({
@@ -194,7 +194,7 @@ export async function getPropertiesHandler(
   next: NextFunction,
 ): Promise<void> {
   try {
-    const userId = req.user?.userId
+    const userId = req.user?.id
 
     if (!userId) {
       res.status(401).json({
@@ -242,7 +242,7 @@ export async function getPropertyHandler(
   next: NextFunction,
 ): Promise<void> {
   try {
-    const userId = req.user?.userId
+    const userId = req.user?.id
     const { id: propertyId } = req.params
 
     if (!userId) {
@@ -300,7 +300,7 @@ export async function createPropertyHandler(
   next: NextFunction,
 ): Promise<void> {
   try {
-    const userId = req.user?.userId
+    const userId = req.user?.id
 
     if (!userId) {
       res.status(401).json({
@@ -376,7 +376,7 @@ export async function updatePropertyHandler(
   next: NextFunction,
 ): Promise<void> {
   try {
-    const userId = req.user?.userId
+    const userId = req.user?.id
     const { id: propertyId } = req.params
 
     if (!userId) {
@@ -453,7 +453,7 @@ export async function deletePropertyHandler(
   next: NextFunction,
 ): Promise<void> {
   try {
-    const userId = req.user?.userId
+    const userId = req.user?.id
     const { id: propertyId } = req.params
 
     if (!userId) {

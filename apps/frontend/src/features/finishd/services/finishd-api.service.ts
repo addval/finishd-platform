@@ -547,10 +547,13 @@ export interface Milestone {
   projectId: string
   title: string
   description?: string
-  amount: number
-  dueDate?: string
-  isPaid: boolean
-  paidAt?: string
+  paymentAmount: number | null
+  targetDate?: string | null
+  paymentStatus: "not_paid" | "paid"
+  paidAt?: string | null
+  status: "pending" | "completed"
+  completedAt?: string | null
+  orderIndex: number
   createdAt: string
 }
 
@@ -565,7 +568,7 @@ export async function getProjectMilestones(projectId: string): Promise<Milestone
 
 export async function createMilestone(
   projectId: string,
-  data: { title: string; description?: string; amount: number; dueDate?: string },
+  data: { title: string; description?: string; paymentAmount: number; targetDate?: string },
 ): Promise<{ success: boolean; milestone?: Milestone; error?: string }> {
   try {
     const response = await apiClient.post(`${API_BASE}/projects/${projectId}/milestones`, data)
@@ -599,7 +602,8 @@ export interface CostEstimate {
   projectId: string
   category: "design_fees" | "labor" | "materials" | "miscellaneous"
   description: string
-  amount: number
+  estimatedAmount: number
+  actualAmount: number | null
   createdAt: string
 }
 
@@ -614,7 +618,7 @@ export async function getProjectCosts(projectId: string): Promise<CostEstimate[]
 
 export async function createCostEstimate(
   projectId: string,
-  data: { category: CostEstimate["category"]; description: string; amount: number },
+  data: { category: CostEstimate["category"]; description: string; estimatedAmount: number },
 ): Promise<{ success: boolean; cost?: CostEstimate; error?: string }> {
   try {
     const response = await apiClient.post(`${API_BASE}/projects/${projectId}/costs`, data)

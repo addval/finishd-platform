@@ -561,10 +561,10 @@ function MilestonesTab({
   const [newDueDate, setNewDueDate] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const totalAmount = milestones.reduce((sum, m) => sum + m.amount, 0)
+  const totalAmount = milestones.reduce((sum, m) => sum + (m.paymentAmount ?? 0), 0)
   const totalPaid = milestones
-    .filter((m) => m.isPaid)
-    .reduce((sum, m) => sum + m.amount, 0)
+    .filter((m) => m.paymentStatus === "paid")
+    .reduce((sum, m) => sum + (m.paymentAmount ?? 0), 0)
 
   const handleCreateMilestone = async () => {
     if (!newTitle.trim() || !newAmount) return
@@ -572,8 +572,8 @@ function MilestonesTab({
     try {
       const result = await createMilestone(projectId, {
         title: newTitle.trim(),
-        amount: parseFloat(newAmount),
-        dueDate: newDueDate || undefined,
+        paymentAmount: parseFloat(newAmount),
+        targetDate: newDueDate || undefined,
       })
       if (result.success) {
         setNewTitle("")
@@ -722,7 +722,7 @@ function MilestonesTab({
                       <p className="font-semibold text-foreground">
                         {milestone.title}
                       </p>
-                      {milestone.isPaid ? (
+                      {milestone.paymentStatus === "paid" ? (
                         <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800">
                           Paid
                         </span>
@@ -733,16 +733,16 @@ function MilestonesTab({
                       )}
                     </div>
                     <p className="mt-1 text-lg font-bold text-foreground">
-                      {formatPrice(milestone.amount)}
+                      {formatPrice(milestone.paymentAmount ?? 0)}
                     </p>
                     <div className="mt-1 flex gap-4 text-sm text-muted-foreground">
-                      {milestone.dueDate && (
+                      {milestone.targetDate && (
                         <span className="flex items-center gap-1">
                           <Calendar className="h-3.5 w-3.5" />
-                          Due: {formatDate(milestone.dueDate)}
+                          Due: {formatDate(milestone.targetDate)}
                         </span>
                       )}
-                      {milestone.isPaid && milestone.paidAt && (
+                      {milestone.paymentStatus === "paid" && milestone.paidAt && (
                         <span className="flex items-center gap-1">
                           <CheckCircle2 className="h-3.5 w-3.5 text-green-600" />
                           Paid: {formatDate(milestone.paidAt)}
@@ -750,7 +750,7 @@ function MilestonesTab({
                       )}
                     </div>
                   </div>
-                  {!milestone.isPaid && (
+                  {milestone.paymentStatus !== "paid" && (
                     <Button
                       variant="primary"
                       size="sm"
@@ -789,11 +789,11 @@ function CostsTab({
   const [newAmount, setNewAmount] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const totalCost = costs.reduce((sum, c) => sum + c.amount, 0)
+  const totalCost = costs.reduce((sum, c) => sum + c.estimatedAmount, 0)
 
   const costsByCategory = COST_CATEGORIES.map((cat) => {
     const items = costs.filter((c) => c.category === cat.value)
-    const subtotal = items.reduce((sum, c) => sum + c.amount, 0)
+    const subtotal = items.reduce((sum, c) => sum + c.estimatedAmount, 0)
     return { ...cat, items, subtotal }
   }).filter((group) => group.items.length > 0)
 
@@ -804,7 +804,7 @@ function CostsTab({
       const result = await createCostEstimate(projectId, {
         category: newCategory,
         description: newDescription.trim(),
-        amount: parseFloat(newAmount),
+        estimatedAmount: parseFloat(newAmount),
       })
       if (result.success) {
         setNewDescription("")
@@ -954,7 +954,7 @@ function CostsTab({
                       </p>
                     </div>
                     <p className="font-medium text-foreground">
-                      {formatPrice(cost.amount)}
+                      {formatPrice(cost.estimatedAmount)}
                     </p>
                   </div>
                 ))}

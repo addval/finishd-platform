@@ -11,11 +11,22 @@ declare global {
   namespace Express {
     interface Request {
       user?: {
-        userId: string
+        id: string
         phone: string
         userType: "homeowner" | "designer" | "contractor" | null
       }
     }
+  }
+}
+
+/**
+ * Request type with authenticated user guaranteed
+ */
+export type AuthenticatedRequest = Request & {
+  user: {
+    id: string
+    phone: string
+    userType: "homeowner" | "designer" | "contractor" | null
   }
 }
 
@@ -93,7 +104,7 @@ export async function authMiddleware(
 
     // Attach user to request
     req.user = {
-      userId: user.id,
+      id: user.id,
       phone: user.phone,
       userType: user.userType,
     }
@@ -141,7 +152,7 @@ export async function optionalAuthMiddleware(
 
       if (user && user.isActive) {
         req.user = {
-          userId: user.id,
+          id: user.id,
           phone: user.phone,
           userType: user.userType,
         }

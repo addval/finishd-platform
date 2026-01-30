@@ -3,8 +3,7 @@
  * HTTP handlers for project endpoints
  */
 
-import type { Response } from "express"
-import type { AuthenticatedRequest } from "../auth/auth.middleware.js"
+import type { Request, Response } from "express"
 import {
   getProjectById,
   getHomeownerProjects,
@@ -22,7 +21,7 @@ import { getDesignerProfileByUserId } from "../designers/designers.service.js"
  * GET /api/v1/projects
  * List projects for current user (homeowner view)
  */
-export async function listProjectsHandler(req: AuthenticatedRequest, res: Response): Promise<void> {
+export async function listProjectsHandler(req: Request, res: Response): Promise<void> {
   const userId = req.user!.id
   const status = req.query.status as ProjectStatus | undefined
 
@@ -51,7 +50,7 @@ export async function listProjectsHandler(req: AuthenticatedRequest, res: Respon
  * List projects for designer (assigned projects)
  */
 export async function listDesignerProjectsHandler(
-  req: AuthenticatedRequest,
+  req: Request,
   res: Response,
 ): Promise<void> {
   const userId = req.user!.id
@@ -93,7 +92,7 @@ export async function listDesignerProjectsHandler(
  * GET /api/v1/projects/:id
  * Get single project by ID
  */
-export async function getProjectHandler(req: AuthenticatedRequest, res: Response): Promise<void> {
+export async function getProjectHandler(req: Request, res: Response): Promise<void> {
   const userId = req.user!.id
   const projectId = req.params.id
 
@@ -122,7 +121,7 @@ export async function getProjectHandler(req: AuthenticatedRequest, res: Response
  * POST /api/v1/projects
  * Create new project
  */
-export async function createProjectHandler(req: AuthenticatedRequest, res: Response): Promise<void> {
+export async function createProjectHandler(req: Request, res: Response): Promise<void> {
   const userId = req.user!.id
   const { title, scope, propertyId, scopeDetails, budgetMin, budgetMax, timelineWeeks, startTimeline } =
     req.body
@@ -180,7 +179,7 @@ export async function createProjectHandler(req: AuthenticatedRequest, res: Respo
  * PATCH /api/v1/projects/:id
  * Update project (draft only)
  */
-export async function updateProjectHandler(req: AuthenticatedRequest, res: Response): Promise<void> {
+export async function updateProjectHandler(req: Request, res: Response): Promise<void> {
   const userId = req.user!.id
   const projectId = req.params.id
   const { title, scope, propertyId, scopeDetails, budgetMin, budgetMax, timelineWeeks, startTimeline } =
@@ -231,7 +230,7 @@ export async function updateProjectHandler(req: AuthenticatedRequest, res: Respo
  * Mark project as completed
  */
 export async function completeProjectHandler(
-  req: AuthenticatedRequest,
+  req: Request,
   res: Response,
 ): Promise<void> {
   const userId = req.user!.id
@@ -261,7 +260,7 @@ export async function completeProjectHandler(
  * POST /api/v1/projects/:id/cancel
  * Cancel project
  */
-export async function cancelProjectHandler(req: AuthenticatedRequest, res: Response): Promise<void> {
+export async function cancelProjectHandler(req: Request, res: Response): Promise<void> {
   const userId = req.user!.id
   const projectId = req.params.id
   const { reason } = req.body
@@ -291,7 +290,7 @@ export async function cancelProjectHandler(req: AuthenticatedRequest, res: Respo
  * Get project activity log
  */
 export async function getProjectActivityHandler(
-  req: AuthenticatedRequest,
+  req: Request,
   res: Response,
 ): Promise<void> {
   const userId = req.user!.id

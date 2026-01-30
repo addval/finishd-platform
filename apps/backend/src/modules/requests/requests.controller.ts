@@ -3,8 +3,7 @@
  * HTTP handlers for project requests and proposals
  */
 
-import type { Response } from "express"
-import type { AuthenticatedRequest } from "../auth/auth.middleware.js"
+import type { Request, Response } from "express"
 import {
   sendRequest,
   getProjectRequests,
@@ -25,7 +24,7 @@ import {
  * POST /api/v1/requests
  * Send request to designer
  */
-export async function sendRequestHandler(req: AuthenticatedRequest, res: Response): Promise<void> {
+export async function sendRequestHandler(req: Request, res: Response): Promise<void> {
   const userId = req.user!.id
   const { projectId, designerId, message } = req.body
 
@@ -64,7 +63,7 @@ export async function sendRequestHandler(req: AuthenticatedRequest, res: Respons
  * Get all requests for a project (homeowner view)
  */
 export async function getProjectRequestsHandler(
-  req: AuthenticatedRequest,
+  req: Request,
   res: Response,
 ): Promise<void> {
   const userId = req.user!.id
@@ -95,7 +94,7 @@ export async function getProjectRequestsHandler(
  * Get all proposals for a project with designer info
  */
 export async function getProjectProposalsHandler(
-  req: AuthenticatedRequest,
+  req: Request,
   res: Response,
 ): Promise<void> {
   const userId = req.user!.id
@@ -126,7 +125,7 @@ export async function getProjectProposalsHandler(
  * Accept a proposal
  */
 export async function acceptProposalHandler(
-  req: AuthenticatedRequest,
+  req: Request,
   res: Response,
 ): Promise<void> {
   const userId = req.user!.id
@@ -157,7 +156,7 @@ export async function acceptProposalHandler(
  * Reject a proposal
  */
 export async function rejectProposalHandler(
-  req: AuthenticatedRequest,
+  req: Request,
   res: Response,
 ): Promise<void> {
   const userId = req.user!.id
@@ -193,7 +192,7 @@ export async function rejectProposalHandler(
  * Get requests received by designer
  */
 export async function getDesignerRequestsHandler(
-  req: AuthenticatedRequest,
+  req: Request,
   res: Response,
 ): Promise<void> {
   const userId = req.user!.id
@@ -229,7 +228,7 @@ export async function getDesignerRequestsHandler(
  * Get request details with project info (designer view)
  */
 export async function getRequestDetailsHandler(
-  req: AuthenticatedRequest,
+  req: Request,
   res: Response,
 ): Promise<void> {
   const userId = req.user!.id
@@ -265,7 +264,7 @@ export async function getRequestDetailsHandler(
  * Decline a request
  */
 export async function declineRequestHandler(
-  req: AuthenticatedRequest,
+  req: Request,
   res: Response,
 ): Promise<void> {
   const userId = req.user!.id
@@ -296,7 +295,7 @@ export async function declineRequestHandler(
  * Submit proposal for a request
  */
 export async function submitProposalHandler(
-  req: AuthenticatedRequest,
+  req: Request,
   res: Response,
 ): Promise<void> {
   const userId = req.user!.id

@@ -10,6 +10,7 @@
  * - 4 contractors (3 verified)
  * - Projects in all states
  * - Sample requests, proposals, tasks, milestones
+ * - Sample notifications for each user type
  */
 
 import dotenv from "dotenv"
@@ -40,6 +41,7 @@ const {
   tasks,
   milestones,
   costEstimates,
+  notifications,
 } = schema
 
 // ============================================================================
@@ -197,6 +199,7 @@ async function clearData() {
   console.log("🗑️  Clearing existing Finishd data...")
 
   // Delete in reverse order of dependencies
+  await db.delete(notifications)
   await db.delete(costEstimates)
   await db.delete(milestones)
   await db.delete(tasks)
@@ -493,6 +496,149 @@ async function seedProjectDetails(projectId: string, userId: string) {
   }
 }
 
+async function seedNotifications(
+  homeowners: Array<{ userId: string; profileId: string; city: string }>,
+  designers: Array<{ userId: string; profileId: string; verified: boolean }>,
+  contractors: Array<{ userId: string; profileId: string; verified: boolean }>,
+) {
+  console.log("🔔 Seeding notifications...")
+
+  let count = 0
+
+  // Notifications for first homeowner (Rajesh Kumar)
+  if (homeowners[0]) {
+    const homeownerNotifs = [
+      {
+        userId: homeowners[0].userId,
+        type: "proposal_received",
+        title: "New Proposal Received",
+        message: "Arjun Design Studio submitted a proposal for your Living Room Makeover project.",
+        isRead: false,
+        data: { projectTitle: "Living Room Makeover" },
+      },
+      {
+        userId: homeowners[0].userId,
+        type: "milestone_completed",
+        title: "Milestone Completed",
+        message: "Design Approval milestone has been marked as completed for your 3BHK Renovation.",
+        isRead: true,
+        data: { milestoneTitle: "Design Approval" },
+      },
+      {
+        userId: homeowners[0].userId,
+        type: "task_update",
+        title: "Task Status Updated",
+        message: "Electrical work has been moved to In Progress.",
+        isRead: true,
+        data: { taskTitle: "Electrical work", newStatus: "in_progress" },
+      },
+      {
+        userId: homeowners[0].userId,
+        type: "payment_reminder",
+        title: "Payment Reminder",
+        message: "Milestone '50% Work Completion' payment of ₹2,00,000 is pending.",
+        isRead: false,
+        data: { milestoneTitle: "50% Work Completion", amount: 200000 },
+      },
+    ]
+
+    for (const n of homeownerNotifs) {
+      await db.insert(notifications).values(n)
+      count++
+    }
+  }
+
+  // Notifications for second homeowner (Priya Sharma)
+  if (homeowners[1]) {
+    await db.insert(notifications).values({
+      userId: homeowners[1].userId,
+      type: "designer_verified",
+      title: "Designer Now Available",
+      message: "Fresh Start Interiors has been verified and is now available for projects.",
+      isRead: false,
+      data: { designerName: "Fresh Start Interiors" },
+    })
+    count++
+  }
+
+  // Notifications for first designer (Arjun Design Studio)
+  if (designers[0]) {
+    const designerNotifs = [
+      {
+        userId: designers[0].userId,
+        type: "new_request",
+        title: "New Project Request",
+        message: "Rajesh Kumar sent you a request for their Living Room Makeover project.",
+        isRead: false,
+        data: { projectTitle: "Living Room Makeover", homeownerName: "Rajesh Kumar" },
+      },
+      {
+        userId: designers[0].userId,
+        type: "proposal_accepted",
+        title: "Proposal Accepted",
+        message: "Your proposal for 3BHK Complete Renovation has been accepted!",
+        isRead: true,
+        data: { projectTitle: "3BHK Complete Renovation" },
+      },
+      {
+        userId: designers[0].userId,
+        type: "payment_received",
+        title: "Payment Received",
+        message: "Payment of ₹50,000 received for Design Approval milestone.",
+        isRead: true,
+        data: { milestoneTitle: "Design Approval", amount: 50000 },
+      },
+    ]
+
+    for (const n of designerNotifs) {
+      await db.insert(notifications).values(n)
+      count++
+    }
+  }
+
+  // Notifications for unverified designer (Fresh Start Interiors)
+  if (designers[4]) {
+    await db.insert(notifications).values({
+      userId: designers[4].userId,
+      type: "verification_pending",
+      title: "Profile Under Review",
+      message: "Your designer profile is being reviewed by the Finishd team. You'll be notified once verified.",
+      isRead: true,
+      data: {},
+    })
+    count++
+  }
+
+  // Notifications for first contractor (Sharma Electricals)
+  if (contractors[0]) {
+    const contractorNotifs = [
+      {
+        userId: contractors[0].userId,
+        type: "project_invitation",
+        title: "Project Invitation",
+        message: "You've been invited to join the 3BHK Complete Renovation project for electrical work.",
+        isRead: false,
+        data: { projectTitle: "3BHK Complete Renovation", trade: "electrician" },
+      },
+      {
+        userId: contractors[0].userId,
+        type: "task_assigned",
+        title: "New Task Assigned",
+        message: "You've been assigned the task 'Electrical work' in 3BHK Complete Renovation.",
+        isRead: true,
+        data: { taskTitle: "Electrical work", projectTitle: "3BHK Complete Renovation" },
+      },
+    ]
+
+    for (const n of contractorNotifs) {
+      await db.insert(notifications).values(n)
+      count++
+    }
+  }
+
+  console.log(`✅ Created ${count} notifications`)
+}
+
 // ============================================================================
 // MAIN
 // ============================================================================
@@ -507,6 +653,7 @@ async function main() {
     const designers = await seedDesigners()
     const contractors = await seedContractors()
     await seedProjects(homeowners, designers)
+    await seedNotifications(homeowners, designers, contractors)
 
     console.log("\n✨ Seed completed successfully!\n")
     console.log("Summary:")
@@ -514,6 +661,7 @@ async function main() {
     console.log(`  - ${designers.length} designers (${designers.filter((d) => d.verified).length} verified)`)
     console.log(`  - ${contractors.length} contractors (${contractors.filter((c) => c.verified).length} verified)`)
     console.log(`  - 10 projects in various states`)
+    console.log(`  - Sample notifications for testing`)
     console.log("\nTest accounts:")
     console.log("  - Homeowner: +91 9876543210 (use OTP: 123456)")
     console.log("  - Designer: +91 9876543220 (verified)")

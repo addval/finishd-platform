@@ -126,7 +126,7 @@ export async function setUserTypeHandler(
   next: NextFunction,
 ): Promise<void> {
   try {
-    const userId = req.user?.userId
+    const userId = req.user?.id
 
     if (!userId) {
       res.status(401).json({
@@ -235,7 +235,7 @@ export async function logoutHandler(
   next: NextFunction,
 ): Promise<void> {
   try {
-    const userId = req.user?.userId
+    const userId = req.user?.id
 
     if (!userId) {
       res.status(401).json({

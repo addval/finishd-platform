@@ -3,8 +3,7 @@
  * HTTP request handlers for user notifications
  */
 
-import type { Response } from "express"
-import type { AuthenticatedRequest } from "../auth/auth.middleware.js"
+import type { Request, Response } from "express"
 import {
   getNotifications,
   markNotificationRead,
@@ -16,7 +15,7 @@ import {
  * Get all notifications for the authenticated user
  */
 export async function getNotificationsHandler(
-  req: AuthenticatedRequest,
+  req: Request,
   res: Response,
 ): Promise<void> {
   try {
@@ -45,7 +44,7 @@ export async function getNotificationsHandler(
  * Mark a single notification as read
  */
 export async function markNotificationReadHandler(
-  req: AuthenticatedRequest,
+  req: Request,
   res: Response,
 ): Promise<void> {
   try {
@@ -86,7 +85,7 @@ export async function markNotificationReadHandler(
  * Mark all notifications as read for the authenticated user
  */
 export async function markAllReadHandler(
-  req: AuthenticatedRequest,
+  req: Request,
   res: Response,
 ): Promise<void> {
   try {

@@ -13,7 +13,7 @@ import { setUserType } from "../auth/auth.service.js"
  */
 export async function getMeHandler(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
-    const userId = req.user?.userId
+    const userId = req.user?.id
 
     if (!userId) {
       res.status(401).json({
@@ -68,7 +68,7 @@ export async function updateMeHandler(
   next: NextFunction,
 ): Promise<void> {
   try {
-    const userId = req.user?.userId
+    const userId = req.user?.id
 
     if (!userId) {
       res.status(401).json({
@@ -172,7 +172,7 @@ export async function deleteMeHandler(
   next: NextFunction,
 ): Promise<void> {
   try {
-    const userId = req.user?.userId
+    const userId = req.user?.id
 
     if (!userId) {
       res.status(401).json({
