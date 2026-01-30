@@ -29,6 +29,8 @@ import { searchRoutes } from "../modules/search/index.js"
 import { projectsRoutes } from "../modules/projects/index.js"
 import { requestsRoutes } from "../modules/requests/index.js"
 import { tasksRoutes } from "../modules/tasks/index.js"
+import { adminRoutes } from "../modules/admin/index.js"
+import { notificationsRoutes } from "../modules/notifications/index.js"
 
 const router = Router()
 
@@ -61,6 +63,12 @@ router.use("/api/v1/requests", requestsRoutes)
 
 // Tasks, milestones, costs routes
 router.use("/api/v1", tasksRoutes)
+
+// Admin routes
+router.use("/api/v1/admin", adminRoutes)
+
+// Notifications routes
+router.use("/api/v1/notifications", notificationsRoutes)
 
 // ============================================================================
 // LEGACY ROUTES (removed - migrated to Drizzle ORM)

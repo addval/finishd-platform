@@ -580,7 +580,9 @@ export async function markMilestonePaid(
   milestoneId: string,
 ): Promise<{ success: boolean; error?: string }> {
   try {
-    await apiClient.post(`${API_BASE}/milestones/${milestoneId}/mark-paid`)
+    await apiClient.post(`${API_BASE}/milestones/${milestoneId}/mark-paid`, {
+      paymentStatus: "paid",
+    })
     return { success: true }
   } catch (error: unknown) {
     const err = error as { response?: { data?: { message?: string } } }

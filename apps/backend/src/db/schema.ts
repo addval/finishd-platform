@@ -436,6 +436,30 @@ export const activityLogs = pgTable(
 )
 
 // ============================================================================
+// NOTIFICATIONS
+// ============================================================================
+
+export const notifications = pgTable(
+  "notifications",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    type: varchar("type", { length: 50 }).notNull(),
+    title: varchar("title", { length: 255 }).notNull(),
+    message: text("message").notNull(),
+    isRead: boolean("is_read").default(false).notNull(),
+    data: jsonb("data"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("notifications_user_id_idx").on(table.userId),
+    index("notifications_is_read_idx").on(table.userId, table.isRead),
+  ],
+)
+
+// ============================================================================
 // RELATIONS
 // ============================================================================
 

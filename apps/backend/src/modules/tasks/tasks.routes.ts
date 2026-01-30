@@ -66,6 +66,9 @@ router.patch("/milestones/:milestoneId/status", updateMilestoneStatusHandler)
 // PATCH /api/v1/milestones/:milestoneId/payment - Update payment status
 router.patch("/milestones/:milestoneId/payment", updateMilestonePaymentHandler)
 
+// POST /api/v1/milestones/:milestoneId/mark-paid - Mark milestone as paid (alias)
+router.post("/milestones/:milestoneId/mark-paid", updateMilestonePaymentHandler)
+
 // DELETE /api/v1/milestones/:milestoneId - Delete milestone
 router.delete("/milestones/:milestoneId", deleteMilestoneHandler)
 
